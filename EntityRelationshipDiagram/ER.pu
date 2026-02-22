@@ -48,7 +48,8 @@ entity books <<MVP>> MVP_COLOR {
   column(current_page): integer <<default: 0, not null>>
   column(deadline): date <<not null>>
   column(status): integer <<default: 0, not null>>
-  column(cover_image): string <<null>>
+  ' 書影は Active Storageで管理（has_one_attached :cover_image）
+  ' booksテーブルに cover_image カラムは持たない
   column(extension_count): integer <<default: 0, not null>>
   column(completed_at): datetime <<null>>
   column_release(is_public): boolean <<default: false, not null>>
