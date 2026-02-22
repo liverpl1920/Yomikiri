@@ -1,0 +1,153 @@
+@startuml Yomikiri_ER
+
+!define primary_key(x) <b><color:#b8861b><&key></color> x</b>
+!define foreign_key(x) <color:#aaaaaa><&key></color> x
+!define column(x) <color:#efefef><&media-record></color> x
+!define column_release(x) <color:#FFB347><&media-record></color> x <color:#FFB347><i>[本リリース]</i></color>
+!define table(x) entity x << (T, white) >>
+
+' 色定義
+!define MVP_COLOR #E8F5E9
+!define RELEASE_COLOR #FFF3E0
+
+' ============================================================
+' MVPリリース対象テーブル
+' ============================================================
+
+' ============================
+' Users（ユーザー）【MVP】
+' ============================
+entity users <<MVP>> MVP_COLOR {
+  primary_key(id): bigint
+  --
+  column(email): string <<unique, not null>>
+  column(encrypted_password): string <<not null>>
+  column(nickname): string <<null>>
+  --
+  ' [本リリース] Google Calendar OAuth用トークン
+  column_release(google_uid): string <<null>>
+  column_release(google_access_token): string <<null>>
+  column_release(google_refresh_token): string <<null>>
+  column_release(google_token_expires_at): datetime <<null>>
+  --
+  column(created_at): datetime
+  column(updated_at): datetime
+}
+
+' ============================
+' Books（積読本）【MVP】
+' ============================
+entity books <<MVP>> MVP_COLOR {
+  primary_key(id): bigint
+  foreign_key(user_id): bigint <<not null>>
+  --
+  column(title): string <<not null>>
+  column(author): string <<null>>
+  column(total_pages): integer <<not null>>
+  column(target_pages): integer <<not null>>
+  column(current_page): integer <<default: 0, not null>>
+  column(deadline): date <<not null>>
+  column(status): integer <<default: 0, not null>>
+  column(cover_image): string <<null>>
+  column(extension_count): integer <<default: 0, not null>>
+  column(completed_at): datetime <<null>>
+  column_release(is_public): boolean <<default: false, not null>>
+  --
+  column(created_at): datetime
+  column(updated_at): datetime
+}
+
+' ============================================================
+' 本リリース追加テーブル
+' ============================================================
+
+' ============================
+' Timeline Events（積読タイムライン）【本リリース】
+' ============================
+entity timeline_events <<Release>> RELEASE_COLOR {
+  primary_key(id): bigint
+  foreign_key(user_id): bigint <<not null>>
+  foreign_key(book_id): bigint <<not null>>
+  --
+  column(event_type): integer <<not null>>
+  column(progress_percentage): decimal
+  column(published_at): datetime <<not null>>
+  --
+  column(created_at): datetime
+  column(updated_at): datetime
+}
+
+' ============================
+' Reading Speed Records（読書スピード計測）【本リリース】
+' ============================
+entity reading_speed_records <<Release>> RELEASE_COLOR {
+  primary_key(id): bigint
+  foreign_key(user_id): bigint <<not null>>
+  foreign_key(book_id): bigint <<not null>>
+  --
+  column(pages_read): integer <<not null>>
+  column(time_spent_seconds): integer <<not null>>
+  column(recorded_at): datetime <<not null>>
+  --
+  column(created_at): datetime
+  column(updated_at): datetime
+}
+
+' ============================
+' Reading Logs（読書日ログ）【本リリース】
+' 連続読書日数を正確に集計するための専用テーブル
+' MVPは books.updated_at で代用（簡易実装）
+' ============================
+entity reading_logs <<Release>> RELEASE_COLOR {
+  primary_key(id): bigint
+  foreign_key(user_id): bigint <<not null>>
+  foreign_key(book_id): bigint <<not null>>
+  --
+  column(read_date): date <<not null>>
+  --
+  column(created_at): datetime
+  column(updated_at): datetime
+}
+
+' ============================
+' Reading Preferences（読書設定）【本リリース】
+' ============================
+entity reading_preferences <<Release>> RELEASE_COLOR {
+  primary_key(id): bigint
+  foreign_key(user_id): bigint <<unique, not null>>
+  --
+  ' ※ 意図的な非正規化: 実装コスト優先でカンマ区切り文字列で保持
+  ' 　 正規化する場合は reading_preference_days(reading_preference_id, day_of_week) に分離
+  column(days): string <<null>>
+  column(frequency): integer <<null>>
+  column(preferred_time_start): time <<null>>
+  column(preferred_time_end): time <<null>>
+  --
+  column(created_at): datetime
+  column(updated_at): datetime
+}
+
+' ============================================================
+' Legend
+' ============================================================
+legend right
+  |= Color |= Release Phase |
+  | <#E8F5E9> | MVP |
+  | <#FFF3E0> | Full Release |
+  | <#FFB347> | Full Release (column only) |
+endlegend
+
+' ============================
+' リレーションシップ
+' ============================
+users ||--o{ books : "has"
+users ||--o| reading_preferences : "has"
+users ||--o{ timeline_events : "has"
+users ||--o{ reading_speed_records : "has"
+users ||--o{ reading_logs : "has"
+
+books ||--o{ timeline_events : "has"
+books ||--o{ reading_speed_records : "has"
+books ||--o{ reading_logs : "has"
+
+@enduml

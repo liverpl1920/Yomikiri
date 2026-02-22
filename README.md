@@ -33,6 +33,9 @@
 ### 画面遷移図
 Figma：https://rinse-grasp-79348631.figma.site/
 
+### ER図
+[ER図](EntityRelationshipDiagram/ER.pu)
+
 ---
 
 ## このサービスへの思い・作りたい理由
