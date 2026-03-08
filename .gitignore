@@ -1,0 +1,39 @@
+# 機密情報 ⚠️ 絶対にコミットしないこと
+/config/master.key
+/config/credentials/*.key
+
+# Rails デフォルト除外
+/.bundle
+/log/*
+/tmp/*
+!/log/.keep
+!/tmp/.keep
+
+# テスト・カバレッジ
+/coverage
+/tmp/test-results
+
+# アップロードファイル
+/storage/*
+!/storage/.keep
+/public/assets
+
+# ノード
+/node_modules
+/yarn-error.log
+
+# 環境変数
+.env
+.env.*
+!.env.example
+
+# OS
+.DS_Store
+Thumbs.db
+
+# エディタ
+.vscode/*
+!.vscode/extensions.json
+.idea/
+*.swp
+*.swo
