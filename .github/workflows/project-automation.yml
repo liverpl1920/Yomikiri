@@ -24,7 +24,7 @@ jobs:
     if: github.event_name == 'pull_request' && github.event.action == 'opened'
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Parse linked issue number
         id: parse
         run: |
