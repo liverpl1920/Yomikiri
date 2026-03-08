@@ -24,7 +24,7 @@ jobs:
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1
         with:
-          ruby-version-file: .ruby-version
+          ruby-version: .ruby-version
           bundler-cache: true
 
       - name: Run RuboCop
@@ -43,7 +43,7 @@ jobs:
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1
         with:
-          ruby-version-file: .ruby-version
+          ruby-version: .ruby-version
           bundler-cache: true
 
       - name: Run Brakeman
@@ -62,7 +62,7 @@ jobs:
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1
         with:
-          ruby-version-file: .ruby-version
+          ruby-version: .ruby-version
           bundler-cache: true
 
       - name: Update advisory DB
@@ -98,6 +98,7 @@ jobs:
       DB_HOST: localhost
       DB_USERNAME: postgres
       DB_PASSWORD: postgres
+      RAILS_MASTER_KEY: ${{ secrets.RAILS_MASTER_KEY }}
 
     steps:
       - uses: actions/checkout@v4
@@ -105,11 +106,13 @@ jobs:
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1
         with:
-          ruby-version-file: .ruby-version
+          ruby-version: .ruby-version
           bundler-cache: true
 
       - name: Set up test database
-        run: bundle exec rails db:schema:load
+        run: |
+          bundle exec rails db:create
+          bundle exec rails db:migrate
 
       - name: Run RSpec
         run: |
