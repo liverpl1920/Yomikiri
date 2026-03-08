@@ -1,0 +1,85 @@
+<% content_for :title, "Yomikiri | 積読を消化する技術" %>
+
+<%# ヘッダー %>
+<header class="top-header">
+  <div class="container top-header__inner">
+    <a href="/" class="top-header__logo">Yomikiri</a>
+    <nav class="top-header__nav">
+      <a href="#" class="btn btn--outline">ログイン</a>
+      <a href="#" class="btn btn--primary btn--lg">無料で始める</a>
+    </nav>
+  </div>
+</header>
+
+<%# ヒーローセクション %>
+<section class="top-hero">
+  <div class="container">
+    <span class="top-hero__eyebrow">積読を、行動に変える</span>
+    <h1 class="top-hero__headline">
+      積読を<span class="top-hero__headline-accent">消化する</span>技術
+    </h1>
+    <p class="top-hero__lead">
+      本に「賞味期限」を設定し、今日読むべきページ数を自動で計算。<br>
+      あの「いつか読もう」を今日のタスクに変えます。
+    </p>
+    <div class="top-hero__cta">
+      <a href="#" class="btn btn--primary btn--lg">無料で始める</a>
+      <a href="#" class="btn btn--outline btn--lg">ログイン</a>
+    </div>
+  </div>
+</section>
+
+<%# 特徴セクション %>
+<section class="top-features">
+  <div class="container">
+    <h2 class="top-features__title">Yomikiri の3つの特徴</h2>
+    <div class="top-features__grid">
+      <article class="top-feature-card">
+        <div class="top-feature-card__icon">⏰</div>
+        <h3 class="top-feature-card__title">賞味期限の設定</h3>
+        <p class="top-feature-card__description">
+          本に読了期限を設定。期限が迫るほど書影が色褪せ、
+          視覚的に「読まなきゃ」と伝えます。
+        </p>
+      </article>
+      <article class="top-feature-card">
+        <div class="top-feature-card__icon">📋</div>
+        <h3 class="top-feature-card__title">今日のノルマを自動計算</h3>
+        <p class="top-feature-card__description">
+          残ページ・残日数から1日あたりの必要ページ数を自動算出。
+          「今日は何ページ読めばいいか」が一目でわかります。
+        </p>
+      </article>
+      <article class="top-feature-card">
+        <div class="top-feature-card__icon">📅</div>
+        <h3 class="top-feature-card__title">Googleカレンダー連携</h3>
+        <p class="top-feature-card__description">
+          ワンクリックで読書予定をGoogleカレンダーに追加。
+          読む時間を"予定"として先に押さえます。
+        </p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<%# CTAセクション %>
+<section class="top-cta">
+  <div class="container">
+    <h2 class="top-cta__title">今日から、積読を消化しよう</h2>
+    <p class="top-cta__description">
+      登録無料。まずは気になっている本を1冊登録してみてください。
+    </p>
+    <div class="top-cta__actions">
+      <a href="#" class="btn btn--primary btn--lg">無料で始める</a>
+      <a href="#" class="btn btn--outline btn--lg">ログインはこちら</a>
+    </div>
+  </div>
+</section>
+
+<%# フッター %>
+<footer class="top-footer">
+  <div class="container top-footer__inner">
+    <span class="top-footer__logo">Yomikiri</span>
+    <p class="top-footer__copy">&copy; <%= Date.today.year %> Yomikiri. All rights reserved.</p>
+  </div>
+</footer>
