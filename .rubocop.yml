@@ -1,0 +1,18 @@
+# Omakase Ruby styling for Rails
+inherit_gem: { rubocop-rails-omakase: rubocop.yml }
+
+AllCops:
+  NewCops: enable
+  Exclude:
+    - "db/schema.rb"
+    - "db/migrate/**/*"
+    - "bin/**/*"
+    - "node_modules/**/*"
+    - "vendor/**/*"
+    - ".steering/**/*"
+    - "scrren_diagram/**/*"
+    - "EntityRelationshipDiagram/**/*"
+
+# Overwrite or add rules to create your own house style
+Rails/FilePath:
+  Enabled: false
