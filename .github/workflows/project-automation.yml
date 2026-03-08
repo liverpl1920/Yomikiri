@@ -34,7 +34,7 @@ jobs:
 
       - name: Move issue to In Progress
         if: steps.parse.outputs.issue_number != ''
-        uses: actions/github-script@v7
+        uses: actions/github-script@v8
         with:
           github-token: ${{ secrets.PROJECT_TOKEN }}
           script: |
