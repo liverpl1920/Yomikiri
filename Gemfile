@@ -29,7 +29,7 @@ end
 group :test do
   gem "capybara"
   gem "selenium-webdriver"
-  gem "shoulda-matchers", "~> 5.0"
+  gem "shoulda-matchers", "~> 7.0"
   gem "rspec_junit_formatter"
   gem "simplecov", require: false
   gem "bundler-audit", require: false
