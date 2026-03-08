@@ -1,0 +1,27 @@
+default: &default
+  adapter: postgresql
+  encoding: unicode
+  pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
+
+development:
+  <<: *default
+  database: yomikiri_development
+  host: <%= ENV.fetch("DB_HOST", "localhost") %>
+  username: <%= ENV.fetch("DB_USERNAME", "postgres") %>
+  password: <%= ENV.fetch("DB_PASSWORD", "") %>
+
+test:
+  <<: *default
+  database: yomikiri_test
+  host: <%= ENV.fetch("DB_HOST", "localhost") %>
+  username: <%= ENV.fetch("DB_USERNAME", "postgres") %>
+  password: <%= ENV.fetch("DB_PASSWORD", "") %>
+
+production:
+  <<: *default
+  url: <%= ENV["DATABASE_URL"] %>
+production:
+  <<: *default
+  database: yomikiri_production
+  username: yomikiri
+  password: <%= ENV["YOMIKIRI_DATABASE_PASSWORD"] %>
