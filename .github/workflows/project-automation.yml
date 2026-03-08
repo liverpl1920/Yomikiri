@@ -13,7 +13,7 @@ jobs:
     if: github.event.action == 'opened' || github.event.action == 'reopened'
 
     steps:
-      - uses: actions/add-to-project@v0.6.1
+      - uses: actions/add-to-project@v1.0.2
         with:
           project-url: https://github.com/users/liverpl1920/projects/2
           github-token: ${{ secrets.PROJECT_TOKEN }}
