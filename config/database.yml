@@ -20,8 +20,3 @@ test:
 production:
   <<: *default
   url: <%= ENV["DATABASE_URL"] %>
-production:
-  <<: *default
-  database: yomikiri_production
-  username: yomikiri
-  password: <%= ENV["YOMIKIRI_DATABASE_PASSWORD"] %>

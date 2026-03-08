@@ -1,0 +1,91 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [main]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  # ─────────────────────────────────────────
+  # ① 静的解析・セキュリティスキャン (RuboCop / Brakeman / bundler-audit)
+  # ─────────────────────────────────────────
+  lint-security:
+    name: RuboCop & Brakeman & bundler-audit
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Ruby をセットアップ
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: .ruby-version
+          bundler-cache: true
+
+      - name: RuboCop を実行
+        run: bundle exec rubocop --format github
+
+      - name: Brakeman を実行
+        run: bundle exec brakeman --no-pager --format github
+
+      - name: bundler-audit を実行（gem 脆弱性スキャン）
+        run: bundle exec bundler-audit check --update
+
+  # ─────────────────────────────────────────
+  # ② 自動テスト (RSpec)
+  # ─────────────────────────────────────────
+  test:
+    name: RSpec
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: yomikiri_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      RAILS_ENV: test
+      DATABASE_URL: postgres://postgres:postgres@localhost:5432/yomikiri_test
+      RAILS_MASTER_KEY: ${{ secrets.RAILS_MASTER_KEY }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Ruby をセットアップ
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: .ruby-version
+          bundler-cache: true
+
+      - name: DB セットアップ
+        run: |
+          bundle exec rails db:create
+          bundle exec rails db:schema:load
+
+      - name: RSpec を実行
+        run: bundle exec rspec --format progress --format RspecJunitFormatter --out tmp/rspec_results.xml
+
+      - name: テスト結果をアップロード
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: rspec-results
+          path: tmp/rspec_results.xml

@@ -1,0 +1,43 @@
+name: Project Automation
+
+on:
+  issues:
+    types: [opened, reopened, closed]
+  pull_request:
+    types: [opened, reopened, closed, merged]
+
+jobs:
+  add_to_project:
+    name: Add to GitHub Project
+    runs-on: ubuntu-latest
+    if: github.event.action == 'opened' || github.event.action == 'reopened'
+
+    steps:
+      - uses: actions/add-to-project@v0.6.1
+        with:
+          project-url: https://github.com/users/liverpl1920/projects/2
+          github-token: ${{ secrets.PROJECT_TOKEN }}
+
+  move_in_progress:
+    name: Move to In Progress on PR open
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request' && github.event.action == 'opened'
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: Parse linked issue number
+        id: parse
+        run: |
+          BODY="${{ github.event.pull_request.body }}"
+          ISSUE=$(echo "$BODY" | grep -oP '(?<=Closes #)\d+' | head -1)
+          echo "issue_number=$ISSUE" >> $GITHUB_OUTPUT
+
+      - name: Move issue to In Progress
+        if: steps.parse.outputs.issue_number != ''
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.PROJECT_TOKEN }}
+          script: |
+            console.log('Linked issue: #${{ steps.parse.outputs.issue_number }}');
+            // Project field updates require GraphQL API — manual setup recommended
+            // See: https://docs.github.com/en/issues/planning-and-tracking-with-projects
