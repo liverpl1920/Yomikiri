@@ -78,7 +78,7 @@ jobs:
       - name: DB セットアップ
         run: |
           bundle exec rails db:create
-          bundle exec rails db:schema:load
+          bundle exec rails db:migrate
 
       - name: RSpec を実行
         run: bundle exec rspec --format progress --format RspecJunitFormatter --out tmp/rspec_results.xml
