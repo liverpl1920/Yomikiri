@@ -1,0 +1,24 @@
+services:
+  - type: web
+    name: yomikiri
+    runtime: ruby
+    region: oregon
+    plan: free
+    buildCommand: |
+      bundle install &&
+      bundle exec rails assets:precompile &&
+      bundle exec rails assets:clean
+    startCommand: bundle exec puma -C config/puma.rb
+    preDeployCommand: bundle exec rails db:migrate
+    healthCheckPath: /up
+    envVars:
+      - key: RAILS_ENV
+        value: production
+      - key: RAILS_LOG_TO_STDOUT
+        value: "true"
+      - key: RAILS_SERVE_STATIC_FILES
+        value: "true"
+      - key: RAILS_MASTER_KEY
+        sync: false
+      - key: DATABASE_URL
+        sync: false

@@ -318,3 +318,68 @@ GitHub Actions（cron）でrake taskを実行し、毎日決まった時間に�
 | OGP画像生成 | Cloudinary |
 | ジョブキュー | solid_queue |
 | カレンダー空き時間解析 | Google Calendar freebusy API |
+---
+
+## デプロイ手順（Render + Neon）
+
+### 必要な環境変数
+
+Renderダッシュボードで以下の環境変数を設定してください。
+
+| 環境変数 | 説明 | 取得方法 |
+|----------|------|---------|
+| `DATABASE_URL` | NeonのPostgreSQL接続文字列 | Neonダッシュボード → Connection Details → Connection String（末尾に `?sslmode=require` を付与） |
+| `RAILS_MASTER_KEY` | Railsのマスターキー | `config/master.key` の内容（本番用は別途生成推奨） |
+
+### セットアップ手順
+
+#### 1. Neonでデータベースを作成する
+
+1. [Neon](https://neon.tech) にサインアップ・ログイン
+2. 新規プロジェクトを作成（例: `yomikiri`）
+3. **Connection Details** から接続文字列を取得する
+   ```
+   postgres://[user]:[password]@[host]/[dbname]?sslmode=require
+   ```
+4. 接続文字列をメモしておく（後でRenderに設定する）
+
+#### 2. Renderでサービスを作成する
+
+1. [Render](https://render.com) にサインアップ・ログイン
+2. **New > Web Service** を選択
+3. GitHubリポジトリ（`liverpl1920/Yomikiri`）を選択
+4. 設定は `render.yaml` から自動検出される（**Blueprint** としてデプロイ可能）
+5. または手動設定：
+   - **Runtime**: Ruby
+   - **Build Command**: `bundle install && bundle exec rails assets:precompile && bundle exec rails assets:clean`
+   - **Start Command**: `bundle exec puma -C config/puma.rb`
+   - **Pre-Deploy Command**: `bundle exec rails db:migrate`
+   - **Health Check Path**: `/up`
+
+#### 3. 環境変数を設定する
+
+Renderのサービスダッシュボード → **Environment** タブで以下を設定：
+
+| キー | 値 |
+|------|----|
+| `DATABASE_URL` | Neonの接続文字列（`?sslmode=require` 付き） |
+| `RAILS_MASTER_KEY` | `config/master.key` の内容 |
+| `RAILS_ENV` | `production` |
+| `RAILS_LOG_TO_STDOUT` | `true` |
+| `RAILS_SERVE_STATIC_FILES` | `true` |
+
+#### 4. 初回デプロイを実行する
+
+1. **Manual Deploy** → **Deploy latest commit** を実行
+2. デプロイログで以下を確認：
+   - `bundle install` が成功する
+   - `rails assets:precompile` が成功する
+   - `rails db:migrate` が成功する（Pre-Deploy Command）
+   - Pumaが起動する
+3. Renderが発行したURL（例: `https://yomikiri.onrender.com`）にアクセスしてTOPページが表示されることを確認する
+
+### 注意事項
+
+- **Free Planの制限**: Renderの無料プランではサービスが15分間アクセスがないとスリープします。最初のリクエストに数十秒かかる場合があります
+- **Neonの無料枠**: ストレージ上限に注意してください（無料枠: 0.5GB）
+- **HTTPS**: Renderは自動でSSL証明書を発行します（`config.force_ssl = true` に対応済み）
