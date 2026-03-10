@@ -44,24 +44,32 @@
 
 ## フェーズ5: コミット・Issue更新
 
-- [ ] 変更をコミットする（Issue #7 対応）
-- [ ] GitHub にプッシュする
-- [ ] Issue #7 を In Progress に移動する
+- [x] 変更をコミットする（Issue #7 対応）
+- [x] GitHub にプッシュする
+- [x] Issue #7 を In Progress に移動する
 
 ---
 
 ## 実装後の振り返り
 
 ### 実装完了日
-{YYYY-MM-DD}
+2026-03-11
 
 ### 計画と実績の差分
 
 **計画と異なった点**:
-- {記入予定}
+- `render.yaml` は既存ファイルとして存在したが、未コミット状態だった。今回のISSUEで初めてコミット対象とした
+- `DATABASE_URL` の `fromDatabase` 参照は、Neon（外部DB）方針に反していたため修正が必要だった（既存ファイルのバグ修正として対応）
+- 本番環境設定ファイル（database.yml, puma.rb, production.rb）はすでに適切に設定されていたため、修正不要だった
 
 ### 学んだこと
-- {記入予定}
+- Renderの `render.yaml` で `fromDatabase` を使うのはRender管理の内部DBを使う場合のみ。Neon等の外部DBは `sync: false` で手動設定する
+- Render Free Planではサービスがスリープする（15分間アクセスなし）ため、初回アクセスに時間がかかる点を README に明記することが重要
+- デプロイ設定ファイルは実際の動作確認（Renderへの実際のデプロイ）が完了条件のため、インフラ側での手動操作が別途必要
 
 ### 次回への改善提案
-- {記入予定}
+- Renderへの実際のデプロイ実行（NeonのDATABASE_URL設定、RAILS_MASTER_KEY設定）は手動作業のため、本ISSUEクローズ前にRenderダッシュボードでの確認が必要
+- `render.yaml` の Blueprint機能を活用して、Renderダッシュボードからの自動セットアップを試すとよい
+
+### PRリンク
+https://github.com/liverpl1920/Yomikiri/pull/57
