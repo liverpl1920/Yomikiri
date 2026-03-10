@@ -335,7 +335,17 @@ APIキー等はGitHub Secretsで管理。定期処理はJST基準（GitHub Actio
 - 各Issue完了時には必ずGitHubにプッシュする
 - コミットメッセージには対応するIssue番号を含める（例: `#123 ユーザープロフィール編集機能を実装`）
 - 複数のIssueにまたがる変更は避け、Issue単位で作業を完結させる
-https://github.com/users/liverpl1920/projects/2/views/1
+
+**GitHub Projectのステータス管理:**
+
+- **実装着手前**: 対象IssueをProjectボード（https://github.com/users/liverpl1920/projects/2/views/1）の **"In Progress"** に移動する
+- **実装完了後**: PRマージ後に対象Issueを **"Done"** に移動する
+- ステータス変更は `gh` CLIで行う:
+  ```bash
+  # 例: Issue #42 を "In Progress" に移動
+  gh issue edit 42 --add-label "in-progress"
+  ```
+  > **Note**: ProjectのステータスフィールドはGraphQL APIが必要なため、CLIから直接変更できない場合はブラウザで手動更新すること
 
 ## プロンプトファイル一覧 (`.github/prompts/`)
 
