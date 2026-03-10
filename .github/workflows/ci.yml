@@ -1,82 +1,50 @@
 name: CI
 
 on:
-  push:
-    branches: ["**"]
   pull_request:
-    branches: [main, develop]
+    branches: [main]
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
+  group: ci-${{ github.ref }}
   cancel-in-progress: true
 
+permissions:
+  contents: read
+
 jobs:
-  # --------------------------------------------------
-  # ジョブ1: RuboCop
-  # --------------------------------------------------
-  rubocop:
-    name: RuboCop
+  # ─────────────────────────────────────────
+  # ① 静的解析・セキュリティスキャン (RuboCop / Brakeman / bundler-audit)
+  # ─────────────────────────────────────────
+  lint-security:
+    name: RuboCop & Brakeman & bundler-audit
     runs-on: ubuntu-latest
+    timeout-minutes: 10
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
-      - name: Set up Ruby
+      - name: Ruby をセットアップ
         uses: ruby/setup-ruby@v1
         with:
           ruby-version: .ruby-version
           bundler-cache: true
 
-      - name: Run RuboCop
-        run: bundle exec rubocop --parallel
+      - name: RuboCop を実行
+        run: bundle exec rubocop --format github
 
-  # --------------------------------------------------
-  # ジョブ2: Brakeman
-  # --------------------------------------------------
-  brakeman:
-    name: Brakeman
-    runs-on: ubuntu-latest
+      - name: Brakeman を実行
+        run: bundle exec brakeman --no-pager --format github
 
-    steps:
-      - uses: actions/checkout@v4
+      - name: bundler-audit を実行（gem 脆弱性スキャン）
+        run: bundle exec bundler-audit check --update
 
-      - name: Set up Ruby
-        uses: ruby/setup-ruby@v1
-        with:
-          ruby-version: .ruby-version
-          bundler-cache: true
-
-      - name: Run Brakeman
-        run: bundle exec brakeman --no-pager
-
-  # --------------------------------------------------
-  # ジョブ3: bundler-audit
-  # --------------------------------------------------
-  bundler_audit:
-    name: bundler-audit
-    runs-on: ubuntu-latest
-
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Set up Ruby
-        uses: ruby/setup-ruby@v1
-        with:
-          ruby-version: .ruby-version
-          bundler-cache: true
-
-      - name: Update advisory DB
-        run: bundle exec bundler-audit update
-
-      - name: Run bundler-audit
-        run: bundle exec bundler-audit check
-
-  # --------------------------------------------------
-  # ジョブ4: RSpec
-  # --------------------------------------------------
-  rspec:
+  # ─────────────────────────────────────────
+  # ② 自動テスト (RSpec)
+  # ─────────────────────────────────────────
+  test:
     name: RSpec
     runs-on: ubuntu-latest
+    timeout-minutes: 15
 
     services:
       postgres:
@@ -85,52 +53,45 @@ jobs:
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: postgres
           POSTGRES_DB: yomikiri_test
+        ports:
+          - 5432:5432
         options: >-
           --health-cmd pg_isready
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
-        ports:
-          - 5432:5432
 
     env:
       RAILS_ENV: test
-      DB_HOST: localhost
-      DB_USERNAME: postgres
-      DB_PASSWORD: postgres
+      DATABASE_URL: postgres://postgres:postgres@localhost:5432/yomikiri_test
       RAILS_MASTER_KEY: ${{ secrets.RAILS_MASTER_KEY }}
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
-      - name: Set up Ruby
+      - name: Ruby をセットアップ
         uses: ruby/setup-ruby@v1
         with:
           ruby-version: .ruby-version
           bundler-cache: true
 
-      - name: Set up test database
+      - name: DB セットアップ
         run: |
           bundle exec rails db:create
           bundle exec rails db:migrate
 
-      - name: Run RSpec
-        run: |
-          bundle exec rspec \
-            --format progress \
-            --format RspecJunitFormatter \
-            --out tmp/test-results/rspec.xml
+      - name: RSpec を実行
+        run: bundle exec rspec --format progress --format RspecJunitFormatter --out tmp/rspec_results.xml
 
-      - name: Upload test results
-        uses: actions/upload-artifact@v4
+      - name: テスト結果をアップロード
+        uses: actions/upload-artifact@v7
         if: always()
         with:
           name: rspec-results
-          path: tmp/test-results/rspec.xml
-          retention-days: 7
+          path: tmp/rspec_results.xml
 
-      - name: Upload coverage report
-        uses: actions/upload-artifact@v4
+      - name: カバレッジレポートをアップロード
+        uses: actions/upload-artifact@v7
         if: always()
         with:
           name: coverage-report
