@@ -6,7 +6,7 @@ services:
     plan: free
     buildCommand: |
       bundle install &&
-      SECRET_KEY_BASE_DUMMY=1 bundle exec rails assets:precompile &&
+      RAILS_MASTER_KEY=00000000000000000000000000000000 SECRET_KEY_BASE_DUMMY=1 bundle exec rails assets:precompile &&
       bundle exec rails assets:clean
     startCommand: bundle exec rails db:migrate && bundle exec puma -C config/puma.rb
     healthCheckPath: /up
