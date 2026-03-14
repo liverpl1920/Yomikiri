@@ -7,7 +7,8 @@ services:
     buildCommand: |
       bundle install &&
       unset RAILS_MASTER_KEY &&
-      SECRET_KEY_BASE_DUMMY=1 bundle exec rails assets:precompile &&
+      export SECRET_KEY_BASE_DUMMY=1 &&
+      bundle exec rails assets:precompile &&
       bundle exec rails assets:clean
     startCommand: bundle exec rails db:migrate && bundle exec puma -C config/puma.rb
     healthCheckPath: /up
