@@ -15,8 +15,17 @@
   </head>
 
   <body>
+    <%= render 'shared/header' %>
+    <%# フラッシュメッセージ %>
+    <% if notice %>
+      <div class="flash flash--notice" role="alert"><%= notice %></div>
+    <% end %>
+    <% if alert %>
+      <div class="flash flash--alert" role="alert"><%= alert %></div>
+    <% end %>
     <main>
       <%= yield %>
     </main>
+    <%= render 'shared/footer' %>
   </body>
 </html>

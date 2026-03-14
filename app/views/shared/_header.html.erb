@@ -1,0 +1,48 @@
+<header class="site-header">
+  <div class="container site-header__inner">
+    <%= link_to 'Yomikiri', root_path, class: 'site-header__logo' %>
+
+    <% if user_signed_in? %>
+      <%# ログイン済みヘッダー %>
+      <nav class="site-header__nav" aria-label="ユーザーメニュー">
+        <div
+          class="dropdown"
+          data-controller="dropdown"
+          data-action="click@window->dropdown#closeOnOutsideClick"
+        >
+          <button
+            class="dropdown__trigger"
+            data-action="dropdown#toggle"
+            aria-haspopup="true"
+            aria-expanded="false"
+            aria-label="メニューを開く"
+          >
+            <span class="dropdown__avatar" aria-hidden="true">
+              <%= current_user.nickname.presence&.first || current_user.email.first %>
+            </span>
+            <span class="dropdown__username"><%= current_user.nickname.presence || current_user.email %></span>
+            <span class="dropdown__caret" aria-hidden="true">▾</span>
+          </button>
+          <ul class="dropdown__menu" data-dropdown-target="menu" role="menu">
+            <li role="none">
+              <%= link_to 'マイページ', edit_user_registration_path, class: 'dropdown__item', role: 'menuitem' %>
+            </li>
+            <li role="none">
+              <%= button_to 'ログアウト', destroy_user_session_path,
+                    method: :delete,
+                    class: 'dropdown__item dropdown__item--logout',
+                    form_class: 'dropdown__logout-form',
+                    role: 'menuitem' %>
+            </li>
+          </ul>
+        </div>
+      </nav>
+    <% else %>
+      <%# ゲストヘッダー %>
+      <nav class="site-header__nav" aria-label="サイトナビゲーション">
+        <%= link_to 'ログイン', new_user_session_path, class: 'btn btn--outline' %>
+        <%= link_to '無料で始める', new_user_registration_path, class: 'btn btn--primary' %>
+      </nav>
+    <% end %>
+  </div>
+</header>

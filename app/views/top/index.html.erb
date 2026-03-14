@@ -1,16 +1,5 @@
 <% content_for :title, "Yomikiri | 積読を消化する技術" %>
 
-<%# ヘッダー %>
-<header class="top-header">
-  <div class="container top-header__inner">
-    <a href="/" class="top-header__logo">Yomikiri</a>
-    <nav class="top-header__nav">
-      <a href="#" class="btn btn--outline">ログイン</a>
-      <a href="#" class="btn btn--primary btn--lg">無料で始める</a>
-    </nav>
-  </div>
-</header>
-
 <%# ヒーローセクション %>
 <section class="top-hero">
   <div class="container">
@@ -23,8 +12,8 @@
       あの「いつか読もう」を今日のタスクに変えます。
     </p>
     <div class="top-hero__cta">
-      <a href="#" class="btn btn--primary btn--lg">無料で始める</a>
-      <a href="#" class="btn btn--outline btn--lg">ログイン</a>
+      <%= link_to '無料で始める', new_user_registration_path, class: 'btn btn--primary btn--lg' %>
+      <%= link_to 'ログイン', new_user_session_path, class: 'btn btn--outline btn--lg' %>
     </div>
   </div>
 </section>
@@ -70,16 +59,8 @@
       登録無料。まずは気になっている本を1冊登録してみてください。
     </p>
     <div class="top-cta__actions">
-      <a href="#" class="btn btn--primary btn--lg">無料で始める</a>
-      <a href="#" class="btn btn--outline btn--lg">ログインはこちら</a>
+      <%= link_to '無料で始める', new_user_registration_path, class: 'btn btn--primary btn--lg' %>
+      <%= link_to 'ログインはこちら', new_user_session_path, class: 'btn btn--outline btn--lg' %>
     </div>
   </div>
 </section>
-
-<%# フッター %>
-<footer class="top-footer">
-  <div class="container top-footer__inner">
-    <span class="top-footer__logo">Yomikiri</span>
-    <p class="top-footer__copy">&copy; <%= Date.today.year %> Yomikiri. All rights reserved.</p>
-  </div>
-</footer>
