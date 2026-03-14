@@ -1,0 +1,201 @@
+/* ========================
+   共通ヘッダー・フッター
+   BEM 命名規則に従う
+   ======================== */
+
+/* ---- サイトヘッダー ---- */
+.site-header {
+  background-color: var(--color-bg);
+  border-bottom: 1px solid var(--color-border);
+  padding: var(--spacing-md) 0;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: var(--shadow-sm);
+}
+
+.site-header__inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.site-header__logo {
+  font-size: var(--font-size-2xl);
+  font-weight: 900;
+  color: var(--color-primary);
+  letter-spacing: -0.02em;
+  text-decoration: none;
+}
+
+.site-header__logo:hover {
+  opacity: 0.85;
+  text-decoration: none;
+}
+
+.site-header__nav {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+}
+
+/* ---- ドロップダウン ---- */
+.dropdown {
+  position: relative;
+}
+
+.dropdown__trigger {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-radius: var(--border-radius);
+  color: var(--color-text);
+  font-size: var(--font-size-base);
+  font-family: var(--font-sans);
+  transition: background-color 0.2s;
+}
+
+.dropdown__trigger:hover {
+  background-color: var(--color-bg-surface);
+}
+
+.dropdown__avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  background-color: var(--color-primary);
+  color: #ffffff;
+  font-size: var(--font-size-sm);
+  font-weight: 700;
+  text-transform: uppercase;
+  flex-shrink: 0;
+}
+
+.dropdown__username {
+  max-width: 120px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+}
+
+.dropdown__caret {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+}
+
+.dropdown__menu {
+  display: none;
+  position: absolute;
+  right: 0;
+  top: calc(100% + 0.5rem);
+  min-width: 160px;
+  background-color: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow-md);
+  z-index: 200;
+  overflow: hidden;
+}
+
+.dropdown__menu--open {
+  display: block;
+}
+
+.dropdown__item {
+  display: block;
+  width: 100%;
+  padding: var(--spacing-sm) var(--spacing-md);
+  color: var(--color-text);
+  font-size: var(--font-size-sm);
+  text-decoration: none;
+  text-align: left;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: var(--font-sans);
+  transition: background-color 0.15s;
+}
+
+.dropdown__item:hover {
+  background-color: var(--color-bg-surface);
+  text-decoration: none;
+}
+
+.dropdown__item--logout {
+  color: var(--color-danger);
+}
+
+.dropdown__item--logout:hover {
+  background-color: #fef2f2;
+}
+
+.dropdown__logout-form {
+  margin: 0;
+}
+
+/* ---- フラッシュメッセージ ---- */
+.flash {
+  padding: var(--spacing-sm) var(--spacing-md);
+  font-size: var(--font-size-sm);
+  text-align: center;
+}
+
+.flash--notice {
+  background-color: #f0fdf4;
+  color: var(--color-success);
+  border-bottom: 1px solid #bbf7d0;
+}
+
+.flash--alert {
+  background-color: #fef2f2;
+  color: var(--color-danger);
+  border-bottom: 1px solid #fecaca;
+}
+
+/* ---- サイトフッター ---- */
+.site-footer {
+  background-color: var(--color-bg-surface);
+  border-top: 1px solid var(--color-border);
+  padding: var(--spacing-lg) 0;
+  margin-top: auto;
+}
+
+.site-footer__inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-md);
+}
+
+.site-footer__logo {
+  font-size: var(--font-size-lg);
+  font-weight: 900;
+  color: var(--color-primary);
+  letter-spacing: -0.02em;
+}
+
+.site-footer__copy {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+}
+
+/* ---- レスポンシブ ---- */
+@media (max-width: 640px) {
+  .dropdown__username {
+    display: none;
+  }
+
+  .site-footer__inner {
+    flex-direction: column;
+    text-align: center;
+  }
+}
