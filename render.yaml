@@ -4,11 +4,14 @@ services:
     runtime: ruby
     region: oregon
     plan: free
+    branch: main
+    autoDeploy: true
     buildCommand: |
       bundle install &&
       unset RAILS_MASTER_KEY &&
       SECRET_KEY_BASE_DUMMY=1 bundle exec rails assets:precompile
-    startCommand: bundle exec rails db:migrate && bundle exec puma -C config/puma.rb
+    preDeployCommand: bundle exec rails db:migrate
+    startCommand: bundle exec puma -C config/puma.rb
     healthCheckPath: /up
     envVars:
       - key: RAILS_ENV
@@ -20,4 +23,6 @@ services:
       - key: RAILS_MASTER_KEY
         sync: false
       - key: DATABASE_URL
+        sync: false
+      - key: SENDGRID_API_KEY
         sync: false
