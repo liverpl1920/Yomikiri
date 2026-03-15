@@ -8,5 +8,9 @@ module Users
       # Issue #15（積読一覧）実装後は books_path に変更する
       stored_location_for(resource) || root_path
     end
+
+    def after_sign_out_path_for(_resource_or_scope)
+      root_path
+    end
   end
 end

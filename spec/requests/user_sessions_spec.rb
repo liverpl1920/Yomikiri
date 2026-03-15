@@ -97,5 +97,29 @@ RSpec.describe 'UserSessions', type: :request do
 
       expect(response).to have_http_status(:see_other)
     end
+
+    it 'ログアウト後にTOPページへリダイレクトされる' do
+      delete destroy_user_session_path
+
+      expect(response).to redirect_to(root_path)
+    end
+  end
+
+  describe 'DELETE /users/sign_out セッション破棄' do
+    let(:user) { create(:user) }
+
+    it 'ログアウト後にセッションが破棄される' do
+      # Warden test helperを使わずPOSTで実際にログインし、セッション破棄を検証する
+      post user_session_path, params: { user: { email: user.email, password: 'password123' } }
+      delete destroy_user_session_path
+      follow_redirect!
+
+      expect(response).to have_http_status(:ok)
+      # ログアウトボタン（ドロップダウン）が表示されないことを確認
+      # flash messageに「ログアウトしました」が含まれるため文字列検索ではなくCSSクラスで確認
+      expect(response.body).not_to include('dropdown__item--logout')
+      # ゲスト用ナビが表示されていることを確認
+      expect(response.body).to include('無料で始める')
+    end
   end
 end
