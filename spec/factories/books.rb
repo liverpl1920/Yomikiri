@@ -6,7 +6,7 @@ FactoryBot.define do
     total_pages { 300 }
     target_pages { 300 }
     current_page { 0 }
-    deadline { Date.today + 14 }
+    deadline { Date.current + 14 }
     extension_count { 0 }
     completed_at { nil }
   end
