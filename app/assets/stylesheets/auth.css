@@ -1,0 +1,178 @@
+/* ========================
+   認証ページ（ログイン・新規登録）共通スタイル
+   BEM 命名規則に従う
+   ======================== */
+
+/* ---- ページレイアウト ---- */
+.auth-page {
+  min-height: calc(100vh - 120px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-xl) var(--spacing-md);
+  background-color: var(--color-bg-surface);
+}
+
+/* ---- カードコンテナ ---- */
+.auth-card {
+  background-color: var(--color-bg);
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--shadow-lg);
+  width: 100%;
+  max-width: 420px;
+  overflow: hidden;
+}
+
+.auth-card__header {
+  text-align: center;
+  padding: var(--spacing-2xl) var(--spacing-xl) var(--spacing-lg);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.auth-card__logo {
+  display: inline-block;
+  font-size: var(--font-size-2xl);
+  font-weight: 900;
+  color: var(--color-primary);
+  letter-spacing: -0.02em;
+  margin-bottom: var(--spacing-md);
+  text-decoration: none;
+}
+
+.auth-card__logo:hover {
+  opacity: 0.85;
+  text-decoration: none;
+}
+
+.auth-card__title {
+  font-size: var(--font-size-xl);
+  font-weight: 700;
+  color: var(--color-text);
+  margin-bottom: var(--spacing-xs);
+}
+
+.auth-card__subtitle {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+}
+
+.auth-card__body {
+  padding: var(--spacing-xl);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.auth-card__footer {
+  padding: var(--spacing-lg) var(--spacing-xl);
+  border-top: 1px solid var(--color-border);
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.auth-card__link-text {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+}
+
+.auth-card__link {
+  color: var(--color-primary);
+  font-weight: 600;
+}
+
+.auth-card__link:hover {
+  text-decoration: underline;
+}
+
+/* ---- フォームパーツ ---- */
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.form-group--checkbox {
+  flex-direction: row;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.form-label {
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.form-input {
+  width: 100%;
+  padding: 0.625rem 0.875rem;
+  font-size: var(--font-size-base);
+  font-family: var(--font-sans);
+  color: var(--color-text);
+  background-color: var(--color-bg);
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--border-radius);
+  transition: border-color 0.15s, box-shadow 0.15s;
+  outline: none;
+}
+
+.form-input:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+}
+
+.form-input::placeholder {
+  color: var(--color-text-muted);
+  opacity: 0.7;
+}
+
+.form-input--error {
+  border-color: var(--color-danger);
+}
+
+.form-input--error:focus {
+  box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.15);
+}
+
+.form-checkbox {
+  width: 1rem;
+  height: 1rem;
+  accent-color: var(--color-primary);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.form-checkbox-label {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+  cursor: pointer;
+}
+
+/* ---- ボタン（幅いっぱい） ---- */
+.btn--full {
+  width: 100%;
+  padding: 0.75rem;
+}
+
+/* ---- フラッシュメッセージ ---- */
+.flash {
+  padding: var(--spacing-md) var(--spacing-lg);
+  border-radius: var(--border-radius);
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+  margin: var(--spacing-md) var(--spacing-md) 0;
+}
+
+.flash--notice {
+  background-color: #dcfce7;
+  color: var(--color-success);
+  border: 1px solid #bbf7d0;
+}
+
+.flash--alert {
+  background-color: #fee2e2;
+  color: var(--color-danger);
+  border: 1px solid #fecaca;
+}

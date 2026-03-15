@@ -1,0 +1,53 @@
+<% content_for :title, "ログイン | Yomikiri" %>
+
+<div class="auth-page">
+  <div class="auth-card">
+    <div class="auth-card__header">
+      <%= link_to 'Yomikiri', root_path, class: 'auth-card__logo' %>
+      <h1 class="auth-card__title">ログイン</h1>
+      <p class="auth-card__subtitle">積読を、行動に変えよう。</p>
+    </div>
+
+    <%= form_for(resource, as: resource_name, url: session_path(resource_name)) do |f| %>
+      <div class="auth-card__body">
+        <div class="form-group">
+          <%= f.label :email, 'メールアドレス', class: 'form-label' %>
+          <%= f.email_field :email,
+                autofocus: true,
+                autocomplete: 'email',
+                class: 'form-input',
+                placeholder: 'example@example.com',
+                required: true %>
+        </div>
+
+        <div class="form-group">
+          <%= f.label :password, 'パスワード', class: 'form-label' %>
+          <%= f.password_field :password,
+                autocomplete: 'current-password',
+                class: 'form-input',
+                placeholder: '6文字以上',
+                required: true %>
+        </div>
+
+        <% if devise_mapping.rememberable? %>
+          <div class="form-group form-group--checkbox">
+            <%= f.check_box :remember_me, class: 'form-checkbox' %>
+            <%= f.label :remember_me, 'ログイン状態を保持する', class: 'form-checkbox-label' %>
+          </div>
+        <% end %>
+
+        <%= f.submit 'ログインする', class: 'btn btn--primary btn--full' %>
+      </div>
+    <% end %>
+
+    <div class="auth-card__footer">
+      <p class="auth-card__link-text">
+        <%= link_to 'パスワードを忘れた場合', new_user_password_path, class: 'auth-card__link' %>
+      </p>
+      <p class="auth-card__link-text">
+        アカウントをお持ちでない方は
+        <%= link_to '新規登録', new_user_registration_path, class: 'auth-card__link' %>
+      </p>
+    </div>
+  </div>
+</div>
