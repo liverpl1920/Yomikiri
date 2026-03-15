@@ -30,7 +30,7 @@ Browser
 
 ### 2. ログインビュー（app/views/devise/sessions/new.html.erb）
 
-**责務**:
+**責務**:
 - メールアドレス・パスワードの入力フォーム
 - 「パスワードを忘れた場合」リンク
 - 新規登録画面へのリンク
@@ -51,7 +51,7 @@ Browser
 
 ### 4. 認証フォームCSS（app/assets/stylesheets/auth.css）
 
-**责務**:
+**責務**:
 - ログイン・新規登録ページ共通のフォームスタイル
 
 **実装の要点**:
@@ -83,9 +83,9 @@ Browser
 
 ### リクエストスペック（spec/requests/user_sessions_spec.rb）
 - GET /users/sign_in → 200 OK、フォームが表示される
-- POST /users/sign_in（正しい認証情報）→ 302 リダイレクト（root または books）
-- POST /users/sign_in（誤った認証情報）→ 200、エラーメッセージ表示
-- ログイン後にログインページへアクセス → リダイレクト
+- POST /users/sign_in（正しい認証情報）→ 303 See Other（root_path、将来は books_path）
+- POST /users/sign_in（誤った認証情報）→ 422 Unprocessable Entity、エラーメッセージ表示
+- ログイン後にログインページへアクセス → 303 root_path へリダイレクト
 
 ## ディレクトリ構造
 
