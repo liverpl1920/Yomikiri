@@ -1,0 +1,36 @@
+<% content_for :title, "積読一覧 | Yomikiri" %>
+
+<div class="container">
+  <div class="book-list-header">
+    <h1 class="book-list-header__title">積読リスト</h1>
+    <%= link_to '+ 本を登録する', new_book_path, class: 'btn btn--primary' %>
+  </div>
+
+  <% if @books.empty? %>
+    <div class="book-list__empty">
+      <p class="book-list__empty-text">まだ積読が登録されていません。</p>
+      <%= link_to '最初の本を登録する', new_book_path, class: 'btn btn--primary' %>
+    </div>
+  <% else %>
+    <ul class="book-list">
+      <% @books.each do |book| %>
+        <li class="book-card">
+          <div class="book-card__info">
+            <h2 class="book-card__title">
+              <%= link_to book.title, book_path(book) %>
+            </h2>
+            <% if book.author.present? %>
+              <p class="book-card__author"><%= book.author %></p>
+            <% end %>
+            <p class="book-card__deadline">
+              読了期限: <time datetime="<%= book.deadline %>"><%= book.deadline.strftime('%Y年%m月%d日') %></time>
+            </p>
+            <p class="book-card__quota">
+              今日のノルマ: <strong><%= book.calculate_daily_quota %></strong> ページ
+            </p>
+          </div>
+        </li>
+      <% end %>
+    </ul>
+  <% end %>
+</div>
