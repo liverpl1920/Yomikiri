@@ -13,7 +13,7 @@ class Book < ApplicationRecord
 
   validate :target_pages_not_exceed_total_pages
   validate :current_page_not_exceed_target_pages
-  validate :deadline_cannot_be_in_the_past, on: :create
+  validate :deadline_cannot_be_in_the_past, if: -> { new_record? || will_save_change_to_deadline? }
 
   def remaining_pages
     target_pages - current_page

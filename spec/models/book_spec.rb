@@ -95,9 +95,16 @@ RSpec.describe Book, type: :model do
         expect(book.errors[:deadline]).not_to be_empty
       end
 
-      it '過去の日付でも更新時は有効' do
+      it '更新時に期限を過去の日付に変更する場合は無効' do
         book = create(:book, deadline: Date.current + 1)
         book.deadline = Date.current - 1
+        expect(book).not_to be_valid
+        expect(book.errors[:deadline]).not_to be_empty
+      end
+
+      it '更新時に期限を変えずに他の属性を変更する場合は有効' do
+        book = create(:book, deadline: Date.current + 1)
+        book.title = '変更後のタイトル'
         expect(book).to be_valid
       end
     end

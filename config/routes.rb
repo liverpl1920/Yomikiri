@@ -2,11 +2,12 @@ Rails.application.routes.draw do
   devise_for :users, controllers: { sessions: "users/sessions" }
   root "top#index"
 
-  resources :books do
+  resources :books, only: [ :index, :new, :create, :show ] do
     member do
-      patch :update_progress
-      patch :change_deadline
-      patch :complete
+      # 後続 Issue で実装予定
+      # patch :update_progress
+      # patch :change_deadline
+      # patch :complete
     end
   end
 
