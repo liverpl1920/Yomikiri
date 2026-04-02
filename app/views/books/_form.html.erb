@@ -1,0 +1,116 @@
+<%= form_with(model: book,
+               data: {
+                 controller: 'book-form',
+                 action: 'book-form#calculateQuota'
+               }) do |f| %>
+
+  <%# バリデーションエラー一覧 %>
+  <% if book.errors.any? %>
+    <div class="form-errors" role="alert">
+      <h2 class="form-errors__title">
+        <%= book.errors.count %>件のエラーがあります
+      </h2>
+      <ul class="form-errors__list">
+        <% book.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <%# タイトル %>
+  <div class="form-field">
+    <%= f.label :title, 'タイトル', class: 'form-field__label' %>
+    <span class="form-field__required" aria-hidden="true">必須</span>
+    <%= f.text_field :title,
+          class: "form-field__input #{'form-field__input--error' if book.errors[:title].any?}",
+          placeholder: '例: リーダブルコード',
+          autocomplete: 'off' %>
+    <% if book.errors[:title].any? %>
+      <span class="form-field__error"><%= book.errors[:title].first %></span>
+    <% end %>
+  </div>
+
+  <%# 著者 %>
+  <div class="form-field">
+    <%= f.label :author, '著者', class: 'form-field__label' %>
+    <span class="form-field__optional">任意</span>
+    <%= f.text_field :author,
+          class: 'form-field__input',
+          placeholder: '例: Dustin Boswell',
+          autocomplete: 'off' %>
+  </div>
+
+  <%# 総ページ数 %>
+  <div class="form-field">
+    <%= f.label :total_pages, '総ページ数', class: 'form-field__label' %>
+    <span class="form-field__required" aria-hidden="true">必須</span>
+    <%= f.number_field :total_pages,
+          class: "form-field__input form-field__input--narrow #{'form-field__input--error' if book.errors[:total_pages].any?}",
+          min: 1,
+          placeholder: '例: 260',
+          data: {
+            'book-form-target': 'totalPages',
+            action: 'input->book-form#syncTargetPages input->book-form#calculateQuota'
+          } %>
+    <span class="form-field__unit">ページ</span>
+    <% if book.errors[:total_pages].any? %>
+      <span class="form-field__error"><%= book.errors[:total_pages].first %></span>
+    <% end %>
+  </div>
+
+  <%# 読了対象ページ数 %>
+  <div class="form-field">
+    <%= f.label :target_pages, '読了対象ページ数', class: 'form-field__label' %>
+    <span class="form-field__required" aria-hidden="true">必須</span>
+    <%= f.number_field :target_pages,
+          class: "form-field__input form-field__input--narrow #{'form-field__input--error' if book.errors[:target_pages].any?}",
+          min: 1,
+          placeholder: '例: 260',
+          data: {
+            'book-form-target': 'targetPages',
+            action: 'input->book-form#calculateQuota'
+          } %>
+    <span class="form-field__unit">ページ</span>
+    <small class="form-field__hint">索引や付録を除く場合のみ変更してください</small>
+    <% if book.errors[:target_pages].any? %>
+      <span class="form-field__error"><%= book.errors[:target_pages].first %></span>
+    <% end %>
+  </div>
+
+  <%# 読了期限 %>
+  <div class="form-field">
+    <%= f.label :deadline, '読了期限', class: 'form-field__label' %>
+    <span class="form-field__required" aria-hidden="true">必須</span>
+    <%= f.date_field :deadline,
+          class: "form-field__input form-field__input--date #{'form-field__input--error' if book.errors[:deadline].any?}",
+          min: Date.current.to_s,
+          data: {
+            'book-form-target': 'deadline',
+            action: 'change->book-form#calculateQuota'
+          } %>
+    <% if book.errors[:deadline].any? %>
+      <span class="form-field__error"><%= book.errors[:deadline].first %></span>
+    <% end %>
+  </div>
+
+  <%# 現在ページ（hidden） %>
+  <%= f.hidden_field :current_page, value: book.current_page.presence || 0 %>
+
+  <%# ノルマプレビュー %>
+  <div class="quota-preview" data-book-form-target="quotaDisplay">
+    <p class="quota-preview__label">今日のノルマ（目安）</p>
+    <p class="quota-preview__value">
+      <span class="quota-preview__number">-</span>
+      <span class="quota-preview__unit">ページ / 日</span>
+    </p>
+    <p class="quota-preview__note">読了期限・ページ数を入力すると自動計算されます</p>
+  </div>
+
+  <%# ボタン %>
+  <div class="form-actions">
+    <%= f.submit book.new_record? ? '登録する' : '更新する',
+          class: 'btn btn--primary btn--lg' %>
+    <%= link_to '一覧に戻る', books_path, class: 'btn btn--outline' %>
+  </div>
+<% end %>

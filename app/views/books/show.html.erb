@@ -1,0 +1,47 @@
+<% content_for :title, "#{@book.title} | Yomikiri" %>
+
+<div class="container">
+  <div class="book-show">
+    <div class="book-show__header">
+      <h1 class="book-show__title"><%= @book.title %></h1>
+      <% if @book.author.present? %>
+        <p class="book-show__author"><%= @book.author %></p>
+      <% end %>
+    </div>
+
+    <dl class="book-show__details">
+      <div class="book-show__detail-item">
+        <dt class="book-show__detail-label">読了期限</dt>
+        <dd class="book-show__detail-value">
+          <time datetime="<%= @book.deadline %>">
+            <%= @book.deadline.strftime('%Y年%m月%d日') %>
+          </time>
+        </dd>
+      </div>
+
+      <div class="book-show__detail-item">
+        <dt class="book-show__detail-label">進捗</dt>
+        <dd class="book-show__detail-value">
+          <%= @book.current_page %> / <%= @book.target_pages %> ページ
+          （<%= @book.progress_percentage %>%）
+        </dd>
+      </div>
+
+      <div class="book-show__detail-item">
+        <dt class="book-show__detail-label">今日のノルマ</dt>
+        <dd class="book-show__detail-value book-show__detail-value--quota">
+          <%= @book.calculate_daily_quota %> ページ
+        </dd>
+      </div>
+
+      <div class="book-show__detail-item">
+        <dt class="book-show__detail-label">総ページ数</dt>
+        <dd class="book-show__detail-value"><%= @book.total_pages %> ページ</dd>
+      </div>
+    </dl>
+
+    <div class="book-show__actions">
+      <%= link_to '一覧に戻る', books_path, class: 'btn btn--outline' %>
+    </div>
+  </div>
+</div>
