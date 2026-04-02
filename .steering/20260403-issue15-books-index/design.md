@@ -75,12 +75,12 @@ end
 ### Book scopeの設計
 
 ```ruby
-scope :for_index_list, -> {
-  # 未了本を期限順→読了本を期限順の順
-  order(
-    Arel.sql("CASE WHEN status = #{statuses[:completed]} THEN 1 ELSE 0 END"),
-    :deadline
-  )
+scope :for_index_list, lambda {
+  # 未了本を期限順→読了本を期限順の順（Arel::Nodes::CaseでSQLインジェクション回避）
+  completed_val = statuses[:completed]
+  status_col = arel_table[:status]
+  ordering = Arel::Nodes::Case.new.when(status_col.eq(completed_val)).then(1).else(0)
+  order(ordering, :deadline)
 }
 ```
 

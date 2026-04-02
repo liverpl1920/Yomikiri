@@ -40,9 +40,9 @@ class Book < ApplicationRecord
     ((current_page.to_f / target_pages) * 100).round
   end
 
-  # 残り日数（今日を含む）
+  # 残り日数（今日を含む／期限当日は 1）
   def days_remaining
-    (deadline - Date.current).to_i
+    (deadline - Date.current).to_i + 1
   end
 
   # 賞味期限ビジュアライザー用CSSクラス

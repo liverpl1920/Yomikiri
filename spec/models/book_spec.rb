@@ -139,14 +139,14 @@ RSpec.describe Book, type: :model do
 
     context '通常の場合（残ページ / 残日数、切り上げ）' do
       it '切り上げされたノルマを返す' do
-        # 残ページ: 300 - 0 = 300, 残日数: 10日, ノルマ: ceil(300/10) = 30
-        book = build(:book, current_page: 0, target_pages: 300, deadline: Date.current + 10)
+        # 残ページ: 300 - 0 = 300, 残日数: 10日（今日含む）, ノルマ: ceil(300/10) = 30
+        book = build(:book, current_page: 0, target_pages: 300, deadline: Date.current + 9)
         expect(book.daily_quota).to eq(30)
       end
 
       it '割り切れない場合は切り上げを返す' do
-        # 残ページ: 100, 残日数: 3日, ノルマ: ceil(100/3) = 34
-        book = build(:book, current_page: 0, target_pages: 100, deadline: Date.current + 3)
+        # 残ページ: 100, 残日数: 3日（今日含む）, ノルマ: ceil(100/3) = 34
+        book = build(:book, current_page: 0, target_pages: 100, deadline: Date.current + 2)
         expect(book.daily_quota).to eq(34)
       end
     end
@@ -189,19 +189,19 @@ RSpec.describe Book, type: :model do
   end
 
   describe '#days_remaining' do
-    it '期限まで10日の場合は10を返す' do
+    it '期限まで10日の場合は11を返す（今日を含む）' do
       book = build(:book, deadline: Date.current + 10)
-      expect(book.days_remaining).to eq(10)
+      expect(book.days_remaining).to eq(11)
     end
 
-    it '期限当日は0を返す' do
+    it '期限当日は1を返す（今日を含む）' do
       book = build(:book, deadline: Date.current)
-      expect(book.days_remaining).to eq(0)
+      expect(book.days_remaining).to eq(1)
     end
 
-    it '期限を過ぎた場合は負の値を返す' do
+    it '期限を3日過ぎた場合は-2を返す' do
       book = build(:book, deadline: Date.current - 3)
-      expect(book.days_remaining).to eq(-3)
+      expect(book.days_remaining).to eq(-2)
     end
   end
 
@@ -217,7 +217,7 @@ RSpec.describe Book, type: :model do
     end
 
     it '残り7日（ちょうど）の場合は urgent-low を返す' do
-      book = build(:book, deadline: Date.current + 7)
+      book = build(:book, deadline: Date.current + 6)
       expect(book.deadline_urgency_class).to eq('book-card__cover--urgent-low')
     end
 
@@ -227,7 +227,7 @@ RSpec.describe Book, type: :model do
     end
 
     it '残り3日（ちょうど）の場合は urgent-medium を返す' do
-      book = build(:book, deadline: Date.current + 3)
+      book = build(:book, deadline: Date.current + 2)
       expect(book.deadline_urgency_class).to eq('book-card__cover--urgent-medium')
     end
 
@@ -237,7 +237,7 @@ RSpec.describe Book, type: :model do
     end
 
     it '残り1日（ちょうど）の場合は urgent-high を返す' do
-      book = build(:book, deadline: Date.current + 1)
+      book = build(:book, deadline: Date.current)
       expect(book.deadline_urgency_class).to eq('book-card__cover--urgent-high')
     end
 

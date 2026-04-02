@@ -1,0 +1,18 @@
+current directory: /home/ippei/runteq/graduation_work/Yomikiri/vendor/cache/ruby/3.3.0/gems/racc-1.8.1/ext/racc/cparse
+/home/ippei/.rbenv/versions/3.3.10/bin/ruby extconf.rb
+creating Makefile
+
+current directory: /home/ippei/runteq/graduation_work/Yomikiri/vendor/cache/ruby/3.3.0/gems/racc-1.8.1/ext/racc/cparse
+make DESTDIR\= sitearchdir\=./.gem.20260403-40869-5mirmf sitelibdir\=./.gem.20260403-40869-5mirmf clean
+
+current directory: /home/ippei/runteq/graduation_work/Yomikiri/vendor/cache/ruby/3.3.0/gems/racc-1.8.1/ext/racc/cparse
+make DESTDIR\= sitearchdir\=./.gem.20260403-40869-5mirmf sitelibdir\=./.gem.20260403-40869-5mirmf
+compiling cparse.c
+linking shared-object racc/cparse.so
+
+current directory: /home/ippei/runteq/graduation_work/Yomikiri/vendor/cache/ruby/3.3.0/gems/racc-1.8.1/ext/racc/cparse
+make DESTDIR\= sitearchdir\=./.gem.20260403-40869-5mirmf sitelibdir\=./.gem.20260403-40869-5mirmf install
+/usr/bin/install -c -m 0755 cparse.so ./.gem.20260403-40869-5mirmf/racc
+
+current directory: /home/ippei/runteq/graduation_work/Yomikiri/vendor/cache/ruby/3.3.0/gems/racc-1.8.1/ext/racc/cparse
+make DESTDIR\= sitearchdir\=./.gem.20260403-40869-5mirmf sitelibdir\=./.gem.20260403-40869-5mirmf clean

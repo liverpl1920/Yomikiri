@@ -79,18 +79,13 @@ RSpec.describe 'Books', type: :request do
         end
 
         it '今日のノルマが読了本には表示されない' do
-          # 読了本のボディを探す範囲を確認（完了本のタイトル以降のノルマ表示がないこと）
           get books_path
 
           body = response.body
-          completed_pos = body.index(book_completed.title)
-          next_book_pos = [ body.index(book_far.title), body.index(book_near.title) ].min
 
-          # 読了後の本エリアに今日のノルマが表示されないことを確認
-          # (completed_posからbodyの末尾にかけて検索)
-          expect(body.index('book-card__quota', completed_pos)).to be_nil.or(
-            satisfy { |pos| pos.nil? || pos > next_book_pos }
-          )
+          # 今日のノルマは未了本(book_far, book_near)にのみ表示され、
+          # 読了本(book_completed)の分は表示されないことを確認する
+          expect(body.scan('book-card__quota-label').size).to eq(2)
         end
       end
 

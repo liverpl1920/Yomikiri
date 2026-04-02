@@ -4,8 +4,8 @@
   <div class="container">
     <div class="books-index__header">
       <h1 class="books-index__title">積読一覧</h1>
-      <%# 書籍登録機能(Issue #14)実装後にリンク先を new_book_path に変更 %>
-      <span class="btn btn--primary books-index__add-btn" aria-disabled="true">+ 本を追加する</span>
+      <%# 書籍登録機能(Issue #14)実装後に link_to new_book_path に変更 %>
+      <button type="button" class="btn btn--primary books-index__add-btn" disabled>+ 本を追加する</button>
     </div>
 
     <% if @books.empty? %>
@@ -17,14 +17,14 @@
           最初の本を登録して、読書管理を始めましょう。
         </p>
         <%# 書籍登録機能(Issue #14)実装後にリンクに変更 %>
-        <span class="btn btn--primary btn--lg" aria-disabled="true">最初の本を登録して始める</span>
+        <button type="button" class="btn btn--primary btn--lg" disabled>最初の本を登録して始める</button>
       </div>
     <% else %>
       <ul class="book-list" aria-label="積読一覧">
         <% @books.each do |book| %>
           <li class="book-list__item">
-            <%# 詳細画面(Issue #16)実装後に book_path(book) へ変更 %>
-            <article class="book-card" data-book-id="<%= book.id %>">
+            <%# 詳細画面(Issue #16)実装後に link_to book_path(book) へ変更 %>
+            <article class="book-card" data-book-id="<%= book.id %>" aria-disabled="true" tabindex="-1">
               <%# 書影 %>
               <div class="book-card__cover-wrapper">
                 <div class="book-card__cover <%= book.deadline_urgency_class %>">

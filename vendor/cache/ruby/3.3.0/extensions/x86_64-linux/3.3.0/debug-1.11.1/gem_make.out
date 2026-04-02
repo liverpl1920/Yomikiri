@@ -1,0 +1,19 @@
+current directory: /home/ippei/runteq/graduation_work/Yomikiri/vendor/cache/ruby/3.3.0/gems/debug-1.11.1/ext/debug
+/home/ippei/.rbenv/versions/3.3.10/bin/ruby extconf.rb
+creating Makefile
+
+current directory: /home/ippei/runteq/graduation_work/Yomikiri/vendor/cache/ruby/3.3.0/gems/debug-1.11.1/ext/debug
+make DESTDIR\= sitearchdir\=./.gem.20260403-40869-5xk8wl sitelibdir\=./.gem.20260403-40869-5xk8wl clean
+
+current directory: /home/ippei/runteq/graduation_work/Yomikiri/vendor/cache/ruby/3.3.0/gems/debug-1.11.1/ext/debug
+make DESTDIR\= sitearchdir\=./.gem.20260403-40869-5xk8wl sitelibdir\=./.gem.20260403-40869-5xk8wl
+compiling debug.c
+compiling iseq_collector.c
+linking shared-object debug/debug.so
+
+current directory: /home/ippei/runteq/graduation_work/Yomikiri/vendor/cache/ruby/3.3.0/gems/debug-1.11.1/ext/debug
+make DESTDIR\= sitearchdir\=./.gem.20260403-40869-5xk8wl sitelibdir\=./.gem.20260403-40869-5xk8wl install
+/usr/bin/install -c -m 0755 debug.so ./.gem.20260403-40869-5xk8wl/debug
+
+current directory: /home/ippei/runteq/graduation_work/Yomikiri/vendor/cache/ruby/3.3.0/gems/debug-1.11.1/ext/debug
+make DESTDIR\= sitearchdir\=./.gem.20260403-40869-5xk8wl sitelibdir\=./.gem.20260403-40869-5xk8wl clean

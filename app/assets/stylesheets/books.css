@@ -52,15 +52,8 @@
   overflow: hidden;
   width: 100%;
   transition: box-shadow 0.2s, transform 0.2s;
-  cursor: pointer;
   text-decoration: none;
   color: inherit;
-}
-
-.book-card:hover {
-  box-shadow: var(--shadow-lg);
-  transform: translateY(-2px);
-  text-decoration: none;
 }
 
 /* ---- 書影エリア ---- */
