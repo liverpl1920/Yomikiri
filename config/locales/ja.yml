@@ -1,0 +1,39 @@
+ja:
+  date:
+    formats:
+      default: "%Y/%m/%d"
+      long: "%Y年%m月%d日"
+      short: "%m/%d"
+  time:
+    formats:
+      default: "%Y/%m/%d %H:%M"
+  book:
+    status:
+      unread: "未読"
+      reading: "読書中"
+      completed: "読了"
+  activerecord:
+    models:
+      book: "本"
+      user: "ユーザー"
+    attributes:
+      book:
+        title: "タイトル"
+        author: "著者"
+        total_pages: "総ページ数"
+        target_pages: "読了対象ページ数"
+        current_page: "現在ページ"
+        deadline: "読了期限"
+        status: "ステータス"
+        extension_count: "延長回数"
+      user:
+        email: "メールアドレス"
+        nickname: "ニックネーム"
+    errors:
+      models:
+        book:
+          attributes:
+            target_pages:
+              less_than_or_equal_to: "は総ページ数（%{count}ページ）以下でなければなりません"
+            current_page:
+              less_than_or_equal_to: "は読了対象ページ数（%{count}ページ）以下でなければなりません"

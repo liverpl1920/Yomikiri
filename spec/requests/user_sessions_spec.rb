@@ -33,10 +33,10 @@ RSpec.describe 'UserSessions', type: :request do
 
       before { sign_in user }
 
-      it 'ルートページへリダイレクトされる' do
+      it '積読一覧ページへリダイレクトされる' do
         get new_user_session_path
 
-        expect(response).to redirect_to(root_path)
+        expect(response).to redirect_to(books_path)
       end
     end
   end
@@ -60,7 +60,7 @@ RSpec.describe 'UserSessions', type: :request do
         }
 
         get new_user_session_path
-        expect(response).to redirect_to(root_path)
+        expect(response).to redirect_to(books_path)
       end
     end
 

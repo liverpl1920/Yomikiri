@@ -1,0 +1,96 @@
+<% content_for :title, "積読一覧 | Yomikiri" %>
+
+<section class="books-index">
+  <div class="container">
+    <div class="books-index__header">
+      <h1 class="books-index__title">積読一覧</h1>
+      <%# 書籍登録機能(Issue #14)実装後にリンク先を new_book_path に変更 %>
+      <span class="btn btn--primary books-index__add-btn" aria-disabled="true">+ 本を追加する</span>
+    </div>
+
+    <% if @books.empty? %>
+      <%# Empty State %>
+      <div class="books-empty">
+        <div class="books-empty__icon" aria-hidden="true">📚</div>
+        <h2 class="books-empty__title">積読本はまだありません</h2>
+        <p class="books-empty__description">
+          最初の本を登録して、読書管理を始めましょう。
+        </p>
+        <%# 書籍登録機能(Issue #14)実装後にリンクに変更 %>
+        <span class="btn btn--primary btn--lg" aria-disabled="true">最初の本を登録して始める</span>
+      </div>
+    <% else %>
+      <ul class="book-list" aria-label="積読一覧">
+        <% @books.each do |book| %>
+          <li class="book-list__item">
+            <%# 詳細画面(Issue #16)実装後に book_path(book) へ変更 %>
+            <article class="book-card" data-book-id="<%= book.id %>">
+              <%# 書影 %>
+              <div class="book-card__cover-wrapper">
+                <div class="book-card__cover <%= book.deadline_urgency_class %>">
+                  <span class="book-card__cover-placeholder" aria-hidden="true">📖</span>
+                </div>
+                <% if book.deadline_urgency_class.present? %>
+                  <span class="book-card__urgency-badge">
+                    <% if book.days_remaining <= 1 %>
+                      期限間近！
+                    <% elsif book.days_remaining <= 3 %>
+                      あと<%= book.days_remaining %>日
+                    <% else %>
+                      あと<%= book.days_remaining %>日
+                    <% end %>
+                  </span>
+                <% end %>
+              </div>
+
+              <%# カード本文 %>
+              <div class="book-card__body">
+                <h2 class="book-card__title"><%= book.title %></h2>
+
+                <% if book.author.present? %>
+                  <p class="book-card__author"><%= book.author %></p>
+                <% end %>
+
+                <%# ステータスバッジ %>
+                <span class="book-card__status book-card__status--<%= book.status %>">
+                  <%= t("book.status.#{book.status}") %>
+                </span>
+
+                <%# 読了期限 %>
+                <div class="book-card__deadline">
+                  <span class="book-card__deadline-label">読了期限</span>
+                  <span class="book-card__deadline-value"><%= l(book.deadline, format: :long) %></span>
+                </div>
+
+                <%# 進捗バー %>
+                <div class="book-card__progress">
+                  <div class="book-card__progress-bar-wrapper" role="progressbar"
+                       aria-valuenow="<%= book.progress_percentage %>"
+                       aria-valuemin="0" aria-valuemax="100"
+                       aria-label="進捗 <%= book.progress_percentage %>%">
+                    <div class="book-card__progress-bar"
+                         style="width: <%= book.progress_percentage %>%;"></div>
+                  </div>
+                  <span class="book-card__progress-text">
+                    <%= book.current_page %> / <%= book.target_pages %> ページ
+                    （<%= book.progress_percentage %>%）
+                  </span>
+                </div>
+
+                <%# 今日のノルマ %>
+                <% unless book.completed? %>
+                  <div class="book-card__quota">
+                    <span class="book-card__quota-label">今日のノルマ</span>
+                    <span class="book-card__quota-value">
+                      <strong><%= book.daily_quota %></strong> ページ
+                    </span>
+                  </div>
+                <% end %>
+              </div>
+            </article>
+          </li>
+        <% end %>
+      </ul>
+    <% end %>
+  </div>
+</section>
