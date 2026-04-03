@@ -305,6 +305,9 @@ RSpec.describe Book, type: :model do
       expect(result.first.id).to eq(book_unread.id)
       expect(result.second.id).to eq(book_completed_near.id)
       expect(result.last.id).to eq(book_completed_far.id)
+    end
+  end
+
   describe 'ビジネスロジック' do
     describe '#remaining_pages' do
       it '読了対象ページ数から現在ページを引いた値を返す' do

@@ -100,6 +100,12 @@ RSpec.describe 'Books', type: :request do
           }
 
           expect(response).to redirect_to(books_path)
+        end
+      end
+    end
+  end
+end
+
 require 'rails_helper'
 
 RSpec.describe 'Books', type: :request do
@@ -252,6 +258,9 @@ RSpec.describe 'Books', type: :request do
         get books_path
 
         expect(response.body).not_to include(other_book.title)
+      end
+    end
+
     context '未認証ユーザーの場合' do
       it 'ログインページへリダイレクトされる' do
         post books_path, params: { book: { title: 'テスト' } }
