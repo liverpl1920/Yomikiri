@@ -4,6 +4,7 @@ class Book < ApplicationRecord
   enum :status, { unread: 0, reading: 1, completed: 2 }
 
   validates :title, presence: true, length: { maximum: 255 }
+  validates :author, length: { maximum: 255 }, allow_blank: true
   validates :total_pages, presence: true, numericality: { only_integer: true, greater_than: 0 }
   validates :target_pages, presence: true, numericality: { only_integer: true, greater_than: 0 }
   validates :current_page, presence: true, numericality: { only_integer: true, greater_than_or_equal_to: 0 }
@@ -12,6 +13,29 @@ class Book < ApplicationRecord
 
   validate :target_pages_not_exceed_total_pages
   validate :current_page_not_exceed_target_pages
+  validate :deadline_cannot_be_in_the_past, if: -> { new_record? || will_save_change_to_deadline? }
+
+  def remaining_pages
+    target_pages - current_page
+  end
+
+  def remaining_days
+    return 0 if deadline.nil? || deadline < Date.current
+
+    (deadline - Date.current).to_i + 1
+  end
+
+  def calculate_daily_quota
+    return 0 if remaining_pages <= 0 || remaining_days <= 0
+
+    (remaining_pages.to_f / remaining_days).ceil
+  end
+
+  def progress_percentage
+    return 0 if target_pages.zero?
+
+    ((current_page.to_f / target_pages) * 100).round(1)
+  end
 
   # 積読一覧用ソートスコープ：未了本を期限順 → 読了本を期限順
   scope :for_index_list, lambda {
@@ -73,5 +97,11 @@ class Book < ApplicationRecord
     return if current_page.blank? || target_pages.blank?
 
     errors.add(:current_page, :less_than_or_equal_to, count: target_pages) if current_page > target_pages
+  end
+
+  def deadline_cannot_be_in_the_past
+    return if deadline.blank?
+
+    errors.add(:deadline, :past_date) if deadline < Date.current
   end
 end

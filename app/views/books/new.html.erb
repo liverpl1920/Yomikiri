@@ -1,0 +1,14 @@
+<% content_for :title, "書籍を登録する | Yomikiri" %>
+
+<div class="container">
+  <div class="page-header">
+    <h1 class="page-header__title">積読を登録する</h1>
+    <p class="page-header__description">
+      本のページ数と読了期限を設定して、今日のノルマを自動計算します。
+    </p>
+  </div>
+
+  <div class="book-form-wrapper">
+    <%= render 'form', book: @book %>
+  </div>
+</div>
