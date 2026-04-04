@@ -426,3 +426,53 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* ========================
+   削除確認モーダル
+   ======================== */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal-overlay[hidden] {
+  display: none;
+}
+
+.modal {
+  background-color: var(--color-bg);
+  border-radius: var(--border-radius-lg);
+  padding: var(--spacing-xl);
+  max-width: 400px;
+  width: 90%;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.15);
+}
+
+.modal__title {
+  font-size: var(--font-size-lg);
+  font-weight: 700;
+  color: var(--color-text);
+  margin-bottom: var(--spacing-sm);
+}
+
+.modal__body {
+  color: var(--color-text-secondary, var(--color-text));
+  margin-bottom: var(--spacing-xl);
+  line-height: 1.6;
+}
+
+.modal__book-name {
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+.modal__actions {
+  display: flex;
+  gap: var(--spacing-md);
+  justify-content: flex-end;
+}

@@ -2,7 +2,7 @@
 
 class BooksController < ApplicationController
   before_action :authenticate_user!
-  before_action :set_book, only: [ :show ]
+  before_action :set_book, only: [ :show, :destroy ]
 
   def index
     @books = current_user.books.for_index_list
@@ -22,6 +22,11 @@ class BooksController < ApplicationController
   end
 
   def show
+  end
+
+  def destroy
+    @book.destroy
+    redirect_to books_path, notice: "#{@book.title}を削除しました。"
   end
 
   private
