@@ -73,7 +73,7 @@ git commit -m "#[Issue番号] [作業内容の概要]"
 - コミットメッセージには必ず Issue番号を含める
 - 複数の Issue にまたがる変更は避け、Issue 単位で作業を完結させる
 
-### push & PR作成（コミット完了後に自動実行）
+### push & PR作成（コミット完了後にCopilotが実行）
 
 ```bash
 # 1. ブランチをプッシュ
@@ -92,9 +92,9 @@ gh pr checks --watch
 
 **Note:** `gh pr checks --watch` は現在のブランチに紐づくPRを自動検出します。PR番号の指定は不要です。
 
-### CI確認（PR作成後に自動実行）
+### CI確認（PR作成後にCopilotが実行）
 
-上記の `gh pr checks --watch` コマンドが以下を自動実行します：
+Copilotが `gh pr checks --watch` を実行し、以下の対応を行います：
 
 | CI結果 | 対応 |
 |--------|------|
@@ -107,14 +107,7 @@ gh pr checks --watch
 - **実装着手前**: Issue を ["In Progress"](https://github.com/users/liverpl1920/projects/2/views/1) に移動する
 - **PRマージ後**: Issue を "Done" に移動する
 
-**CLI操作（参考）:**
-```bash
-# GitHub CLI v2.40以降でプロジェクトV2操作が可能
-# 実際の運用では、ブラウザでの手動更新を推奨
-gh issue edit [Issue番号] --add-project "Yomikiri" --project-column "In Progress"
-```
-
-**Note:** GitHub Projects V2のCLI操作は複雑なため、通常はブラウザで手動更新することを推奨します。
+**操作方法:** ブラウザで [GitHub Project](https://github.com/users/liverpl1920/projects/2/views/1) を開き、該当 Issue のステータスを手動で更新してください。
 
 ---
 
