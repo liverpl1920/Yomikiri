@@ -10,11 +10,12 @@ export default class extends Controller {
 
   updateLink () {
     this.linkTarget.href = this.buildUrl()
+    this.linkTarget.target = '_blank'
+    this.linkTarget.rel = 'noopener noreferrer'
   }
 
-  open (event) {
-    event.preventDefault()
-    window.open(this.buildUrl(), '_blank', 'noopener,noreferrer')
+  open (_event) {
+    this.updateLink()
   }
 
   buildUrl () {

@@ -349,6 +349,16 @@ RSpec.describe 'Books', type: :request do
         get book_path(book)
         expect(response.body).not_to include('book-card__cover--urgent')
       end
+
+      it 'Googleカレンダー連携セクションが表示される' do
+        book = create(:book, user: user, title: 'テスト書籍')
+        get book_path(book)
+        expect(response.body).to include('data-controller="google-calendar"')
+        expect(response.body).to include('Googleカレンダーで予定を作る')
+        expect(response.body).to include('value="30"')
+        expect(response.body).to include('checked')
+        expect(response.body).to include('MVPでは、Google側での予定の変更・削除はアプリ内に反映されません')
+      end
     end
 
     context '未認証ユーザーの場合' do

@@ -523,15 +523,26 @@
   transition: border-color 0.15s, background-color 0.15s;
 }
 
-.book-show__gcal-option:has(input:checked) {
-  border-color: var(--color-primary);
-  background-color: #eff6ff;
-  font-weight: 600;
-  color: var(--color-primary);
-}
-
 .book-show__gcal-option input[type="radio"] {
   accent-color: var(--color-primary);
+}
+
+.book-show__gcal-option input[type="radio"]:checked {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+@supports selector(.book-show__gcal-option:has(input:checked)) {
+  .book-show__gcal-option:has(input:checked) {
+    border-color: var(--color-primary);
+    background-color: #eff6ff;
+    font-weight: 600;
+    color: var(--color-primary);
+  }
+
+  .book-show__gcal-option input[type="radio"]:checked {
+    outline: none;
+  }
 }
 
 .book-show__gcal-note {
