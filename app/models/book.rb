@@ -19,18 +19,6 @@ class Book < ApplicationRecord
     target_pages - current_page
   end
 
-  def remaining_days
-    return 0 if deadline.nil? || deadline < Date.current
-
-    (deadline - Date.current).to_i + 1
-  end
-
-  def calculate_daily_quota
-    return 0 if remaining_pages <= 0 || remaining_days <= 0
-
-    (remaining_pages.to_f / remaining_days).ceil
-  end
-
   # 積読一覧用ソートスコープ：未了本を期限順 → 読了本を期限順
   scope :for_index_list, lambda {
     completed_val = statuses[:completed]

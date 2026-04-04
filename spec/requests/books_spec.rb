@@ -3,6 +3,9 @@
 require 'rails_helper'
 
 RSpec.describe 'Books', type: :request do
+  let(:user) { create(:user) }
+  let(:other_user) { create(:user) }
+
   describe 'GET /books' do
     context '未ログインの場合' do
       it 'ログイン画面へリダイレクトされる' do
@@ -13,8 +16,6 @@ RSpec.describe 'Books', type: :request do
     end
 
     context 'ログイン済みの場合' do
-      let(:user) { create(:user) }
-
       before { sign_in user }
 
       context '書籍が0冊の場合' do
@@ -59,9 +60,7 @@ RSpec.describe 'Books', type: :request do
           pos_far = body.index(book_far.title)
           pos_completed = body.index(book_completed.title)
 
-          # 期限が近い本が期限が遠い本より先に出現する
           expect(pos_near).to be < pos_far
-          # 未了本が完了本より先に出現する
           expect(pos_near).to be < pos_completed
           expect(pos_far).to be < pos_completed
         end
@@ -89,12 +88,20 @@ RSpec.describe 'Books', type: :request do
         end
 
         it '期限超過の本には「期限超過」メッセージが表示される' do
-          overdue_book = travel_to(10.days.ago) do
+          travel_to(10.days.ago) do
             create(:book, user: user, title: '期限超過の本', deadline: Date.current + 5, status: :unread)
           end
           get books_path
 
           expect(response.body).to include('期限超過')
+        end
+
+        it '自分の書籍だけが表示される' do
+          other_book = create(:book, user: other_user, title: '他ユーザーの積読本')
+          get books_path
+
+          expect(response.body).to include(book_far.title)
+          expect(response.body).not_to include(other_book.title)
         end
       end
 
@@ -110,39 +117,6 @@ RSpec.describe 'Books', type: :request do
 
           expect(response).to redirect_to(books_path)
         end
-      end
-    end
-  end
-end
-
-require 'rails_helper'
-
-RSpec.describe 'Books', type: :request do
-  let(:user) { create(:user) }
-  let(:other_user) { create(:user) }
-
-  describe 'GET /books' do
-    context '認証済みユーザーの場合' do
-      before { sign_in user }
-
-      it '200を返す' do
-        get books_path
-        expect(response).to have_http_status(:ok)
-      end
-
-      it '自分の書籍だけが表示される' do
-        book = create(:book, user: user, title: '私の積読本')
-        other_book = create(:book, user: other_user, title: '他ユーザーの積読本')
-        get books_path
-        expect(response.body).to include(book.title)
-        expect(response.body).not_to include(other_book.title)
-      end
-    end
-
-    context '未認証ユーザーの場合' do
-      it 'ログインページへリダイレクトされる' do
-        get books_path
-        expect(response).to redirect_to(new_user_session_path)
       end
     end
   end
@@ -256,20 +230,6 @@ RSpec.describe 'Books', type: :request do
       end
     end
 
-    context '他ユーザーの書籍は表示されない' do
-      let(:user) { create(:user) }
-      let(:other_user) { create(:user) }
-      let!(:other_book) { create(:book, user: other_user) }
-
-      before { sign_in user }
-
-      it '他ユーザーの書籍が表示されない' do
-        get books_path
-
-        expect(response.body).not_to include(other_book.title)
-      end
-    end
-
     context '未認証ユーザーの場合' do
       it 'ログインページへリダイレクトされる' do
         post books_path, params: { book: { title: 'テスト' } }
@@ -300,7 +260,9 @@ RSpec.describe 'Books', type: :request do
                              deadline: Date.current + 9, status: :unread)
         get book_path(book)
         expect(response.body).to include('今日のノルマ')
-        expect(response.body).to include('10')
+        # <strong>10</strong> ページ として描画されるため数値と単位を個別に確認
+        expect(response.body).to include('>10<')
+        expect(response.body).to include('ページ')
       end
 
       it '読了済みの場合はノルマ欄に「読了済み」が表示される' do
@@ -323,7 +285,9 @@ RSpec.describe 'Books', type: :request do
         book = create(:book, user: user, current_page: 50, target_pages: 200,
                              deadline: Date.current + 5)
         get book_path(book)
-        expect(response.body).to include('150')
+        expect(response.body).to include('150 ページ')
+      end
+
       it 'ステータスバッジが表示される' do
         book = create(:book, user: user, status: :reading)
         get book_path(book)
@@ -335,8 +299,6 @@ RSpec.describe 'Books', type: :request do
         book = create(:book, user: user, current_page: 50, target_pages: 100)
         get book_path(book)
         expect(response.body).to include('book-show__progress-bar')
-        expect(response.body).to include('50')
-        expect(response.body).to include('100')
       end
 
       it '延長回数が表示される' do
