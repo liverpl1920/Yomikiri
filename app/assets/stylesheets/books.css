@@ -672,3 +672,136 @@
 .progress-update__advanced-section[hidden] {
   display: none;
 }
+
+/* ========================
+   読了機能 (Issue #21)
+   ======================== */
+
+/* ---- 読了ボタンエリア (W-6) ---- */
+.book-show__complete-section {
+  text-align: center;
+}
+
+.book-show__complete-btn {
+  display: inline-block;
+  width: 100%;
+  padding: var(--spacing-md) var(--spacing-xl);
+  font-size: var(--font-size-base);
+  font-weight: 700;
+  color: var(--color-text-muted);
+  background-color: var(--color-bg-surface);
+  border: 2px solid var(--color-border);
+  border-radius: var(--border-radius-lg);
+  cursor: pointer;
+  transition: background-color 0.2s, border-color 0.2s, color 0.2s, transform 0.1s;
+}
+
+.book-show__complete-btn:hover {
+  background-color: var(--color-border);
+}
+
+.book-show__complete-btn--highlighted {
+  color: #ffffff;
+  background-color: #16a34a;
+  border-color: #16a34a;
+  font-size: var(--font-size-lg);
+  padding: var(--spacing-lg) var(--spacing-xl);
+  box-shadow: 0 4px 12px rgba(22, 163, 74, 0.4);
+  animation: pulse-green 2s infinite;
+}
+
+.book-show__complete-btn--highlighted:hover {
+  background-color: #15803d;
+  border-color: #15803d;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(22, 163, 74, 0.5);
+}
+
+@keyframes pulse-green {
+  0%, 100% { box-shadow: 0 4px 12px rgba(22, 163, 74, 0.4); }
+  50% { box-shadow: 0 4px 20px rgba(22, 163, 74, 0.7); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .book-show__complete-btn--highlighted {
+    animation: none;
+  }
+}
+
+/* ---- 読了済みカード (W-4) ---- */
+.book-card--completed {
+  opacity: 0.75;
+  filter: grayscale(30%);
+}
+
+.book-card--completed:hover {
+  opacity: 0.9;
+  filter: grayscale(0%);
+}
+
+/* ---- 読了お祝いモーダル (W-13) ---- */
+.celebration-modal-overlay {
+  /* 削除確認モーダルより高い z-index で前面に表示 */
+  z-index: 1100;
+}
+
+.celebration-modal {
+  text-align: center;
+  gap: var(--spacing-lg);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.celebration-modal__emoji {
+  font-size: 4rem;
+  line-height: 1;
+  margin: 0;
+}
+
+.celebration-modal__title {
+  font-size: var(--font-size-xl);
+  color: #15803d;
+}
+
+.celebration-modal__book-name {
+  font-size: var(--font-size-base);
+  color: var(--color-text);
+  font-weight: 600;
+}
+
+.celebration-modal__stats {
+  display: flex;
+  gap: var(--spacing-xl);
+  justify-content: center;
+  margin: 0;
+  padding: var(--spacing-md) var(--spacing-xl);
+  background-color: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  border-radius: var(--border-radius-lg);
+  width: 100%;
+}
+
+.celebration-modal__stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-xs);
+}
+
+.celebration-modal__stat-label {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+}
+
+.celebration-modal__stat-value {
+  font-size: var(--font-size-base);
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.celebration-modal__stat-value strong {
+  font-size: var(--font-size-2xl);
+  font-weight: 900;
+  color: #15803d;
+}
