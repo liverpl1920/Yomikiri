@@ -35,8 +35,13 @@ RSpec.describe 'Books', type: :request do
         it 'Empty State のボタンが new_book_path へのリンクである' do
           get books_path
 
-          expect(response.body).to include(new_book_path)
-          expect(response.body).not_to include('disabled')
+          empty_state_link = response.body.scan(%r{<a\b[^>]*href="[^"]*"[^>]*>.*?</a>}m).find do |anchor|
+            anchor.include?(%(href="#{new_book_path}")) &&
+              anchor.gsub(/<[^>]+>/, ' ').gsub(/\s+/, ' ').include?('最初の本を登録して始める')
+          end
+
+          expect(empty_state_link).to be_present
+          expect(empty_state_link).not_to match(/\bdisabled\b/)
         end
       end
 
@@ -54,8 +59,13 @@ RSpec.describe 'Books', type: :request do
         it 'ヘッダーの「+ 本を追加する」ボタンが new_book_path へのリンクである' do
           get books_path
 
-          expect(response.body).to include(new_book_path)
-          expect(response.body).not_to include('disabled')
+          add_book_link = response.body.scan(%r{<a\b[^>]*href="[^"]*"[^>]*>.*?</a>}m).find do |anchor|
+            anchor.include?(%(href="#{new_book_path}")) &&
+              anchor.gsub(/<[^>]+>/, ' ').gsub(/\s+/, ' ').include?('本を追加する')
+          end
+
+          expect(add_book_link).to be_present
+          expect(add_book_link).not_to match(/\bdisabled\b/)
         end
 
         it '書籍一覧が表示される' do
