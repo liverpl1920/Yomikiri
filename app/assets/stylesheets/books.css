@@ -252,75 +252,6 @@
   font-weight: 700;
 }
 
-/* ---- 書籍詳細 (W-6) ---- */
-.book-show {
-  max-width: 640px;
-  margin: var(--spacing-2xl) auto;
-}
-
-.book-show__header {
-  margin-bottom: var(--spacing-xl);
-}
-
-.book-show__title {
-  font-size: var(--font-size-2xl);
-  font-weight: 700;
-  color: var(--color-text);
-}
-
-.book-show__author {
-  font-size: var(--font-size-base);
-  color: var(--color-text-muted);
-  margin-top: var(--spacing-xs);
-}
-
-.book-show__details {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-md);
-  margin-bottom: var(--spacing-xl);
-}
-
-.book-show__detail-item {
-  display: flex;
-  gap: var(--spacing-md);
-  padding: var(--spacing-md);
-  background-color: #f9fafb;
-  border-radius: var(--border-radius);
-}
-
-.book-show__detail-label {
-  font-size: var(--font-size-sm);
-  color: var(--color-text-muted);
-  min-width: 120px;
-  flex-shrink: 0;
-  font-weight: 600;
-}
-
-.book-show__detail-value {
-  font-size: var(--font-size-base);
-  color: var(--color-text);
-}
-
-.book-show__detail-value strong {
-  font-size: var(--font-size-xl);
-  font-weight: 900;
-  color: #b45309;
-}
-
-.book-show__quota-overdue {
-  color: #dc2626;
-  font-weight: 700;
-}
-
-.book-show__quota-done {
-  color: var(--color-text-muted);
-}
-
-.book-show__actions {
-  margin-top: var(--spacing-xl);
-}
-
 /* ---- Empty State ---- */
 .books-empty {
   text-align: center;
@@ -374,6 +305,44 @@
   display: flex;
   flex-direction: column;
   gap: var(--spacing-xl);
+}
+
+/* ---- 書影エリア（賞味期限ビジュアライザー） ---- */
+.book-show__cover-wrapper {
+  position: relative;
+  width: 120px;
+  flex-shrink: 0;
+}
+
+.book-show__cover {
+  width: 120px;
+  aspect-ratio: 3 / 4;
+  background-color: var(--color-bg-surface);
+  border-radius: var(--border-radius);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  transition: filter 0.3s, opacity 0.3s;
+}
+
+.book-show__cover-placeholder {
+  font-size: 3rem;
+  line-height: 1;
+}
+
+.book-show__urgency-badge {
+  position: absolute;
+  top: var(--spacing-xs);
+  right: calc(-1 * var(--spacing-xs));
+  background-color: var(--color-danger);
+  color: #ffffff;
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 0.2rem 0.5rem;
+  border-radius: 99px;
+  line-height: 1.4;
+  white-space: nowrap;
 }
 
 /* ---- ヘッダー ---- */
@@ -487,6 +456,21 @@
   font-size: var(--font-size-base);
   font-weight: 600;
   color: var(--color-text);
+}
+
+.book-show__detail-value strong {
+  font-size: var(--font-size-xl);
+  font-weight: 900;
+  color: #b45309;
+}
+
+.book-show__quota-overdue {
+  color: #dc2626;
+  font-weight: 700;
+}
+
+.book-show__quota-done {
+  color: var(--color-text-muted);
 }
 
 /* ---- アクションボタン ---- */

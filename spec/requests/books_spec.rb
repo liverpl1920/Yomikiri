@@ -314,6 +314,41 @@ RSpec.describe 'Books', type: :request do
         expect(response.body).to include('一覧に戻る')
         expect(response.body).to include(books_path)
       end
+
+      it '残り7日以下の本に urgent-low クラスが表示される' do
+        book = create(:book, user: user, deadline: Date.current + 6)
+        get book_path(book)
+        expect(response.body).to include('book-card__cover--urgent-low')
+        expect(response.body).to include('あと7日')
+      end
+
+      it '残り3日以下の本に urgent-medium クラスが表示される' do
+        book = create(:book, user: user, deadline: Date.current + 2)
+        get book_path(book)
+        expect(response.body).to include('book-card__cover--urgent-medium')
+        expect(response.body).to include('あと3日')
+      end
+
+      it '残り1日（期限当日）の本に urgent-high クラスと「期限間近！」バッジが表示される' do
+        book = create(:book, user: user, deadline: Date.current)
+        get book_path(book)
+        expect(response.body).to include('book-card__cover--urgent-high')
+        expect(response.body).to include('期限間近！')
+      end
+
+      it '読了済みの場合は urgency クラスが表示されない' do
+        book = create(:book, user: user, status: :completed, current_page: 300,
+                             target_pages: 300, deadline: Date.current)
+        get book_path(book)
+        expect(response.body).not_to include('book-card__cover--urgent-high')
+        expect(response.body).not_to include('book-show__urgency-badge')
+      end
+
+      it '残り8日以上の本は urgency クラスが表示されない' do
+        book = create(:book, user: user, deadline: Date.current + 7)
+        get book_path(book)
+        expect(response.body).not_to include('book-card__cover--urgent')
+      end
     end
 
     context '未認証ユーザーの場合' do
