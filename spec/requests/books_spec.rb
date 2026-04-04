@@ -445,6 +445,74 @@ RSpec.describe 'Books', type: :request do
     end
   end
 
+  describe 'PATCH /books/:id/change_deadline' do
+    context '認証済みユーザーの場合' do
+      before { sign_in user }
+
+      it 'deadlineが更新される' do
+        book = create(:book, user: user, deadline: Date.current + 7)
+        new_deadline = Date.current + 14
+        patch change_deadline_book_path(book), params: { deadline: new_deadline.to_s }
+        expect(book.reload.deadline).to eq(new_deadline)
+      end
+
+      it 'extension_countがインクリメントされる' do
+        book = create(:book, user: user, deadline: Date.current + 7, extension_count: 1)
+        patch change_deadline_book_path(book), params: { deadline: (Date.current + 14).to_s }
+        expect(book.reload.extension_count).to eq(2)
+      end
+
+      it '更新後、書籍詳細画面にリダイレクトされる' do
+        book = create(:book, user: user, deadline: Date.current + 7)
+        patch change_deadline_book_path(book), params: { deadline: (Date.current + 14).to_s }
+        expect(response).to redirect_to(book_path(book))
+      end
+
+      it 'フラッシュメッセージが表示される' do
+        book = create(:book, user: user, deadline: Date.current + 7)
+        patch change_deadline_book_path(book), params: { deadline: (Date.current + 14).to_s }
+        follow_redirect!
+        expect(response.body).to include('読了期限を延長しました。')
+      end
+
+      it '現在の期限と同じ日付は無効（422）' do
+        book = create(:book, user: user, deadline: Date.current + 7)
+        patch change_deadline_book_path(book), params: { deadline: (Date.current + 7).to_s }
+        expect(response).to have_http_status(:unprocessable_entity)
+        expect(book.reload.deadline).to eq(Date.current + 7)
+      end
+
+      it '現在の期限より前の日付は無効（422）' do
+        book = create(:book, user: user, deadline: Date.current + 7)
+        patch change_deadline_book_path(book), params: { deadline: (Date.current + 3).to_s }
+        expect(response).to have_http_status(:unprocessable_entity)
+        expect(book.reload.deadline).to eq(Date.current + 7)
+      end
+
+      it '日付として不正な文字列は無効（422）' do
+        book = create(:book, user: user, deadline: Date.current + 7)
+        patch change_deadline_book_path(book), params: { deadline: 'not-a-date' }
+        expect(response).to have_http_status(:unprocessable_entity)
+        expect(book.reload.deadline).to eq(Date.current + 7)
+      end
+
+      it '他ユーザーの書籍は更新できない（404）' do
+        other_book = create(:book, user: other_user, deadline: Date.current + 7)
+        patch change_deadline_book_path(other_book), params: { deadline: (Date.current + 14).to_s }
+        expect(response).to have_http_status(:not_found)
+        expect(other_book.reload.deadline).to eq(Date.current + 7)
+      end
+    end
+
+    context '未認証ユーザーの場合' do
+      it 'ログインページへリダイレクトされる' do
+        book = create(:book, user: user, deadline: Date.current + 7)
+        patch change_deadline_book_path(book), params: { deadline: (Date.current + 14).to_s }
+        expect(response).to redirect_to(new_user_session_path)
+      end
+    end
+  end
+
   describe 'PATCH /books/:id/complete' do
     context '認証済みユーザーの場合' do
       before { sign_in user }

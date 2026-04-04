@@ -1,7 +1,7 @@
 import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
-  static targets = ["overlay"]
+  static targets = ["overlay", "extendOverlay"]
 
   open() {
     this.overlayTarget.removeAttribute("hidden")
@@ -16,6 +16,22 @@ export default class extends Controller {
   closeOnBackdrop(event) {
     if (event.target === this.overlayTarget) {
       this.close()
+    }
+  }
+
+  openExtend() {
+    this.extendOverlayTarget.removeAttribute("hidden")
+    this.extendOverlayTarget.setAttribute("aria-hidden", "false")
+  }
+
+  closeExtend() {
+    this.extendOverlayTarget.setAttribute("hidden", "")
+    this.extendOverlayTarget.setAttribute("aria-hidden", "true")
+  }
+
+  closeExtendOnBackdrop(event) {
+    if (event.target === this.extendOverlayTarget) {
+      this.closeExtend()
     }
   }
 }

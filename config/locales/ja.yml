@@ -35,6 +35,7 @@ ja:
           attributes:
             deadline:
               past_date: "は過去の日付にできません"
+              must_be_after_current_deadline: "は現在の期限より後の日付を指定してください"
             target_pages:
               less_than_or_equal_to: "は総ページ数（%{count}ページ）以下にしてください"
             current_page:
