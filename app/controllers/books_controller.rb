@@ -2,7 +2,7 @@
 
 class BooksController < ApplicationController
   before_action :authenticate_user!
-  before_action :set_book, only: [ :show, :destroy, :update_progress, :complete ]
+  before_action :set_book, only: [ :show, :destroy, :update_progress, :complete, :change_deadline ]
 
   def index
     @books = current_user.books.for_index_list
@@ -34,6 +34,18 @@ class BooksController < ApplicationController
     else
       render :show, status: :unprocessable_entity
     end
+  end
+
+  def change_deadline
+    new_deadline = Date.parse(params[:deadline].to_s)
+    if @book.extend_deadline!(new_deadline)
+      redirect_to @book, notice: "読了期限を延長しました。"
+    else
+      render :show, status: :unprocessable_entity
+    end
+  rescue Date::Error
+    @book.errors.add(:deadline, :invalid)
+    render :show, status: :unprocessable_entity
   end
 
   def complete

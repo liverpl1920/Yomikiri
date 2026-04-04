@@ -405,4 +405,52 @@ RSpec.describe Book, type: :model do
       end
     end
   end
+
+  describe '#extend_deadline!' do
+    let(:book) { create(:book, deadline: Date.current + 7, extension_count: 0) }
+
+    context '現在の期限より後の日付を渡した場合' do
+      it 'deadlineが更新される' do
+        new_deadline = Date.current + 14
+        book.extend_deadline!(new_deadline)
+        expect(book.reload.deadline).to eq(new_deadline)
+      end
+
+      it 'extension_countがインクリメントされる' do
+        book.extend_deadline!(Date.current + 14)
+        expect(book.reload.extension_count).to eq(1)
+      end
+
+      it 'trueを返す' do
+        expect(book.extend_deadline!(Date.current + 14)).to be_truthy
+      end
+    end
+
+    context '現在の期限と同じ日付を渡した場合' do
+      it 'falseを返す' do
+        expect(book.extend_deadline!(Date.current + 7)).to be_falsey
+      end
+
+      it 'deadlineが変更されない' do
+        book.extend_deadline!(Date.current + 7)
+        expect(book.reload.deadline).to eq(Date.current + 7)
+      end
+
+      it 'extension_countが変わらない' do
+        book.extend_deadline!(Date.current + 7)
+        expect(book.reload.extension_count).to eq(0)
+      end
+    end
+
+    context '現在の期限より前の日付を渡した場合' do
+      it 'falseを返す' do
+        expect(book.extend_deadline!(Date.current + 3)).to be_falsey
+      end
+
+      it 'deadlineが変更されない' do
+        book.extend_deadline!(Date.current + 3)
+        expect(book.reload.deadline).to eq(Date.current + 7)
+      end
+    end
+  end
 end

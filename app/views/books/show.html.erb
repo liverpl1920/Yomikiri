@@ -203,6 +203,12 @@
 
     <div class="book-show__actions">
       <%= link_to '一覧に戻る', books_path, class: 'btn btn--outline' %>
+      <% unless @book.completed? %>
+        <button type="button" class="btn btn--secondary"
+                data-action="click->modal#openExtend">
+          期限を延長する
+        </button>
+      <% end %>
       <button type="button" class="btn btn--danger"
               data-action="click->modal#open">
         削除する
@@ -238,6 +244,51 @@
     </div>
   </div>
 
+  <%# 期限延長モーダル (W-10) %>
+  <div class="modal-overlay"
+       hidden
+       aria-hidden="true"
+       aria-modal="true"
+       role="dialog"
+       aria-labelledby="extend-modal-title"
+       data-modal-target="extendOverlay"
+       data-action="click->modal#closeExtendOnBackdrop">
+    <div class="modal">
+      <h2 class="modal__title" id="extend-modal-title">読了期限の延長</h2>
+      <p class="modal__body">
+        現在の期限：<time datetime="<%= @book.deadline %>"><%= l(@book.deadline, format: :long) %></time><br>
+        延長回数：これまで <%= @book.extension_count %> 回（今回で <%= @book.extension_count + 1 %> 回目）
+      </p>
+
+      <%# バリデーションエラー表示（change_deadline で render :show された場合） %>
+      <% if @book.errors[:deadline].any? %>
+        <div class="form-errors" role="alert">
+          <ul class="form-errors__list">
+            <% @book.errors[:deadline].each do |message| %>
+              <li><%= I18n.t('activerecord.attributes.book.deadline') + message %></li>
+            <% end %>
+          </ul>
+        </div>
+      <% end %>
+
+      <%= form_with url: change_deadline_book_path(@book), method: :patch,
+            data: { turbo: false } do |f| %>
+        <div class="modal__field">
+          <label class="modal__label" for="deadline">新しい期限</label>
+          <input type="date" id="deadline" name="deadline"
+                 class="modal__input"
+                 min="<%= (@book.deadline + 1).to_s %>"
+                 value="<%= (@book.deadline + 1).to_s %>"
+                 aria-label="新しい読了期限">
+        </div>
+        <div class="modal__actions">
+          <button type="button" class="btn btn--outline"
+                  data-action="click->modal#closeExtend">
+            キャンセル
+          </button>
+          <%= f.submit "延長する", class: "btn btn--primary" %>
+        </div>
+      <% end %>
   <%# 読了お祝いモーダル (W-13) %>
   <% if flash[:completed_book].present? %>
     <% days_to_complete = (@book.completed_at.to_date - @book.created_at.to_date).to_i + 1 %>

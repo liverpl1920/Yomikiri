@@ -17,6 +17,15 @@ class Book < ApplicationRecord
 
   before_save :auto_set_reading_status
 
+  def extend_deadline!(new_deadline)
+    return false if new_deadline.blank?
+    return errors.add(:deadline, :must_be_after_current_deadline) && false if new_deadline <= deadline
+
+    self.deadline = new_deadline
+    self.extension_count += 1
+    save
+  end
+
   def remaining_pages
     target_pages - current_page
   end
