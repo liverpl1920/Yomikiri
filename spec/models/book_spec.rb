@@ -370,8 +370,7 @@ RSpec.describe Book, type: :model do
       context 'ステータスが completed の場合' do
         it 'current_page を変更してもステータスは completed のまま' do
           book = create(:book, status: :completed, current_page: 300, target_pages: 300)
-          book.title = '別のタイトル'
-          book.save!
+          book.update!(current_page: 200)
           expect(book.reload).to be_completed
         end
       end
