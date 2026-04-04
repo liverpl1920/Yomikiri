@@ -23,7 +23,7 @@
       <ul class="book-list" aria-label="積読一覧">
         <% @books.each do |book| %>
         <li class="book-list__item">
-            <%= link_to book_path(book), class: 'book-card' do %>
+            <%= link_to book_path(book), class: "book-card#{' book-card--completed' if book.completed?}" do %>
               <%# 書影 %>
               <div class="book-card__cover-wrapper">
                 <div class="book-card__cover <%= book.deadline_urgency_class %>">
