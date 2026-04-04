@@ -107,6 +107,17 @@
       </div>
     <% end %>
 
+    <%# 読了ボタン (W-6) %>
+    <% unless @book.completed? %>
+      <% complete_btn_class = @book.progress_percentage >= 100 ? 'book-show__complete-btn book-show__complete-btn--highlighted' : 'book-show__complete-btn' %>
+      <div class="book-show__complete-section">
+        <%= button_to '読了にする！', complete_book_path(@book),
+              method: :patch,
+              class: complete_btn_class,
+              form: { data: { turbo: false } } %>
+      </div>
+    <% end %>
+
     <dl class="book-show__details">
       <div class="book-show__detail-item">
         <dt class="book-show__detail-label">ステータス</dt>
@@ -210,67 +221,40 @@
       </div>
     </div>
   </div>
-</div>
 
-      <div class="book-show__detail-item">
-        <dt class="book-show__detail-label">読了期限</dt>
-        <dd class="book-show__detail-value">
-          <time datetime="<%= @book.deadline %>">
-            <%= l(@book.deadline, format: :long) %>
-          </time>
-        </dd>
-      </div>
-
-      <div class="book-show__detail-item">
-        <dt class="book-show__detail-label">残ページ数</dt>
-        <dd class="book-show__detail-value"><%= @book.remaining_pages %> ページ</dd>
-      </div>
-
-      <div class="book-show__detail-item">
-        <dt class="book-show__detail-label">総ページ数</dt>
-        <dd class="book-show__detail-value"><%= @book.total_pages %> ページ</dd>
-      </div>
-
-      <div class="book-show__detail-item">
-        <dt class="book-show__detail-label">延長回数</dt>
-        <dd class="book-show__detail-value"><%= @book.extension_count %> 回</dd>
-      </div>
-    </dl>
-
-    <div class="book-show__actions">
-      <%= link_to '一覧に戻る', books_path, class: 'btn btn--outline' %>
-      <button type="button" class="btn btn--danger"
-              data-action="click->modal#open">
-        削除する
-      </button>
-    </div>
-  </div>
-
-  <%# 削除確認モーダル (W-12) %>
-  <div class="modal-overlay"
-       hidden
-       aria-hidden="true"
-       aria-modal="true"
-       role="dialog"
-       aria-labelledby="modal-title"
-       data-modal-target="overlay"
-       data-action="click->modal#closeOnBackdrop">
-    <div class="modal">
-      <h2 class="modal__title" id="modal-title">本の削除</h2>
-      <p class="modal__body">
-        「<span class="modal__book-name"><%= @book.title %></span>」を削除してもよろしいですか？<br>
-        削除すると元に戻すことはできません。
-      </p>
-      <div class="modal__actions">
-        <button type="button" class="btn btn--outline"
-                data-action="click->modal#close">
-          キャンセル
-        </button>
-        <%= button_to '削除する', book_path(@book),
-              method: :delete,
-              class: 'btn btn--danger',
-              form: { data: { turbo_confirm: false } } %>
+  <%# 読了お祝いモーダル (W-13) %>
+  <% if flash[:completed_book].present? %>
+    <% days_to_complete = (@book.completed_at.to_date - @book.created_at.to_date).to_i + 1 %>
+    <div class="modal-overlay celebration-modal-overlay"
+         aria-modal="true"
+         role="dialog"
+         aria-labelledby="celebration-modal-title">
+      <div class="modal celebration-modal">
+        <p class="celebration-modal__emoji" aria-hidden="true">🎉</p>
+        <h2 class="modal__title celebration-modal__title" id="celebration-modal-title">
+          読了おめでとうございます！
+        </h2>
+        <p class="celebration-modal__book-name">
+          「<%= @book.title %>」を読み終えました
+        </p>
+        <dl class="celebration-modal__stats">
+          <div class="celebration-modal__stat">
+            <dt class="celebration-modal__stat-label">読了日</dt>
+            <dd class="celebration-modal__stat-value">
+              <%= l(@book.completed_at.to_date, format: :long) %>
+            </dd>
+          </div>
+          <div class="celebration-modal__stat">
+            <dt class="celebration-modal__stat-label">読了までの日数</dt>
+            <dd class="celebration-modal__stat-value">
+              <strong><%= days_to_complete %></strong> 日
+            </dd>
+          </div>
+        </dl>
+        <div class="modal__actions">
+          <%= link_to '一覧に戻る', books_path, class: 'btn btn--primary' %>
+        </div>
       </div>
     </div>
-  </div>
+  <% end %>
 </div>

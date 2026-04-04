@@ -5,9 +5,9 @@ Rails.application.routes.draw do
   resources :books, only: [ :index, :new, :create, :show, :destroy ] do
     member do
       patch :update_progress
+      patch :complete
       # 後続 Issue で実装予定
       # patch :change_deadline
-      # patch :complete
     end
   end
 

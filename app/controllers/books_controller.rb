@@ -2,7 +2,7 @@
 
 class BooksController < ApplicationController
   before_action :authenticate_user!
-  before_action :set_book, only: [ :show, :destroy, :update_progress ]
+  before_action :set_book, only: [ :show, :destroy, :update_progress, :complete ]
 
   def index
     @books = current_user.books.for_index_list
@@ -31,6 +31,15 @@ class BooksController < ApplicationController
       render :show, status: :unprocessable_entity
     elsif @book.update(current_page: new_page)
       redirect_to @book, notice: "進捗を更新しました。"
+    else
+      render :show, status: :unprocessable_entity
+    end
+  end
+
+  def complete
+    if @book.update(status: :completed, completed_at: Time.current)
+      flash[:completed_book] = @book.title
+      redirect_to @book
     else
       render :show, status: :unprocessable_entity
     end
