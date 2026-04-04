@@ -19,24 +19,6 @@ class Book < ApplicationRecord
     target_pages - current_page
   end
 
-  def remaining_days
-    return 0 if deadline.nil? || deadline < Date.current
-
-    (deadline - Date.current).to_i + 1
-  end
-
-  def calculate_daily_quota
-    return 0 if remaining_pages <= 0 || remaining_days <= 0
-
-    (remaining_pages.to_f / remaining_days).ceil
-  end
-
-  def progress_percentage
-    return 0 if target_pages.zero?
-
-    ((current_page.to_f / target_pages) * 100).round(1)
-  end
-
   # 積読一覧用ソートスコープ：未了本を期限順 → 読了本を期限順
   scope :for_index_list, lambda {
     completed_val = statuses[:completed]
@@ -46,13 +28,14 @@ class Book < ApplicationRecord
   }
 
   # 今日のノルマ（残ページ ÷ 残日数、切り上げ）
+  # 期限超過時（D <= 0）は D=1 として計算する
   def daily_quota
     return 0 if completed?
 
     remaining = target_pages - current_page
     return 0 if remaining <= 0
 
-    days = [ days_remaining, 1 ].max
+    days = overdue? ? 1 : days_remaining
     (remaining.to_f / days).ceil
   end
 
@@ -64,9 +47,14 @@ class Book < ApplicationRecord
     ((current_page.to_f / target_pages) * 100).round
   end
 
-  # 残り日数（今日を含む／期限当日は 1）
+  # 残り日数（今日を含む／期限当日は D=1）
   def days_remaining
     (deadline - Date.current).to_i + 1
+  end
+
+  # 期限超過判定（D <= 0、すなわち期限日翌日以降）
+  def overdue?
+    days_remaining <= 0
   end
 
   # 賞味期限ビジュアライザー用CSSクラス

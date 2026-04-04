@@ -174,14 +174,14 @@ RSpec.describe Book, type: :model do
       end
     end
 
-    context '残日数が0以下（期限当日または過ぎた場合）' do
+    context '期限超過の場合（期限翌日以降）' do
       it '残日数を1日として計算する' do
-        # 残ページ: 100, 残日数: max(0,1)=1, ノルマ: 100
-        book = build(:book, current_page: 0, target_pages: 100, deadline: Date.current)
+        # 残ページ: 100, days_remaining = 0（期限の翌日）→ D=1 として計算
+        book = build(:book, current_page: 0, target_pages: 100, deadline: Date.current - 1)
         expect(book.daily_quota).to eq(100)
       end
 
-      it '期限が過ぎた場合も1日として計算する' do
+      it '期限を5日過ぎた場合も1日として計算する' do
         book = build(:book, current_page: 0, target_pages: 50, deadline: Date.current - 5)
         expect(book.daily_quota).to eq(50)
       end
@@ -225,6 +225,28 @@ RSpec.describe Book, type: :model do
     it '期限を3日過ぎた場合は-2を返す' do
       book = build(:book, deadline: Date.current - 3)
       expect(book.days_remaining).to eq(-2)
+    end
+  end
+
+  describe '#overdue?' do
+    it '期限当日は期限超過ではない' do
+      book = build(:book, deadline: Date.current)
+      expect(book.overdue?).to be false
+    end
+
+    it '期限翌日は期限超過となる' do
+      book = build(:book, deadline: Date.current - 1)
+      expect(book.overdue?).to be true
+    end
+
+    it '期限を5日過ぎた場合は期限超過となる' do
+      book = build(:book, deadline: Date.current - 5)
+      expect(book.overdue?).to be true
+    end
+
+    it '期限まで3日ある場合は期限超過ではない' do
+      book = build(:book, deadline: Date.current + 3)
+      expect(book.overdue?).to be false
     end
   end
 
@@ -316,51 +338,15 @@ RSpec.describe Book, type: :model do
       end
     end
 
-    describe '#remaining_days' do
-      it '今日を含む残日数を返す' do
-        book = build(:book, deadline: Date.current)
-        expect(book.remaining_days).to eq(1)
-      end
-
-      it '明日が期限の場合は2を返す' do
-        book = build(:book, deadline: Date.current + 1)
-        expect(book.remaining_days).to eq(2)
-      end
-
-      it '期限が過去の場合は0を返す' do
-        book = build(:book, deadline: Date.current - 1)
-        expect(book.remaining_days).to eq(0)
-      end
-    end
-
-    describe '#calculate_daily_quota' do
-      it '残ページ / 残日数の切り上げを返す' do
-        book = build(:book, target_pages: 100, current_page: 0, deadline: Date.current + 9)
-        # 残100ページ / 残10日 = 10ページ
-        expect(book.calculate_daily_quota).to eq(10)
-      end
-
-      it '割り切れない場合は切り上げる' do
-        book = build(:book, target_pages: 101, current_page: 0, deadline: Date.current + 9)
-        # 残101ページ / 残10日 = 10.1 → 11
-        expect(book.calculate_daily_quota).to eq(11)
-      end
-
-      it '残ページが0の場合は0を返す' do
-        book = build(:book, target_pages: 100, current_page: 100, deadline: Date.current + 1)
-        expect(book.calculate_daily_quota).to eq(0)
-      end
-    end
-
     describe '#progress_percentage' do
       it '進捗率を返す' do
         book = build(:book, target_pages: 200, current_page: 100)
-        expect(book.progress_percentage).to eq(50.0)
+        expect(book.progress_percentage).to eq(50)
       end
 
       it '未読の場合は0を返す' do
         book = build(:book, target_pages: 200, current_page: 0)
-        expect(book.progress_percentage).to eq(0.0)
+        expect(book.progress_percentage).to eq(0)
       end
     end
   end

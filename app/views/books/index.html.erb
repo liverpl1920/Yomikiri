@@ -80,9 +80,13 @@
                 <% unless book.completed? %>
                   <div class="book-card__quota">
                     <span class="book-card__quota-label">今日のノルマ</span>
-                    <span class="book-card__quota-value">
-                      <strong><%= book.daily_quota %></strong> ページ
-                    </span>
+                    <% if book.overdue? %>
+                      <span class="book-card__quota-value book-card__quota-value--overdue">期限超過</span>
+                    <% else %>
+                      <span class="book-card__quota-value">
+                        <strong><%= book.daily_quota %></strong> ページ
+                      </span>
+                    <% end %>
                   </div>
                 <% end %>
               </div>
