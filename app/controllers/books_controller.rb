@@ -37,7 +37,8 @@ class BooksController < ApplicationController
   end
 
   def complete
-    if @book.update(status: :completed, completed_at: Time.current)
+    completed_at = @book.completed_at || Time.current
+    if @book.update(status: :completed, current_page: @book.target_pages, completed_at: completed_at)
       flash[:completed_book] = @book.title
       redirect_to @book
     else

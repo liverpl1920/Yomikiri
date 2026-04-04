@@ -464,6 +464,12 @@ RSpec.describe 'Books', type: :request do
           end
         end
 
+        it 'current_page が target_pages に揃えられる' do
+          reading_book = create(:book, user: user, current_page: 80, target_pages: 100, status: :reading)
+          patch complete_book_path(reading_book)
+          expect(reading_book.reload.current_page).to eq(100)
+        end
+
         it '書籍詳細画面へリダイレクトされる' do
           patch complete_book_path(book)
           expect(response).to redirect_to(book_path(book))
@@ -481,6 +487,17 @@ RSpec.describe 'Books', type: :request do
           follow_redirect!
           expect(response.body).to include('一覧に戻る')
           expect(response.body).to include(books_path)
+        end
+      end
+
+      context '冪等性: 既に読了済みの書籍を再度読了にする場合' do
+        it 'completed_at が上書きされない' do
+          original_time = 3.days.ago
+          already_done = create(:book, user: user, status: :completed,
+                                       current_page: 100, target_pages: 100,
+                                       completed_at: original_time)
+          patch complete_book_path(already_done)
+          expect(already_done.reload.completed_at).to be_within(1.second).of(original_time)
         end
       end
 

@@ -722,6 +722,12 @@
   50% { box-shadow: 0 4px 20px rgba(22, 163, 74, 0.7); }
 }
 
+@media (prefers-reduced-motion: reduce) {
+  .book-show__complete-btn--highlighted {
+    animation: none;
+  }
+}
+
 /* ---- 読了済みカード (W-4) ---- */
 .book-card--completed {
   opacity: 0.75;
