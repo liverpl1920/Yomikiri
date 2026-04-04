@@ -2,6 +2,22 @@
 
 <div class="container" data-controller="modal">
   <div class="book-show">
+    <%# 書影エリア（賞味期限ビジュアライザー） %>
+    <div class="book-show__cover-wrapper">
+      <div class="book-show__cover <%= @book.deadline_urgency_class %>">
+        <span class="book-show__cover-placeholder" aria-hidden="true">📖</span>
+      </div>
+      <% if @book.deadline_urgency_class.present? %>
+        <span class="book-show__urgency-badge">
+          <% if @book.days_remaining <= 1 %>
+            期限間近！
+          <% else %>
+            あと<%= @book.days_remaining %>日
+          <% end %>
+        </span>
+      <% end %>
+    </div>
+
     <div class="book-show__header">
       <h1 class="book-show__title"><%= @book.title %></h1>
       <% if @book.author.present? %>
