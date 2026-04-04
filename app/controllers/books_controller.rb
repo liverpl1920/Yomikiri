@@ -2,8 +2,36 @@
 
 class BooksController < ApplicationController
   before_action :authenticate_user!
+  before_action :set_book, only: [ :show ]
 
   def index
     @books = current_user.books.for_index_list
+  end
+
+  def new
+    @book = current_user.books.build
+  end
+
+  def create
+    @book = current_user.books.build(book_params)
+    if @book.save
+      redirect_to @book, notice: "#{@book.title}を登録しました。"
+    else
+      render :new, status: :unprocessable_entity
+    end
+  end
+
+  def show
+  end
+
+  private
+
+  def set_book
+    @book = current_user.books.find_by(id: params[:id])
+    render file: Rails.public_path.join("404.html"), status: :not_found, layout: false unless @book
+  end
+
+  def book_params
+    params.require(:book).permit(:title, :author, :total_pages, :target_pages, :current_page, :deadline, :status)
   end
 end
