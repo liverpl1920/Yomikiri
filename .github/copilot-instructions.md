@@ -1,36 +1,4 @@
 # プロジェクトメモリ
-
-## 技術スタック
-
-### MVPリリース
-
-| カテゴリ | 技術 |
-|----------|------|
-| フレームワーク | Ruby on Rails 7.2.x |
-| データベース | PostgreSQL（Neon） |
-| デプロイ先 | Render |
-| 認証 | Devise |
-| カレンダー連携 | Google Calendar URL生成（OAuth不要） |
-
-### 本リリース（追加）
-
-| カテゴリ | 技術 |
-|----------|------|
-| カレンダー連携 | omniauth-google-oauth2 / google-api-client |
-| 書籍検索 | openBD API（APIキー不要） |
-| メール送信 | ActionMailer + SendGrid |
-| 定期実行 | GitHub Actions + rake task（JST換算で設定） |
-
-### バックグラウンド処理
-
-GitHub Actions（cron）でrake taskを実行:
-
-- ノルマ再計算
-- 期限イベント生成（期限3日前、読了など）
-- 通知対象抽出
-
-APIキー等はGitHub Secretsで管理。定期処理はJST基準（GitHub ActionsのcronはUTCのため換算すること）。
-
 ## スペック駆動開発の基本原則
 
 ### 基本フロー
@@ -138,6 +106,19 @@ APIキー等はGitHub Secretsで管理。定期処理はJST基準（GitHub Actio
 **ポイント**: スペック駆動開発の詳細を意識する必要はありません。各プロンプトファイル(`.github/prompts/`)が適切な動作を定義しています。
 
 ### Git操作のルール
+
+**実装前に必ずブランチを切る:**
+
+- `main` ブランチで直接作業しない
+- 実装着手前に必ず作業ブランチを作成する
+- ブランチ名はIssue番号と作業内容を含める（例: `feature/#123-user-profile`）
+
+```bash
+# 実装着手前に必ず実行
+git checkout main
+git pull origin main
+git checkout -b feature/#[Issue番号]-[作業内容の概要]
+```
 
 **コミット前に必ずローカルでテストを実行する:**
 
