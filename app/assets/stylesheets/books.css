@@ -479,6 +479,78 @@
   gap: var(--spacing-md);
 }
 
+/* ---- Googleカレンダー連携 ---- */
+.book-show__gcal {
+  background-color: var(--color-bg-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius-lg);
+  padding: var(--spacing-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.book-show__gcal-title {
+  font-size: var(--font-size-base);
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+.book-show__gcal-label {
+  display: block;
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  color: var(--color-text-muted);
+  margin-bottom: var(--spacing-xs);
+}
+
+.book-show__gcal-options {
+  display: flex;
+  gap: var(--spacing-sm);
+  flex-wrap: wrap;
+}
+
+.book-show__gcal-option {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  cursor: pointer;
+  font-size: var(--font-size-sm);
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius);
+  background-color: var(--color-bg);
+  transition: border-color 0.15s, background-color 0.15s;
+}
+
+.book-show__gcal-option input[type="radio"] {
+  accent-color: var(--color-primary);
+}
+
+.book-show__gcal-option input[type="radio"]:checked {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+@supports selector(.book-show__gcal-option:has(input:checked)) {
+  .book-show__gcal-option:has(input:checked) {
+    border-color: var(--color-primary);
+    background-color: #eff6ff;
+    font-weight: 600;
+    color: var(--color-primary);
+  }
+
+  .book-show__gcal-option input[type="radio"]:checked {
+    outline: none;
+  }
+}
+
+.book-show__gcal-note {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+  margin: 0;
+}
+
 /* ---- レスポンシブ ---- */
 @media (max-width: 640px) {
   .book-show__details {
