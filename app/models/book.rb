@@ -15,6 +15,8 @@ class Book < ApplicationRecord
   validate :current_page_not_exceed_target_pages
   validate :deadline_cannot_be_in_the_past, if: -> { new_record? || will_save_change_to_deadline? }
 
+  before_save :auto_set_reading_status
+
   def remaining_pages
     target_pages - current_page
   end
@@ -91,5 +93,16 @@ class Book < ApplicationRecord
     return if deadline.blank?
 
     errors.add(:deadline, :past_date) if deadline < Date.current
+  end
+
+  # 初回の進捗記録（current_page が 0 → 1 以上）時に unread → reading へ自動遷移する
+  def auto_set_reading_status
+    return unless unread?
+    return unless persisted?
+    return unless current_page_changed?
+    return unless current_page_was.to_i.zero?
+    return if current_page.to_i.zero?
+
+    self.status = :reading
   end
 end
