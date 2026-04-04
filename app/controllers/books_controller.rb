@@ -26,7 +26,10 @@ class BooksController < ApplicationController
 
   def update_progress
     new_page = calculate_new_page
-    if @book.update(current_page: new_page)
+    if new_page.nil?
+      @book.errors.add(:base, "ページ数が無効です")
+      render :show, status: :unprocessable_entity
+    elsif @book.update(current_page: new_page)
       redirect_to @book, notice: "進捗を更新しました。"
     else
       render :show, status: :unprocessable_entity
@@ -47,9 +50,12 @@ class BooksController < ApplicationController
 
   def calculate_new_page
     if params[:direct_page].present?
-      params[:direct_page].to_i
+      Integer(params[:direct_page], exception: false)
     else
-      @book.current_page + params[:pages_read].to_i
+      pages_read = Integer(params[:pages_read], exception: false)
+      return nil if pages_read.nil? || pages_read <= 0
+
+      @book.current_page + pages_read
     end
   end
 

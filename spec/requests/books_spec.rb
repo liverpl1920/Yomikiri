@@ -390,6 +390,27 @@ RSpec.describe 'Books', type: :request do
           expect(response).to have_http_status(:unprocessable_entity)
           expect(book.reload.current_page).to eq(90)
         end
+
+        it 'pages_read が負の値の場合はバリデーションエラーになり current_page が変わらない' do
+          book = create(:book, user: user, current_page: 50, target_pages: 100)
+          patch update_progress_book_path(book), params: { pages_read: -1 }
+          expect(response).to have_http_status(:unprocessable_entity)
+          expect(book.reload.current_page).to eq(50)
+        end
+
+        it 'pages_read が非数値の場合はバリデーションエラーになり current_page が変わらない' do
+          book = create(:book, user: user, current_page: 50, target_pages: 100)
+          patch update_progress_book_path(book), params: { pages_read: 'abc' }
+          expect(response).to have_http_status(:unprocessable_entity)
+          expect(book.reload.current_page).to eq(50)
+        end
+
+        it 'pages_read が 0 の場合はバリデーションエラーになり current_page が変わらない' do
+          book = create(:book, user: user, current_page: 50, target_pages: 100)
+          patch update_progress_book_path(book), params: { pages_read: 0 }
+          expect(response).to have_http_status(:unprocessable_entity)
+          expect(book.reload.current_page).to eq(50)
+        end
       end
 
       context '現在ページを直接入力（direct_page）で更新する場合' do

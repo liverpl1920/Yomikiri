@@ -27,11 +27,12 @@
       </div>
     </div>
 
-    <% unless @book.completed? %>
+    <% remaining_pages = @book.target_pages - @book.current_page %>
+    <% if !@book.completed? && remaining_pages > 0 %>
       <%# 進捗更新フォーム %>
       <div class="book-show__progress-update"
            data-controller="progress-update"
-           data-progress-update-max-value="<%= @book.target_pages - @book.current_page %>">
+           data-progress-update-max-value="<%= remaining_pages %>">
 
         <%# バリデーションエラー表示 %>
         <% if @book.errors.any? %>
