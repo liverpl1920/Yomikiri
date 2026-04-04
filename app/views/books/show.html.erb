@@ -11,6 +11,15 @@
 
     <dl class="book-show__details">
       <div class="book-show__detail-item">
+        <dt class="book-show__detail-label">ステータス</dt>
+        <dd class="book-show__detail-value">
+          <span class="book-card__status book-card__status--<%= @book.status %>">
+            <%= t("book.status.#{@book.status}") %>
+          </span>
+        </dd>
+      </div>
+
+      <div class="book-show__detail-item">
         <dt class="book-show__detail-label">読了期限</dt>
         <dd class="book-show__detail-value">
           <time datetime="<%= @book.deadline %>">
@@ -22,21 +31,48 @@
       <div class="book-show__detail-item">
         <dt class="book-show__detail-label">進捗</dt>
         <dd class="book-show__detail-value">
-          <%= @book.current_page %> / <%= @book.target_pages %> ページ
-          （<%= @book.progress_percentage %>%）
+          <div class="book-card__progress">
+            <div class="book-card__progress-bar-wrapper" role="progressbar"
+                 aria-valuenow="<%= @book.progress_percentage %>"
+                 aria-valuemin="0" aria-valuemax="100"
+                 aria-label="進捗 <%= @book.progress_percentage %>%">
+              <div class="book-card__progress-bar"
+                   style="width: <%= @book.progress_percentage %>%;"></div>
+            </div>
+            <span class="book-card__progress-text">
+              <%= @book.current_page %> / <%= @book.target_pages %> ページ
+              （<%= @book.progress_percentage %>%）
+            </span>
+          </div>
         </dd>
       </div>
 
       <div class="book-show__detail-item">
+        <dt class="book-show__detail-label">残りページ数</dt>
+        <dd class="book-show__detail-value"><%= @book.remaining_pages %> ページ</dd>
+      </div>
+
+      <div class="book-show__detail-item">
         <dt class="book-show__detail-label">今日のノルマ</dt>
-        <dd class="book-show__detail-value book-show__detail-value--quota">
-          <%= @book.calculate_daily_quota %> ページ
+        <dd class="book-show__detail-value">
+          <% if @book.completed? %>
+            <span class="book-show__quota-done">読了済み</span>
+          <% elsif @book.overdue? %>
+            <span class="book-show__quota-overdue">期限超過</span>
+          <% else %>
+            <strong><%= @book.daily_quota %></strong> ページ
+          <% end %>
         </dd>
       </div>
 
       <div class="book-show__detail-item">
         <dt class="book-show__detail-label">総ページ数</dt>
         <dd class="book-show__detail-value"><%= @book.total_pages %> ページ</dd>
+      </div>
+
+      <div class="book-show__detail-item">
+        <dt class="book-show__detail-label">延長回数</dt>
+        <dd class="book-show__detail-value"><%= @book.extension_count %> 回</dd>
       </div>
     </dl>
 

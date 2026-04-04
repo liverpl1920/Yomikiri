@@ -87,6 +87,15 @@ RSpec.describe 'Books', type: :request do
           # 読了本(book_completed)の分は表示されないことを確認する
           expect(body.scan('book-card__quota-label').size).to eq(2)
         end
+
+        it '期限超過の本には「期限超過」メッセージが表示される' do
+          overdue_book = travel_to(10.days.ago) do
+            create(:book, user: user, title: '期限超過の本', deadline: Date.current + 5, status: :unread)
+          end
+          get books_path
+
+          expect(response.body).to include('期限超過')
+        end
       end
 
       context 'ログイン後のリダイレクト' do
@@ -284,6 +293,37 @@ RSpec.describe 'Books', type: :request do
         other_book = create(:book, user: other_user)
         get book_path(other_book)
         expect(response).to have_http_status(:not_found)
+      end
+
+      it '今日のノルマが表示される（未了本）' do
+        book = create(:book, user: user, current_page: 0, target_pages: 100,
+                             deadline: Date.current + 9, status: :unread)
+        get book_path(book)
+        expect(response.body).to include('今日のノルマ')
+        expect(response.body).to include('10')
+      end
+
+      it '読了済みの場合はノルマ欄に「読了済み」が表示される' do
+        book = create(:book, user: user, status: :completed, current_page: 100,
+                             target_pages: 100, deadline: Date.current + 5)
+        get book_path(book)
+        expect(response.body).to include('読了済み')
+      end
+
+      it '期限超過の場合はノルマ欄に「期限超過」が表示される' do
+        overdue_book = travel_to(10.days.ago) do
+          create(:book, user: user, deadline: Date.current + 5, status: :unread,
+                        current_page: 0, target_pages: 100)
+        end
+        get book_path(overdue_book)
+        expect(response.body).to include('期限超過')
+      end
+
+      it '詳細画面に残りページ数が表示される' do
+        book = create(:book, user: user, current_page: 50, target_pages: 200,
+                             deadline: Date.current + 5)
+        get book_path(book)
+        expect(response.body).to include('150')
       end
     end
 
