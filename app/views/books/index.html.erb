@@ -4,8 +4,7 @@
   <div class="container">
     <div class="books-index__header">
       <h1 class="books-index__title">積読一覧</h1>
-      <%# 書籍登録機能(Issue #14)実装後に link_to new_book_path に変更 %>
-      <button type="button" class="btn btn--primary books-index__add-btn" disabled>+ 本を追加する</button>
+      <%= link_to "+ 本を追加する", new_book_path, class: "btn btn--primary books-index__add-btn" %>
     </div>
 
     <% if @books.empty? %>
@@ -16,8 +15,7 @@
         <p class="books-empty__description">
           最初の本を登録して、読書管理を始めましょう。
         </p>
-        <%# 書籍登録機能(Issue #14)実装後にリンクに変更 %>
-        <button type="button" class="btn btn--primary btn--lg" disabled>最初の本を登録して始める</button>
+        <%= link_to "最初の本を登録して始める", new_book_path, class: "btn btn--primary btn--lg" %>
       </div>
     <% else %>
       <ul class="book-list" aria-label="積読一覧">

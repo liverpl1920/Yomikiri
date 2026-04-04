@@ -31,6 +31,13 @@ RSpec.describe 'Books', type: :request do
           expect(response.body).to include('積読本はまだありません')
           expect(response.body).to include('最初の本を登録して始める')
         end
+
+        it 'Empty State のボタンが new_book_path へのリンクである' do
+          get books_path
+
+          expect(response.body).to include(new_book_path)
+          expect(response.body).not_to include('disabled')
+        end
       end
 
       context '書籍が複数ある場合' do
@@ -42,6 +49,13 @@ RSpec.describe 'Books', type: :request do
           get books_path
 
           expect(response).to have_http_status(:ok)
+        end
+
+        it 'ヘッダーの「+ 本を追加する」ボタンが new_book_path へのリンクである' do
+          get books_path
+
+          expect(response.body).to include(new_book_path)
+          expect(response.body).not_to include('disabled')
         end
 
         it '書籍一覧が表示される' do
