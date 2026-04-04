@@ -362,4 +362,39 @@ RSpec.describe 'Books', type: :request do
       end
     end
   end
+
+  describe 'DELETE /books/:id' do
+    context '認証済みユーザーの場合' do
+      before { sign_in user }
+
+      it '自分の書籍を削除できる' do
+        book = create(:book, user: user)
+        expect {
+          delete book_path(book)
+        }.to change(Book, :count).by(-1)
+      end
+
+      it '削除後、積読一覧画面へリダイレクトされる' do
+        book = create(:book, user: user)
+        delete book_path(book)
+        expect(response).to redirect_to(books_path)
+      end
+
+      it '他ユーザーの書籍は削除できない（404）' do
+        other_book = create(:book, user: other_user)
+        expect {
+          delete book_path(other_book)
+        }.not_to change(Book, :count)
+        expect(response).to have_http_status(:not_found)
+      end
+    end
+
+    context '未認証ユーザーの場合' do
+      it 'ログインページへリダイレクトされる' do
+        book = create(:book, user: user)
+        delete book_path(book)
+        expect(response).to redirect_to(new_user_session_path)
+      end
+    end
+  end
 end

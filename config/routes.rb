@@ -2,7 +2,7 @@ Rails.application.routes.draw do
   devise_for :users, controllers: { sessions: "users/sessions" }
   root "top#index"
 
-  resources :books, only: [ :index, :new, :create, :show ] do
+  resources :books, only: [ :index, :new, :create, :show, :destroy ] do
     member do
       # 後続 Issue で実装予定
       # patch :update_progress

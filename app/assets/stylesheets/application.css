@@ -152,3 +152,15 @@ ul, ol {
   padding: 0.9rem 2rem;
   font-size: var(--font-size-lg);
 }
+
+.btn--danger {
+  background-color: var(--color-danger, #dc2626);
+  color: #ffffff;
+  border-color: var(--color-danger, #dc2626);
+}
+
+.btn--danger:hover {
+  background-color: var(--color-danger-hover, #b91c1c);
+  border-color: var(--color-danger-hover, #b91c1c);
+  text-decoration: none;
+}
