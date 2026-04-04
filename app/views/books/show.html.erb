@@ -27,7 +27,149 @@
       </div>
     </div>
 
+    <% unless @book.completed? %>
+      <%# 進捗更新フォーム %>
+      <div class="book-show__progress-update"
+           data-controller="progress-update"
+           data-progress-update-max-value="<%= @book.target_pages - @book.current_page %>">
+
+        <%# バリデーションエラー表示 %>
+        <% if @book.errors.any? %>
+          <div class="form-errors" role="alert">
+            <ul class="form-errors__list">
+              <% @book.errors.full_messages.each do |message| %>
+                <li><%= message %></li>
+              <% end %>
+            </ul>
+          </div>
+        <% end %>
+
+        <h2 class="book-show__progress-update-title">今日の進捗を記録する</h2>
+
+        <%# 今日読んだページ数フォーム（デフォルト） %>
+        <%= form_with url: update_progress_book_path(@book), method: :patch,
+              data: { turbo: false } do |f| %>
+          <div class="progress-update__field">
+            <label class="progress-update__label" for="pages_read">今日読んだページ数</label>
+            <div class="progress-update__input-group">
+              <button type="button" class="progress-update__step-btn"
+                      aria-label="1ページ減らす"
+                      data-action="click->progress-update#decrement">
+                −
+              </button>
+              <input type="number" id="pages_read" name="pages_read"
+                     class="progress-update__input"
+                     value="1" min="1"
+                     max="<%= @book.target_pages - @book.current_page %>"
+                     data-progress-update-target="pagesRead"
+                     aria-label="今日読んだページ数">
+              <button type="button" class="progress-update__step-btn"
+                      aria-label="1ページ増やす"
+                      data-action="click->progress-update#increment">
+                ＋
+              </button>
+            </div>
+          </div>
+          <%= f.submit "更新する", class: "btn btn--primary" %>
+        <% end %>
+
+        <%# 現在ページを直接入力（折りたたみ） %>
+        <div class="progress-update__advanced">
+          <button type="button" class="progress-update__toggle"
+                  aria-expanded="false"
+                  aria-controls="direct-input-section"
+                  data-action="click->progress-update#toggleAdvanced">
+            <span class="progress-update__toggle-icon" aria-hidden="true">▶</span>
+            現在ページを直接入力
+          </button>
+          <div id="direct-input-section"
+               class="progress-update__advanced-section"
+               hidden
+               data-progress-update-target="advancedSection">
+            <%= form_with url: update_progress_book_path(@book), method: :patch,
+                  data: { turbo: false } do |f| %>
+              <div class="progress-update__field">
+                <label class="progress-update__label" for="direct_page">現在ページ</label>
+                <div class="progress-update__input-row">
+                  <input type="number" id="direct_page" name="direct_page"
+                         class="progress-update__input"
+                         value="<%= @book.current_page %>" min="0"
+                         max="<%= @book.target_pages %>"
+                         aria-label="現在ページ">
+                  <span class="progress-update__unit">/ <%= @book.target_pages %> ページ</span>
+                </div>
+              </div>
+              <%= f.submit "更新する", class: "btn btn--primary" %>
+            <% end %>
+          </div>
+        </div>
+      </div>
+    <% end %>
+
     <dl class="book-show__details">
+      <div class="book-show__detail-item">
+        <dt class="book-show__detail-label">読了期限</dt>
+        <dd class="book-show__detail-value">
+          <time datetime="<%= @book.deadline %>">
+            <%= l(@book.deadline, format: :long) %>
+          </time>
+        </dd>
+      </div>
+
+      <div class="book-show__detail-item">
+        <dt class="book-show__detail-label">残ページ数</dt>
+        <dd class="book-show__detail-value"><%= @book.remaining_pages %> ページ</dd>
+      </div>
+
+      <div class="book-show__detail-item">
+        <dt class="book-show__detail-label">総ページ数</dt>
+        <dd class="book-show__detail-value"><%= @book.total_pages %> ページ</dd>
+      </div>
+
+      <div class="book-show__detail-item">
+        <dt class="book-show__detail-label">延長回数</dt>
+        <dd class="book-show__detail-value"><%= @book.extension_count %> 回</dd>
+      </div>
+    </dl>
+
+    <div class="book-show__actions">
+      <%= link_to '一覧に戻る', books_path, class: 'btn btn--outline' %>
+      <button type="button" class="btn btn--danger"
+              data-action="click->modal#open">
+        削除する
+      </button>
+    </div>
+  </div>
+
+  <%# 削除確認モーダル (W-12) %>
+  <div class="modal-overlay"
+       hidden
+       aria-hidden="true"
+       aria-modal="true"
+       role="dialog"
+       aria-labelledby="modal-title"
+       data-modal-target="overlay"
+       data-action="click->modal#closeOnBackdrop">
+    <div class="modal">
+      <h2 class="modal__title" id="modal-title">本の削除</h2>
+      <p class="modal__body">
+        「<span class="modal__book-name"><%= @book.title %></span>」を削除してもよろしいですか？<br>
+        削除すると元に戻すことはできません。
+      </p>
+      <div class="modal__actions">
+        <button type="button" class="btn btn--outline"
+                data-action="click->modal#close">
+          キャンセル
+        </button>
+        <%= button_to '削除する', book_path(@book),
+              method: :delete,
+              class: 'btn btn--danger',
+              form: { data: { turbo_confirm: false } } %>
+      </div>
+    </div>
+  </div>
+</div>
+
       <div class="book-show__detail-item">
         <dt class="book-show__detail-label">読了期限</dt>
         <dd class="book-show__detail-value">

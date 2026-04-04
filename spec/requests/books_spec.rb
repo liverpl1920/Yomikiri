@@ -366,4 +366,68 @@ RSpec.describe 'Books', type: :request do
       end
     end
   end
+
+  describe 'PATCH /books/:id/update_progress' do
+    context '認証済みユーザーの場合' do
+      before { sign_in user }
+
+      context '今日読んだページ数（pages_read）で更新する場合' do
+        it 'current_page が pages_read 分加算される' do
+          book = create(:book, user: user, current_page: 10, target_pages: 100)
+          patch update_progress_book_path(book), params: { pages_read: 20 }
+          expect(book.reload.current_page).to eq(30)
+        end
+
+        it '更新後、書籍詳細画面へリダイレクトされる' do
+          book = create(:book, user: user, current_page: 0, target_pages: 100)
+          patch update_progress_book_path(book), params: { pages_read: 10 }
+          expect(response).to redirect_to(book_path(book))
+        end
+
+        it 'フラッシュメッセージが表示される' do
+          book = create(:book, user: user, current_page: 0, target_pages: 100)
+          patch update_progress_book_path(book), params: { pages_read: 10 }
+          follow_redirect!
+          expect(response.body).to include('進捗を更新しました。')
+        end
+
+        it 'current_page が target_pages を超える場合はバリデーションエラーになる' do
+          book = create(:book, user: user, current_page: 90, target_pages: 100)
+          patch update_progress_book_path(book), params: { pages_read: 20 }
+          expect(response).to have_http_status(:unprocessable_entity)
+          expect(book.reload.current_page).to eq(90)
+        end
+      end
+
+      context '現在ページを直接入力（direct_page）で更新する場合' do
+        it 'current_page が指定した値に更新される' do
+          book = create(:book, user: user, current_page: 10, target_pages: 200)
+          patch update_progress_book_path(book), params: { direct_page: 50 }
+          expect(book.reload.current_page).to eq(50)
+        end
+
+        it 'direct_page が target_pages を超える場合はバリデーションエラーになる' do
+          book = create(:book, user: user, current_page: 10, target_pages: 100)
+          patch update_progress_book_path(book), params: { direct_page: 150 }
+          expect(response).to have_http_status(:unprocessable_entity)
+          expect(book.reload.current_page).to eq(10)
+        end
+      end
+
+      it '他ユーザーの書籍は更新できない（404）' do
+        other_book = create(:book, user: other_user, current_page: 0, target_pages: 100)
+        patch update_progress_book_path(other_book), params: { pages_read: 10 }
+        expect(response).to have_http_status(:not_found)
+        expect(other_book.reload.current_page).to eq(0)
+      end
+    end
+
+    context '未認証ユーザーの場合' do
+      it 'ログインページへリダイレクトされる' do
+        book = create(:book, user: user, current_page: 0, target_pages: 100)
+        patch update_progress_book_path(book), params: { pages_read: 10 }
+        expect(response).to redirect_to(new_user_session_path)
+      end
+    end
+  end
 end
