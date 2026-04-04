@@ -330,6 +330,62 @@ RSpec.describe Book, type: :model do
     end
   end
 
+  describe 'コールバック' do
+    describe '#auto_set_reading_status (before_save)' do
+      context 'ステータスが unread の場合' do
+        it 'current_page が 0 から 1 以上に変更されると reading になる' do
+          book = create(:book, status: :unread, current_page: 0)
+          book.update!(current_page: 1)
+          expect(book.reload).to be_reading
+        end
+
+        it 'current_page が 0 から大きい値に変更されても reading になる' do
+          book = create(:book, status: :unread, current_page: 0)
+          book.update!(current_page: 50)
+          expect(book.reload).to be_reading
+        end
+
+        it 'current_page が 0 のまま他の属性を変更してもステータスは変わらない' do
+          book = create(:book, status: :unread, current_page: 0)
+          book.update!(title: '別のタイトル')
+          expect(book.reload).to be_unread
+        end
+
+        it 'current_page を 0 のまま保存してもステータスは変わらない' do
+          book = create(:book, status: :unread, current_page: 0)
+          book.current_page = 0
+          book.save!
+          expect(book.reload).to be_unread
+        end
+      end
+
+      context 'ステータスが reading の場合' do
+        it 'current_page が更新されてもステータスは reading のまま' do
+          book = create(:book, status: :reading, current_page: 1)
+          book.update!(current_page: 2)
+          expect(book.reload).to be_reading
+        end
+      end
+
+      context 'ステータスが completed の場合' do
+        it 'current_page を変更してもステータスは completed のまま' do
+          book = create(:book, status: :completed, current_page: 300, target_pages: 300)
+          book.title = '別のタイトル'
+          book.save!
+          expect(book.reload).to be_completed
+        end
+      end
+
+      context '新規作成時' do
+        it '新規作成では current_page が 0 以外でもステータスを自動変更しない' do
+          book = build(:book, status: :unread, current_page: 5)
+          book.save!
+          expect(book.reload).to be_unread
+        end
+      end
+    end
+  end
+
   describe 'ビジネスロジック' do
     describe '#remaining_pages' do
       it '読了対象ページ数から現在ページを引いた値を返す' do
