@@ -501,6 +501,18 @@ RSpec.describe 'Books', type: :request do
         patch change_deadline_book_path(other_book), params: { deadline: (Date.current + 14).to_s }
         expect(response).to have_http_status(:not_found)
         expect(other_book.reload.deadline).to eq(Date.current + 7)
+      end
+    end
+
+    context '未認証ユーザーの場合' do
+      it 'ログインページへリダイレクトされる' do
+        book = create(:book, user: user, deadline: Date.current + 7)
+        patch change_deadline_book_path(book), params: { deadline: (Date.current + 14).to_s }
+        expect(response).to redirect_to(new_user_session_path)
+      end
+    end
+  end
+
   describe 'PATCH /books/:id/complete' do
     context '認証済みユーザーの場合' do
       before { sign_in user }
@@ -567,8 +579,6 @@ RSpec.describe 'Books', type: :request do
 
     context '未認証ユーザーの場合' do
       it 'ログインページへリダイレクトされる' do
-        book = create(:book, user: user, deadline: Date.current + 7)
-        patch change_deadline_book_path(book), params: { deadline: (Date.current + 14).to_s }
         book = create(:book, user: user, current_page: 100, target_pages: 100)
         patch complete_book_path(book)
         expect(response).to redirect_to(new_user_session_path)

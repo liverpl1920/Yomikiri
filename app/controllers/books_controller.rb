@@ -2,7 +2,7 @@
 
 class BooksController < ApplicationController
   before_action :authenticate_user!
-  before_action :set_book, only: [ :show, :destroy, :update_progress, :complete:change_deadline ]
+  before_action :set_book, only: [ :show, :destroy, :update_progress, :complete, :change_deadline ]
 
   def index
     @books = current_user.books.for_index_list
@@ -46,7 +46,8 @@ class BooksController < ApplicationController
   rescue Date::Error
     @book.errors.add(:deadline, :invalid)
     render :show, status: :unprocessable_entity
-    
+  end
+
   def complete
     completed_at = @book.completed_at || Time.current
     if @book.update(status: :completed, current_page: @book.target_pages, completed_at: completed_at)
