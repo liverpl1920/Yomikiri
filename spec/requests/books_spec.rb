@@ -285,6 +285,42 @@ RSpec.describe 'Books', type: :request do
         get book_path(other_book)
         expect(response).to have_http_status(:not_found)
       end
+
+      it 'ステータスバッジが表示される' do
+        book = create(:book, user: user, status: :reading)
+        get book_path(book)
+        expect(response.body).to include('book-show__status--reading')
+        expect(response.body).to include('読書中')
+      end
+
+      it '進捗プログレスバーが表示される' do
+        book = create(:book, user: user, current_page: 50, target_pages: 100)
+        get book_path(book)
+        expect(response.body).to include('book-show__progress-bar')
+        expect(response.body).to include('50')
+        expect(response.body).to include('100')
+      end
+
+      it '残ページ数が表示される' do
+        book = create(:book, user: user, current_page: 30, target_pages: 200)
+        get book_path(book)
+        expect(response.body).to include('残ページ数')
+        expect(response.body).to include('170')
+      end
+
+      it '延長回数が表示される' do
+        book = create(:book, user: user, extension_count: 2)
+        get book_path(book)
+        expect(response.body).to include('延長回数')
+        expect(response.body).to include('2')
+      end
+
+      it '「一覧に戻る」ボタンが表示される' do
+        book = create(:book, user: user)
+        get book_path(book)
+        expect(response.body).to include('一覧に戻る')
+        expect(response.body).to include(books_path)
+      end
     end
 
     context '未認証ユーザーの場合' do
