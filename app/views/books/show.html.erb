@@ -214,6 +214,43 @@
         削除する
       </button>
     </div>
+
+    <%# Googleカレンダー連携 (W-7) %>
+    <% gcal_description = "「#{@book.title}」の読書時間 (Yomikiri)" %>
+    <div class="book-show__gcal"
+         data-controller="google-calendar"
+         data-google-calendar-title-value="<%= h(@book.title) %>"
+         data-google-calendar-description-value="<%= h(gcal_description) %>">
+      <h2 class="book-show__gcal-title">Googleカレンダーで予定を作る</h2>
+
+      <div class="book-show__gcal-duration">
+        <span class="book-show__gcal-label">読書時間を選択</span>
+        <div class="book-show__gcal-options"
+             data-action="change->google-calendar#updateLink">
+          <% [15, 30, 45, 60].each do |min| %>
+            <label class="book-show__gcal-option">
+              <input type="radio" name="gcal_duration" value="<%= min %>"
+                     <%= min == 30 ? 'checked' : '' %>
+                     data-google-calendar-target="duration">
+              <span><%= min %>分</span>
+            </label>
+          <% end %>
+        </div>
+      </div>
+
+      <a class="btn btn--primary book-show__gcal-btn"
+         href="#"
+         target="_blank"
+         rel="noopener noreferrer"
+         data-google-calendar-target="link"
+         data-action="click->google-calendar#open">
+        Googleカレンダーで予定を作る
+      </a>
+
+      <p class="book-show__gcal-note">
+        ※ MVPでは、Google側での予定の変更・削除はアプリ内に反映されません。
+      </p>
+    </div>
   </div>
 
   <%# 削除確認モーダル (W-12) %>
