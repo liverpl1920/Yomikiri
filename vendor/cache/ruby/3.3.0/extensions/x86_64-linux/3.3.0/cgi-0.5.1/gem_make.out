@@ -1,0 +1,18 @@
+current directory: /home/ippei/runteq/graduation_work/Yomikiri/vendor/cache/ruby/3.3.0/gems/cgi-0.5.1/ext/cgi/escape
+/home/ippei/.rbenv/versions/3.3.10/bin/ruby extconf.rb
+creating Makefile
+
+current directory: /home/ippei/runteq/graduation_work/Yomikiri/vendor/cache/ruby/3.3.0/gems/cgi-0.5.1/ext/cgi/escape
+make DESTDIR\= sitearchdir\=./.gem.20260403-40869-t8ye64 sitelibdir\=./.gem.20260403-40869-t8ye64 clean
+
+current directory: /home/ippei/runteq/graduation_work/Yomikiri/vendor/cache/ruby/3.3.0/gems/cgi-0.5.1/ext/cgi/escape
+make DESTDIR\= sitearchdir\=./.gem.20260403-40869-t8ye64 sitelibdir\=./.gem.20260403-40869-t8ye64
+compiling escape.c
+linking shared-object cgi/escape.so
+
+current directory: /home/ippei/runteq/graduation_work/Yomikiri/vendor/cache/ruby/3.3.0/gems/cgi-0.5.1/ext/cgi/escape
+make DESTDIR\= sitearchdir\=./.gem.20260403-40869-t8ye64 sitelibdir\=./.gem.20260403-40869-t8ye64 install
+/usr/bin/install -c -m 0755 escape.so ./.gem.20260403-40869-t8ye64/cgi
+
+current directory: /home/ippei/runteq/graduation_work/Yomikiri/vendor/cache/ruby/3.3.0/gems/cgi-0.5.1/ext/cgi/escape
+make DESTDIR\= sitearchdir\=./.gem.20260403-40869-t8ye64 sitelibdir\=./.gem.20260403-40869-t8ye64 clean

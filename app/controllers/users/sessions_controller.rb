@@ -5,8 +5,7 @@ module Users
     private
 
     def after_sign_in_path_for(resource)
-      # Issue #15（積読一覧）実装後は books_path に変更する
-      stored_location_for(resource) || root_path
+      stored_location_for(resource) || books_path
     end
 
     def after_sign_out_path_for(_resource_or_scope)

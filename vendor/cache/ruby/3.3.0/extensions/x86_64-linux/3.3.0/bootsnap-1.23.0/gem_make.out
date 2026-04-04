@@ -1,0 +1,29 @@
+current directory: /home/ippei/runteq/graduation_work/Yomikiri/vendor/cache/ruby/3.3.0/gems/bootsnap-1.23.0/ext/bootsnap
+/home/ippei/.rbenv/versions/3.3.10/bin/ruby extconf.rb
+checking for fdatasync() in unistd.h... yes
+checking for fstatat() in sys/stat.h... yes
+checking for whether -D_GNU_SOURCE is accepted as CPPFLAGS... yes
+checking for whether -O3 is accepted as CFLAGS... yes
+checking for whether -std=c99 is accepted as CFLAGS... yes
+creating Makefile
+
+current directory: /home/ippei/runteq/graduation_work/Yomikiri/vendor/cache/ruby/3.3.0/gems/bootsnap-1.23.0/ext/bootsnap
+make DESTDIR\= sitearchdir\=./.gem.20260403-40869-9b6wch sitelibdir\=./.gem.20260403-40869-9b6wch clean
+
+current directory: /home/ippei/runteq/graduation_work/Yomikiri/vendor/cache/ruby/3.3.0/gems/bootsnap-1.23.0/ext/bootsnap
+make DESTDIR\= sitearchdir\=./.gem.20260403-40869-9b6wch sitelibdir\=./.gem.20260403-40869-9b6wch
+make: Warning: File 'bootsnap.c' has modification time 1.6 s in the future
+compiling bootsnap.c
+linking shared-object bootsnap/bootsnap.so
+make: warning:  Clock skew detected.  Your build may be incomplete.
+
+current directory: /home/ippei/runteq/graduation_work/Yomikiri/vendor/cache/ruby/3.3.0/gems/bootsnap-1.23.0/ext/bootsnap
+make DESTDIR\= sitearchdir\=./.gem.20260403-40869-9b6wch sitelibdir\=./.gem.20260403-40869-9b6wch install
+make: Warning: File 'bootsnap.c' has modification time 1.1 s in the future
+compiling bootsnap.c
+linking shared-object bootsnap/bootsnap.so
+/usr/bin/install -c -m 0755 bootsnap.so ./.gem.20260403-40869-9b6wch/bootsnap
+make: warning:  Clock skew detected.  Your build may be incomplete.
+
+current directory: /home/ippei/runteq/graduation_work/Yomikiri/vendor/cache/ruby/3.3.0/gems/bootsnap-1.23.0/ext/bootsnap
+make DESTDIR\= sitearchdir\=./.gem.20260403-40869-9b6wch sitelibdir\=./.gem.20260403-40869-9b6wch clean

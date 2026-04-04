@@ -1,327 +1,290 @@
 /* ========================
-   書籍フォーム (book-form)
+   Books（積読一覧）スタイル
+   BEM 命名規則に従う
    ======================== */
 
-.book-form-wrapper {
-  max-width: 600px;
-  margin-inline: auto;
+/* ---- 積読一覧ページ全体 ---- */
+.books-index {
+  padding: var(--spacing-xl) 0 var(--spacing-3xl);
 }
 
-/* ページヘッダー */
-.page-header {
-  margin-block-end: var(--spacing-xl);
-}
-
-.page-header__title {
-  font-size: var(--font-size-2xl);
-  margin-block-end: var(--spacing-sm);
-}
-
-.page-header__description {
-  color: var(--color-text-muted);
-  font-size: var(--font-size-sm);
-}
-
-/* フォームエラー一覧 */
-.form-errors {
-  background-color: #fef2f2;
-  border: 1px solid #fca5a5;
-  border-radius: var(--border-radius);
-  padding: var(--spacing-md);
-  margin-block-end: var(--spacing-lg);
-}
-
-.form-errors__title {
-  font-size: var(--font-size-base);
-  color: var(--color-danger);
-  margin-block-end: var(--spacing-sm);
-}
-
-.form-errors__list {
-  list-style: disc;
-  padding-inline-start: var(--spacing-lg);
-  color: var(--color-danger);
-  font-size: var(--font-size-sm);
-}
-
-.form-errors__list li + li {
-  margin-block-start: var(--spacing-xs);
-}
-
-/* フォームフィールド */
-.form-field {
-  margin-block-end: var(--spacing-lg);
+.books-index__header {
   display: flex;
-  flex-direction: column;
-  gap: var(--spacing-xs);
-}
-
-.form-field__label {
-  font-weight: 600;
-  font-size: var(--font-size-sm);
-  color: var(--color-text);
-}
-
-.form-field__required {
-  display: inline-block;
-  font-size: 0.75rem;
-  font-weight: 600;
-  color: #ffffff;
-  background-color: var(--color-danger);
-  padding: 0.1rem 0.4rem;
-  border-radius: 2px;
-  vertical-align: middle;
-  margin-inline-start: var(--spacing-xs);
-}
-
-.form-field__optional {
-  display: inline-block;
-  font-size: 0.75rem;
-  color: var(--color-text-muted);
-  margin-inline-start: var(--spacing-xs);
-}
-
-.form-field__input {
-  width: 100%;
-  padding: 0.625rem 0.75rem;
-  border: 1px solid var(--color-border);
-  border-radius: var(--border-radius);
-  font-size: var(--font-size-base);
-  font-family: var(--font-sans);
-  color: var(--color-text);
-  background-color: var(--color-bg);
-  transition: border-color 0.15s, box-shadow 0.15s;
-}
-
-.form-field__input:focus {
-  outline: none;
-  border-color: var(--color-primary);
-  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
-}
-
-.form-field__input--error {
-  border-color: var(--color-danger);
-}
-
-.form-field__input--error:focus {
-  box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.15);
-}
-
-.form-field__input--narrow {
-  max-width: 160px;
-}
-
-.form-field__input--date {
-  max-width: 200px;
-}
-
-.form-field__unit {
-  font-size: var(--font-size-sm);
-  color: var(--color-text-muted);
-  align-self: center;
-  margin-inline-start: var(--spacing-xs);
-  margin-top: -0.5rem;
-}
-
-.form-field__hint {
-  font-size: var(--font-size-sm);
-  color: var(--color-text-muted);
-  line-height: 1.4;
-}
-
-.form-field__error {
-  font-size: var(--font-size-sm);
-  color: var(--color-danger);
-}
-
-/* ノルマプレビュー */
-.quota-preview {
-  background-color: var(--color-bg-surface);
-  border: 1px solid var(--color-border);
-  border-radius: var(--border-radius-lg);
-  padding: var(--spacing-md) var(--spacing-lg);
-  margin-block-end: var(--spacing-lg);
-  text-align: center;
-}
-
-.quota-preview__label {
-  font-size: var(--font-size-sm);
-  color: var(--color-text-muted);
-  margin-block-end: var(--spacing-xs);
-}
-
-.quota-preview__value {
-  display: flex;
-  align-items: baseline;
-  justify-content: center;
-  gap: var(--spacing-xs);
-}
-
-.quota-preview__number {
-  font-size: var(--font-size-3xl);
-  font-weight: 700;
-  color: var(--color-primary);
-}
-
-.quota-preview__unit {
-  font-size: var(--font-size-sm);
-  color: var(--color-text-muted);
-}
-
-.quota-preview__note {
-  font-size: var(--font-size-sm);
-  color: var(--color-text-muted);
-  margin-block-start: var(--spacing-xs);
-}
-
-.quota-preview__note--error {
-  color: var(--color-danger);
-}
-
-/* フォームアクション */
-.form-actions {
-  display: flex;
-  gap: var(--spacing-md);
   align-items: center;
-  flex-wrap: wrap;
-}
-
-/* ========================
-   書籍詳細 (book-show)
-   ======================== */
-
-.book-show {
-  max-width: 700px;
-  margin-inline: auto;
-}
-
-.book-show__header {
-  margin-block-end: var(--spacing-xl);
-}
-
-.book-show__title {
-  font-size: var(--font-size-2xl);
-  margin-block-end: var(--spacing-xs);
-}
-
-.book-show__author {
-  color: var(--color-text-muted);
-  font-size: var(--font-size-base);
-}
-
-.book-show__details {
-  display: grid;
-  gap: var(--spacing-md);
-  margin-block-end: var(--spacing-xl);
-}
-
-.book-show__detail-item {
-  display: flex;
-  gap: var(--spacing-md);
-  padding-block: var(--spacing-sm);
-  border-bottom: 1px solid var(--color-border);
-}
-
-.book-show__detail-label {
-  font-weight: 600;
-  min-width: 140px;
-  color: var(--color-text-muted);
-  font-size: var(--font-size-sm);
-}
-
-.book-show__detail-value {
-  color: var(--color-text);
-}
-
-.book-show__detail-value--quota {
-  font-size: var(--font-size-lg);
-  font-weight: 700;
-  color: var(--color-primary);
-}
-
-.book-show__actions {
-  display: flex;
-  gap: var(--spacing-md);
-  flex-wrap: wrap;
-}
-
-/* ========================
-   積読一覧 (book-list)
-   ======================== */
-
-.book-list-header {
-  display: flex;
   justify-content: space-between;
-  align-items: center;
-  margin-block-end: var(--spacing-xl);
+  margin-bottom: var(--spacing-xl);
+  flex-wrap: wrap;
+  gap: var(--spacing-md);
 }
 
-.book-list-header__title {
+.books-index__title {
   font-size: var(--font-size-2xl);
+  font-weight: 700;
+  color: var(--color-text);
 }
 
+.books-index__add-btn {
+  white-space: nowrap;
+}
+
+/* ---- 書籍カードリスト ---- */
 .book-list {
   display: grid;
-  gap: var(--spacing-md);
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: var(--spacing-lg);
+  list-style: none;
+  padding: 0;
+  margin: 0;
 }
 
+.book-list__item {
+  display: flex;
+}
+
+/* ---- 書籍カード ---- */
 .book-card {
+  display: flex;
+  flex-direction: column;
   background-color: var(--color-bg);
   border: 1px solid var(--color-border);
   border-radius: var(--border-radius-lg);
-  padding: var(--spacing-md) var(--spacing-lg);
   box-shadow: var(--shadow-sm);
-  transition: box-shadow 0.2s;
+  overflow: hidden;
+  width: 100%;
+  transition: box-shadow 0.2s, transform 0.2s;
+  text-decoration: none;
+  color: inherit;
 }
 
-.book-card:hover {
-  box-shadow: var(--shadow-md);
+/* ---- 書影エリア ---- */
+.book-card__cover-wrapper {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.book-card__cover {
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  background-color: var(--color-bg-surface);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  transition: filter 0.3s, opacity 0.3s;
+}
+
+.book-card__cover img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.book-card__cover-placeholder {
+  font-size: 4rem;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+}
+
+/* 賞味期限ビジュアライザー */
+.book-card__cover--urgent-low {
+  filter: sepia(30%);
+  opacity: 0.85;
+}
+
+.book-card__cover--urgent-medium {
+  filter: sepia(60%);
+  opacity: 0.70;
+}
+
+.book-card__cover--urgent-high {
+  filter: sepia(90%);
+  opacity: 0.55;
+}
+
+/* 緊急度バッジ */
+.book-card__urgency-badge {
+  position: absolute;
+  top: var(--spacing-sm);
+  right: var(--spacing-sm);
+  background-color: var(--color-danger);
+  color: #ffffff;
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 0.2rem 0.5rem;
+  border-radius: 99px;
+  line-height: 1.4;
+  white-space: nowrap;
+}
+
+/* ---- カード本文 ---- */
+.book-card__body {
+  padding: var(--spacing-md);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  flex: 1;
 }
 
 .book-card__title {
-  font-size: var(--font-size-lg);
-  margin-block-end: var(--spacing-xs);
-}
-
-.book-card__title a {
+  font-size: var(--font-size-base);
+  font-weight: 700;
   color: var(--color-text);
-  text-decoration: none;
-}
-
-.book-card__title a:hover {
-  color: var(--color-primary);
-  text-decoration: underline;
+  line-height: 1.4;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
 }
 
 .book-card__author {
   font-size: var(--font-size-sm);
   color: var(--color-text-muted);
-  margin-block-end: var(--spacing-sm);
 }
 
-.book-card__deadline {
-  font-size: var(--font-size-sm);
+/* ステータスバッジ */
+.book-card__status {
+  display: inline-block;
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.15rem 0.5rem;
+  border-radius: 99px;
+  width: fit-content;
+}
+
+.book-card__status--unread {
+  background-color: #f3f4f6;
   color: var(--color-text-muted);
-  margin-block-end: var(--spacing-xs);
 }
 
-.book-card__quota {
+.book-card__status--reading {
+  background-color: #dbeafe;
+  color: #1d4ed8;
+}
+
+.book-card__status--completed {
+  background-color: #dcfce7;
+  color: #15803d;
+}
+
+/* ---- 読了期限 ---- */
+.book-card__deadline {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
   font-size: var(--font-size-sm);
+}
+
+.book-card__deadline-label {
+  color: var(--color-text-muted);
+  flex-shrink: 0;
+}
+
+.book-card__deadline-value {
+  font-weight: 600;
   color: var(--color-text);
 }
 
-.book-card__quota strong {
-  color: var(--color-primary);
-  font-weight: 700;
+/* ---- 進捗バー ---- */
+.book-card__progress {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
 }
 
-.book-list__empty {
+.book-card__progress-bar-wrapper {
+  height: 6px;
+  background-color: var(--color-border);
+  border-radius: 99px;
+  overflow: hidden;
+}
+
+.book-card__progress-bar {
+  height: 100%;
+  background-color: var(--color-primary);
+  border-radius: 99px;
+  transition: width 0.3s ease;
+  min-width: 2px;
+}
+
+.book-card__progress-text {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+}
+
+/* ---- 今日のノルマ ---- */
+.book-card__quota {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  background-color: #fffbeb;
+  border: 1px solid #fcd34d;
+  border-radius: var(--border-radius);
+  padding: var(--spacing-sm) var(--spacing-md);
+  margin-top: auto;
+}
+
+.book-card__quota-label {
+  font-size: var(--font-size-sm);
+  color: #92400e;
+  flex-shrink: 0;
+}
+
+.book-card__quota-value {
+  font-size: var(--font-size-sm);
+  color: #92400e;
+}
+
+.book-card__quota-value strong {
+  font-size: var(--font-size-xl);
+  font-weight: 900;
+  color: #b45309;
+}
+
+/* ---- Empty State ---- */
+.books-empty {
   text-align: center;
   padding: var(--spacing-3xl) var(--spacing-xl);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-lg);
 }
 
-.book-list__empty-text {
-  color: var(--color-text-muted);
-  margin-block-end: var(--spacing-lg);
+.books-empty__icon {
+  font-size: 4rem;
+  line-height: 1;
+}
+
+.books-empty__title {
+  font-size: var(--font-size-2xl);
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+.books-empty__description {
   font-size: var(--font-size-lg);
+  color: var(--color-text-muted);
+  max-width: 400px;
+}
+
+/* ---- レスポンシブ ---- */
+@media (max-width: 640px) {
+  .books-index__header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .book-list {
+    grid-template-columns: 1fr;
+  }
+
+  .books-empty {
+    padding: var(--spacing-2xl) var(--spacing-md);
+  }
 }

@@ -21,7 +21,7 @@ jobs:
     timeout-minutes: 10
 
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v4
 
       - name: Ruby をセットアップ
         uses: ruby/setup-ruby@v1
@@ -67,7 +67,7 @@ jobs:
       RAILS_MASTER_KEY: ${{ secrets.RAILS_MASTER_KEY }}
 
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v4
 
       - name: Ruby をセットアップ
         uses: ruby/setup-ruby@v1
@@ -84,14 +84,14 @@ jobs:
         run: bundle exec rspec --format progress --format RspecJunitFormatter --out tmp/rspec_results.xml
 
       - name: テスト結果をアップロード
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@v4
         if: always()
         with:
           name: rspec-results
           path: tmp/rspec_results.xml
 
       - name: カバレッジレポートをアップロード
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@v4
         if: always()
         with:
           name: coverage-report

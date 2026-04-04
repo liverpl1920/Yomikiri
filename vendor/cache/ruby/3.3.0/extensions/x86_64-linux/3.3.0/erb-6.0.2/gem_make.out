@@ -1,0 +1,19 @@
+current directory: /home/ippei/runteq/graduation_work/Yomikiri/vendor/cache/ruby/3.3.0/gems/erb-6.0.2/ext/erb/escape
+/home/ippei/.rbenv/versions/3.3.10/bin/ruby extconf.rb
+checking for rb_ext_ractor_safe() in ruby.h... yes
+creating Makefile
+
+current directory: /home/ippei/runteq/graduation_work/Yomikiri/vendor/cache/ruby/3.3.0/gems/erb-6.0.2/ext/erb/escape
+make DESTDIR\= sitearchdir\=./.gem.20260403-40869-e7zn4e sitelibdir\=./.gem.20260403-40869-e7zn4e clean
+
+current directory: /home/ippei/runteq/graduation_work/Yomikiri/vendor/cache/ruby/3.3.0/gems/erb-6.0.2/ext/erb/escape
+make DESTDIR\= sitearchdir\=./.gem.20260403-40869-e7zn4e sitelibdir\=./.gem.20260403-40869-e7zn4e
+compiling escape.c
+linking shared-object erb/escape.so
+
+current directory: /home/ippei/runteq/graduation_work/Yomikiri/vendor/cache/ruby/3.3.0/gems/erb-6.0.2/ext/erb/escape
+make DESTDIR\= sitearchdir\=./.gem.20260403-40869-e7zn4e sitelibdir\=./.gem.20260403-40869-e7zn4e install
+/usr/bin/install -c -m 0755 escape.so ./.gem.20260403-40869-e7zn4e/erb
+
+current directory: /home/ippei/runteq/graduation_work/Yomikiri/vendor/cache/ruby/3.3.0/gems/erb-6.0.2/ext/erb/escape
+make DESTDIR\= sitearchdir\=./.gem.20260403-40869-e7zn4e sitelibdir\=./.gem.20260403-40869-e7zn4e clean
