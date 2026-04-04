@@ -324,6 +324,33 @@ RSpec.describe 'Books', type: :request do
                              deadline: Date.current + 5)
         get book_path(book)
         expect(response.body).to include('150')
+      it 'ステータスバッジが表示される' do
+        book = create(:book, user: user, status: :reading)
+        get book_path(book)
+        expect(response.body).to include('book-show__status--reading')
+        expect(response.body).to include('読書中')
+      end
+
+      it '進捗プログレスバーが表示される' do
+        book = create(:book, user: user, current_page: 50, target_pages: 100)
+        get book_path(book)
+        expect(response.body).to include('book-show__progress-bar')
+        expect(response.body).to include('50')
+        expect(response.body).to include('100')
+      end
+
+      it '延長回数が表示される' do
+        book = create(:book, user: user, extension_count: 2)
+        get book_path(book)
+        expect(response.body).to include('延長回数')
+        expect(response.body).to include('2')
+      end
+
+      it '「一覧に戻る」ボタンが表示される' do
+        book = create(:book, user: user)
+        get book_path(book)
+        expect(response.body).to include('一覧に戻る')
+        expect(response.body).to include(books_path)
       end
     end
 

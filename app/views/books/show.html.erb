@@ -7,6 +7,24 @@
       <% if @book.author.present? %>
         <p class="book-show__author"><%= @book.author %></p>
       <% end %>
+      <span class="book-show__status book-show__status--<%= @book.status %>">
+        <%= t("book.status.#{@book.status}") %>
+      </span>
+    </div>
+
+    <div class="book-show__progress">
+      <div class="book-show__progress-header">
+        <span class="book-show__progress-label">進捗</span>
+        <span class="book-show__progress-text">
+          <%= @book.current_page %> / <%= @book.target_pages %> ページ（<%= @book.progress_percentage %>%）
+        </span>
+      </div>
+      <div class="book-show__progress-bar-wrapper" role="progressbar"
+           aria-valuenow="<%= @book.progress_percentage %>"
+           aria-valuemin="0" aria-valuemax="100"
+           aria-label="進捗 <%= @book.progress_percentage %>%">
+        <div class="book-show__progress-bar" style="width: <%= @book.progress_percentage %>%;"></div>
+      </div>
     </div>
 
     <dl class="book-show__details">
@@ -23,7 +41,7 @@
         <dt class="book-show__detail-label">読了期限</dt>
         <dd class="book-show__detail-value">
           <time datetime="<%= @book.deadline %>">
-            <%= @book.deadline.strftime('%Y年%m月%d日') %>
+            <%= l(@book.deadline, format: :long) %>
           </time>
         </dd>
       </div>
@@ -63,11 +81,15 @@
             <strong><%= @book.daily_quota %></strong> ページ
           <% end %>
         </dd>
-      </div>
 
       <div class="book-show__detail-item">
         <dt class="book-show__detail-label">総ページ数</dt>
         <dd class="book-show__detail-value"><%= @book.total_pages %> ページ</dd>
+      </div>
+
+      <div class="book-show__detail-item">
+        <dt class="book-show__detail-label">延長回数</dt>
+        <dd class="book-show__detail-value"><%= @book.extension_count %> 回</dd>
       </div>
 
       <div class="book-show__detail-item">
