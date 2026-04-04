@@ -1,239 +1,222 @@
-# プロジェクトメモリ
-## スペック駆動開発の基本原則
+# Copilot 行動指示書
 
-### 基本フロー
+このファイルはCopilotが**自律的に**作業を進めるための行動ルールを定義します。
+作業のたびに必ずこのファイルを読み、ルールに従って実行してください。
 
-1. **ドキュメント作成**: 永続ドキュメント(`docs/`)で「何を作るか」を定義
-2. **作業計画**: ステアリングファイル(`.steering/`)で「今回何をするか」を計画
-3. **実装**: tasklist.mdに従って実装し、進捗を随時更新
-4. **検証**: テストと動作確認
-5. **更新**: 必要に応じてドキュメント更新
+---
 
-### 重要なルール
+## 1. 開発の全体フロー（必ず守る順序）
 
-#### ドキュメント作成時
-
-**1ファイルずつ作成し、必ずユーザーの承認を得てから次に進む**
-
-承認待ちの際は、明確に伝える:
-```
-「[ドキュメント名]の作成が完了しました。内容を確認してください。
-承認いただけたら次のドキュメントに進みます。」
-```
-
-#### 実装前の確認
-
-新しい実装を始める前に、必ず以下を確認:
-
-1. `.github/copilot-instructions.md`を読む
-2. 関連する永続ドキュメント(`docs/`)を読む
-3. Grepで既存の類似実装を検索
-4. 既存パターンを理解してから実装開始
-
-#### ステアリングファイル管理
-
-作業ごとに `.steering/[YYYYMMDD]-[タスク名]/` を作成:
-
-- `requirements.md`: 今回の要求内容
-- `design.md`: 実装アプローチ
-- `tasklist.md`: 具体的なタスクリスト
-
-命名規則: `20250115-add-user-profile` 形式
-
-#### ステアリングファイルの管理
-
-**作業計画・実装・検証時は `#skill-steering` スキルを参照してください。**
-
-- **作業計画時**: `steering` スキル（`.github/skills/steering/SKILL.md`）のモード1(ステアリングファイル作成)を使用
-- **実装時**: `steering` スキル（`.github/skills/steering/SKILL.md`）のモード2(実装とtasklist.md更新管理)を使用
-- **検証時**: `steering` スキル（`.github/skills/steering/SKILL.md`）のモード3(振り返り)を使用
-
-詳細な手順と更新管理のルールは `.github/skills/steering/SKILL.md` に定義されています。
-
-## ディレクトリ構造
-
-### 永続的ドキュメント(`docs/`)
-
-アプリケーション全体の「何を作るか」「どう作るか」を定義:
-
-#### 下書き・アイデア（`docs/ideas/`）
-- 壁打ち・ブレインストーミングの成果物
-- 技術調査メモ
-- 自由形式（構造化は最小限）
-- `setup-project`プロンプト実行時に自動的に読み込まれる
-
-#### 正式版ドキュメント
-- **product-requirements.md** - プロダクト要求定義書
-- **functional-design.md** - 機能設計書
-- **architecture.md** - 技術仕様書
-- **repository-structure.md** - リポジトリ構造定義書
-- **development-guidelines.md** - 開発ガイドライン
-- **glossary.md** - ユビキタス言語定義
-
-### 作業単位のドキュメント(`.steering/`)
-
-特定の開発作業における「今回何をするか」を定義:
-
-- `requirements.md`: 今回の作業の要求内容
-- `design.md`: 変更内容の設計
-- `tasklist.md`: タスクリスト
-
-## 開発プロセス
-
-### 初回セットアップ
-
-1. このテンプレートを使用
-2. `#setup-project.prompt.md` で永続的ドキュメント作成(対話的に6つ作成)
-3. `#add-feature.prompt.md` で機能実装
-
-### 日常的な使い方
-
-**基本は普通に会話で依頼してください:**
+作業依頼を受けたら、以下の順序で進めること。ステップを飛ばしてはならない。
 
 ```
-# ドキュメントの編集
-> PRDに新機能を追加してください
-> architecture.mdのパフォーマンス要件を見直して
-> glossary.mdに新しいドメイン用語を追加
-
-# 機能追加(定型フローはプロンプト)
-> @workspace #add-feature.prompt.md ユーザープロフィール編集
-
-# 詳細レビュー(詳細なレポートが必要なとき)
-> @workspace #review-docs.prompt.md docs/product-requirements.md
+[1] 実装前確認     → docs/ の関連ドキュメントを読む
+[2] ブランチ作成   → main から feature ブランチを切る
+[3] 計画           → .steering/ にステアリングファイルを作成
+[4] 実装           → tasklist.md に従って1タスクずつ実装・更新
+[5] 検証           → RSpec + RuboCop を実行し全通過を確認
+[6] コミット       → Issue番号付きメッセージでコミット
+[7] push & PR      → リモートにプッシュしてPRを作成
+[8] CI確認         → gh pr checks --watch で CI ステータスを確認
+[9] 振り返り       → tasklist.md に振り返りを記載
 ```
 
-**ポイント**: スペック駆動開発の詳細を意識する必要はありません。各プロンプトファイル(`.github/prompts/`)が適切な動作を定義しています。
+---
 
-### Git操作のルール
+## 2. 実装前の必須確認（[1]の詳細）
 
-**実装前に必ずブランチを切る:**
+新しい作業を始める前に、**必ず以下を確認してから**実装を開始すること:
 
-- `main` ブランチで直接作業しない
-- 実装着手前に必ず作業ブランチを作成する
-- ブランチ名はIssue番号と作業内容を含める（例: `feature/#123-user-profile`）
+1. `docs/` 内の関連ドキュメントを読む（特に `architecture.md`, `development-guidelines.md`）
+2. Grep で既存の類似実装を検索し、コードパターンを把握する
+3. 既存パターンを理解してから実装開始
+
+---
+
+## 3. Gitワークフロー（フロー[2][6][7][8]に対応）
+
+このセクションは以下のフローステップの詳細です：
+- [2] ブランチ作成
+- [6] コミット
+- [7] push & PR
+- [8] CI確認
+
+### ブランチ作成（実装着手前に必ず実行）
 
 ```bash
-# 実装着手前に必ず実行
 git checkout main
 git pull origin main
 git checkout -b feature/#[Issue番号]-[作業内容の概要]
+# 例: feature/#23-deadline-visualizer
 ```
 
-**コミット前に必ずローカルでテストを実行する:**
+- `main` ブランチで直接作業しない
+- ブランチ名は必ず Issue番号を含める
+
+### コミット前テスト（必ず実行、通過しなければコミットしない）
 
 ```bash
-# コミット前に必ず実行
 docker compose up -d db  # DBコンテナが起動していない場合
 bundle exec rspec
 bundle exec rubocop
 ```
 
-- RSpecが全て通過し、RuboCopにエラーがないことを確認してからコミットすること
-- 上記が通過しない場合はコミットしない
+- RSpec が全て通過し、RuboCop にエラーがないことを確認してからコミットする
 
-**Issueごとにコミット&プッシュを行う:**
+### コミット
 
-- プロジェクトのIssueごとに、関連する変更をまとめてコミットする
-- 各Issue完了時には必ずGitHubにプッシュする
-- コミットメッセージには対応するIssue番号を含める（例: `#123 ユーザープロフィール編集機能を実装`）
-- 複数のIssueにまたがる変更は避け、Issue単位で作業を完結させる
+```bash
+git commit -m "#[Issue番号] [作業内容の概要]"
+# 例: #23 賞味期限ビジュアライザー機能の実装
+```
 
-**GitHub Projectのステータス管理:**
+- コミットメッセージには必ず Issue番号を含める
+- 複数の Issue にまたがる変更は避け、Issue 単位で作業を完結させる
 
-- **実装着手前**: 対象IssueをProjectボード（https://github.com/users/liverpl1920/projects/2/views/1）の **"In Progress"** に移動する
-- **実装完了後**: PRマージ後に対象Issueを **"Done"** に移動する
-- ステータス変更は `gh` CLIで行う:
-  ```bash
-  # 例: Issue #42 を "In Progress" に移動
-  gh issue edit 42 --add-label "in-progress"
+### push & PR作成（コミット完了後に自動実行）
+
+```bash
+# 1. ブランチをプッシュ
+git push origin [ブランチ名]
+
+# 2. PRを作成してCI監視まで一気に実行
+gh pr create \
+  --title "#[Issue番号] [作業内容の概要]" \
+  --body $'## 概要\n[変更内容の説明]\n\n## 変更内容\n[変更ファイルと内容]\n\n## テスト結果\n[rspec / rubocop の結果]\n\nCloses #[Issue番号]' \
+  --base main \
+  --head [ブランチ名]
+
+# 3. 作成したPRのCI監視を開始
+gh pr checks --watch
+```
+
+**Note:** `gh pr checks --watch` は現在のブランチに紐づくPRを自動検出します。PR番号の指定は不要です。
+
+### CI確認（PR作成後に自動実行）
+
+上記の `gh pr checks --watch` コマンドが以下を自動実行します：
+
+| CI結果 | 対応 |
+|--------|------|
+| 成功（pass） | 作業完了としてユーザーに報告する |
+| 失敗（fail） | 失敗内容を分析し、修正コミット→プッシュ→再確認 |
+| 実行中（pending） | `--watch` が自動的に完了まで待機するため追加操作は不要 |
+
+### GitHub Project ステータス管理
+
+- **実装着手前**: Issue を ["In Progress"](https://github.com/users/liverpl1920/projects/2/views/1) に移動する
+- **PRマージ後**: Issue を "Done" に移動する
+
+**CLI操作（参考）:**
+```bash
+# GitHub CLI v2.40以降でプロジェクトV2操作が可能
+# 実際の運用では、ブラウザでの手動更新を推奨
+gh issue edit [Issue番号] --add-project "Yomikiri" --project-column "In Progress"
+```
+
+**Note:** GitHub Projects V2のCLI操作は複雑なため、通常はブラウザで手動更新することを推奨します。
+
+---
+
+## 4. ステアリングファイル管理（フロー[3][9]に対応）
+
+このセクションは以下のフローステップの詳細です：
+- [3] 計画（ステアリングファイル作成）
+- [9] 振り返り（tasklist.md更新）
+
+### ファイル構成
+
+作業ごとに `.steering/[YYYYMMDD]-[タスク名]/` を作成し、3ファイルを用意する:
+
+```
+.steering/20260404-deadline-visualizer/
+  requirements.md   # 今回の要求内容
+  design.md         # 実装アプローチ
+  tasklist.md       # タスクリスト（進捗追跡）
+```
+
+### git管理方針
+
+`.steering/` ディレクトリは**作業履歴として保持するため、git管理対象とする**。
+
+- 各作業の計画・実装・振り返りの記録として価値がある
+- 過去の実装パターンや意思決定の参照に有用
+- チーム全体でナレッジを共有できる
+- `.gitignore` に追加せず、PR時にもコミットする
+
+### tasklist.md の運用（最重要）
+
+- タスク完了のたびに `[ ]` → `[x]` にリアルタイム更新する
+- **全タスクが `[x]` になるまで作業を継続する**（スキップ禁止）
+- 技術的理由でスキップする場合のみ: `[x] ~~タスク名~~（理由: ...）`
+- 振り返りの記載は全タスク完了後に行う
+
+### スキルの使い分け
+
+| タイミング | 使用スキル |
+|-----------|-----------|
+| ステアリングファイル作成時 | `steering` スキル（`.github/skills/steering/SKILL.md`）モード1 |
+| 実装時 | `steering` スキル モード2 |
+| 振り返り記載時 | `steering` スキル モード3 |
+| コード実装時（規約確認） | `development-guidelines` スキル（`.github/skills/development-guidelines/SKILL.md`） |
+
+---
+
+## 5. ドキュメント作成時のルール
+
+ドキュメント（`docs/` 配下）を新規作成する場合:
+
+- **1ファイルずつ作成**し、必ずユーザーの承認を得てから次に進む
+- 承認待ちの際は明確に伝える:
   ```
-  > **Note**: ProjectのステータスフィールドはGraphQL APIが必要なため、CLIから直接変更できない場合はブラウザで手動更新すること
+  「[ドキュメント名]の作成が完了しました。内容を確認してください。
+  承認いただけたら次のドキュメントに進みます。」
+  ```
 
-## プロンプトファイル一覧 (`.github/prompts/`)
+---
 
-### コマンド系プロンプト
-- `setup-project.prompt.md` - 初回セットアップ (6つの永続ドキュメント作成)
-- `add-feature.prompt.md` - 新機能追加 (完全自動実行モード)
-- `review-docs.prompt.md` - ドキュメントのレビュー
+## 6. 参照情報
 
-## エージェント一覧 (`.github/agents/`)
+### ディレクトリ構造
 
-エージェントはスキルと同様に独立した定義ファイルとして管理します。
+| パス | 用途 |
+|------|------|
+| `docs/` | プロジェクト全体の永続ドキュメント（「北極星」） |
+| `docs/product-requirements.md` | プロダクト要求定義書 |
+| `docs/functional-design.md` | 機能設計書 |
+| `docs/architecture.md` | 技術仕様書 |
+| `docs/repository-structure.md` | リポジトリ構造定義書 |
+| `docs/development-guidelines.md` | 開発ガイドライン |
+| `docs/glossary.md` | ユビキタス言語定義 |
+| `docs/idea/` | 壁打ち・ブレインストーミングメモ（自由形式） |
+| `.steering/` | 作業単位のドキュメント（作業ごとに新規作成、履歴として保持） |
+| `.github/prompts/` | プロンプトファイル |
+| `.github/skills/` | スキル定義ファイル |
+| `.github/agents/` | エージェント定義ファイル |
 
-- `doc-reviewer.md` - ドキュメントレビューエージェント
-- `implementation-validator.md` - 実装検証エージェント
+### プロンプトファイル一覧
 
-## スキル一覧 (`.github/skills/`)
+| ファイル | 用途 |
+|---------|------|
+| `add-feature.prompt.md` | 新機能追加（完全自動実行モード） |
+| `setup-project.prompt.md` | 初回セットアップ（6つの永続ドキュメント作成） |
+| `review-docs.prompt.md` | ドキュメントのレビュー |
 
-スキルはAgentが自動的に必要に応じてSKILL.mdを読み込みます（上記`<skills>`ブロック参照）。
+### スキル一覧
 
-- `steering/SKILL.md` - ステアリングファイル管理
-- `prd-writing/SKILL.md` - PRD作成ガイド
-- `functional-design/SKILL.md` - 機能設計書作成ガイド
-- `architecture-design/SKILL.md` - アーキテクチャ設計書作成ガイド
-- `repository-structure/SKILL.md` - リポジトリ構造定義書作成ガイド
-- `development-guidelines/SKILL.md` - 開発ガイドライン作成ガイド
-- `glossary-creation/SKILL.md` - 用語集作成ガイド
+| スキル | ファイル | 使用タイミング |
+|--------|---------|--------------|
+| steering | `.github/skills/steering/SKILL.md` | 作業計画・実装・振り返り時 |
+| development-guidelines | `.github/skills/development-guidelines/SKILL.md` | コード実装時 |
+| prd-writing | `.github/skills/prd-writing/SKILL.md` | PRD作成時 |
+| functional-design | `.github/skills/functional-design/SKILL.md` | 機能設計書作成時 |
+| architecture-design | `.github/skills/architecture-design/SKILL.md` | アーキテクチャ設計時 |
+| repository-structure | `.github/skills/repository-structure/SKILL.md` | リポジトリ構造定義時 |
+| glossary-creation | `.github/skills/glossary-creation/SKILL.md` | 用語集作成時 |
 
-## ドキュメント管理の原則
+### エージェント一覧
 
-### 永続的ドキュメント(`docs/`)
-
-- 基本設計を記述
-- 頻繁に更新されない
-- プロジェクト全体の「北極星」
-
-### 作業単位のドキュメント(`.steering/`)
-
-- 特定の作業に特化
-- 作業ごとに新規作成
-- 履歴として保持
-
-<skills>
-Here is a list of skills that contain domain specific knowledge on a variety of topics.
-Each skill comes with a description of the topic and a file path that contains the detailed instructions.
-When a user asks you to perform a task that falls within the domain of a skill, use the read_file tool to acquire the full instructions from the file path.
-
-<skill>
-<name>steering</name>
-<description>作業指示毎の作業計画、タスクリストをドキュメントに記録するためのスキル。ユーザーからの指示をトリガーとした作業計画時、実装時、検証時に読み込む。</description>
-<file>.github/skills/steering/SKILL.md</file>
-</skill>
-
-<skill>
-<name>prd-writing</name>
-<description>プロダクト要求定義書(PRD)を作成するための詳細ガイドとテンプレート。PRD作成時にのみ使用。</description>
-<file>.github/skills/prd-writing/SKILL.md</file>
-</skill>
-
-<skill>
-<name>functional-design</name>
-<description>機能設計書を作成するための詳細ガイドとテンプレート。機能設計書作成時にのみ使用。</description>
-<file>.github/skills/functional-design/SKILL.md</file>
-</skill>
-
-<skill>
-<name>architecture-design</name>
-<description>アーキテクチャ設計書を作成するための詳細ガイドとテンプレート。アーキテクチャ設計時にのみ使用。</description>
-<file>.github/skills/architecture-design/SKILL.md</file>
-</skill>
-
-<skill>
-<name>repository-structure</name>
-<description>リポジトリ構造定義書を作成するための詳細ガイドとテンプレート。リポジトリ構造定義時にのみ使用。</description>
-<file>.github/skills/repository-structure/SKILL.md</file>
-</skill>
-
-<skill>
-<name>development-guidelines</name>
-<description>チーム全体で統一された開発プロセスとコーディング規約を確立するための包括的なガイドとテンプレート。開発ガイドライン作成時、コード実装時に使用する。</description>
-<file>.github/skills/development-guidelines/SKILL.md</file>
-</skill>
-
-<skill>
-<name>glossary-creation</name>
-<description>用語集を作成するための詳細ガイドとテンプレート。用語集作成時にのみ使用。</description>
-<file>.github/skills/glossary-creation/SKILL.md</file>
-</skill>
-</skills>
+| エージェント | ファイル | 用途 |
+|------------|---------|------|
+| doc-reviewer | `.github/agents/doc-reviewer.agent.md` | ドキュメントレビュー |
+| implementation-validator | `.github/agents/implementation-validator.agent.md` | 実装品質の検証 |
