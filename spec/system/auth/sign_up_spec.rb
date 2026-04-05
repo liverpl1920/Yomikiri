@@ -13,8 +13,7 @@ RSpec.describe '新規ユーザー登録', type: :system do
       click_button '登録する'
 
       # 登録成功後: registrations_controller の after_sign_up_path_for で books_path へリダイレクト
-      # ヘッダーにログイン済みUI（ドロップダウン）が表示されることを確認
-      expect(page).to have_css('.dropdown')
+      expect(page).to have_current_path(books_path)
     end
 
     it 'パスワード確認不一致の場合にエラーが表示される' do
@@ -35,7 +34,7 @@ RSpec.describe '新規ユーザー登録', type: :system do
       visit new_user_registration_path
 
       # 既存ユーザーはページアクセスがリダイレクトされる
-      expect(page).not_to have_button('登録する')
+      expect(page).to have_current_path(books_path)
     end
   end
 end
