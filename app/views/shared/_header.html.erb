@@ -1,6 +1,6 @@
 <header class="site-header">
   <div class="container site-header__inner">
-    <%= link_to 'Yomikiri', root_path, class: 'site-header__logo' %>
+    <%= link_to 'Yomikiri', user_signed_in? ? books_path : root_path, class: 'site-header__logo' %>
 
     <% if user_signed_in? %>
       <%# ログイン済みヘッダー %>
