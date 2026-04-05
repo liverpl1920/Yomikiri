@@ -326,6 +326,8 @@
           <%= f.submit "延長する", class: "btn btn--primary" %>
         </div>
       <% end %>
+    </div>
+  </div>
   <%# 読了お祝いモーダル (W-13) %>
   <% if flash[:completed_book].present? %>
     <% days_to_complete = (@book.completed_at.to_date - @book.created_at.to_date).to_i + 1 %>
