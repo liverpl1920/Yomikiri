@@ -26,7 +26,9 @@ RSpec.describe 'Header and Footer', type: :request do
     it 'ロゴリンクが root_path を指している' do
       get root_path
 
-      expect(response.body).to include("href=\"#{root_path}\"")
+      doc = Nokogiri::HTML(response.body)
+      logo_link = doc.at_css('a.site-header__logo')
+      expect(logo_link['href']).to eq(root_path)
     end
   end
 
@@ -64,7 +66,9 @@ RSpec.describe 'Header and Footer', type: :request do
     it 'ロゴリンクが books_path を指している' do
       get books_path
 
-      expect(response.body).to include("href=\"#{books_path}\"")
+      doc = Nokogiri::HTML(response.body)
+      logo_link = doc.at_css('a.site-header__logo')
+      expect(logo_link['href']).to eq(books_path)
     end
   end
 end
