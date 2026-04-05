@@ -216,10 +216,11 @@
     </div>
 
     <%# Googleカレンダー連携 (W-7) %>
-    <% gcal_description = "「#{@book.title}」の読書時間 (Yomikiri)" %>
+    <% gcal_title = "【Yomikiri】#{@book.title}" %>
+    <% gcal_description = "【Yomikiri】「#{@book.title}」の読書時間" %>
     <div class="book-show__gcal"
          data-controller="google-calendar"
-         data-google-calendar-title-value="<%= h(@book.title) %>"
+         data-google-calendar-title-value="<%= h(gcal_title) %>"
          data-google-calendar-description-value="<%= h(gcal_description) %>">
       <h2 class="book-show__gcal-title">Googleカレンダーで予定を作る</h2>
 
