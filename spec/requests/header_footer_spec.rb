@@ -22,6 +22,12 @@ RSpec.describe 'Header and Footer', type: :request do
       expect(response.body).to include('site-footer')
       expect(response.body).to include('All rights reserved')
     end
+
+    it 'ロゴリンクが root_path を指している' do
+      get root_path
+
+      expect(response.body).to include("href=\"#{root_path}\"")
+    end
   end
 
   context 'ログイン済み時' do
@@ -53,6 +59,12 @@ RSpec.describe 'Header and Footer', type: :request do
 
       expect(response.body).to include('site-footer')
       expect(response.body).to include('All rights reserved')
+    end
+
+    it 'ロゴリンクが books_path を指している' do
+      get books_path
+
+      expect(response.body).to include("href=\"#{books_path}\"")
     end
   end
 end
