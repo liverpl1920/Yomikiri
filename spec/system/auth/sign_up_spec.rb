@@ -25,7 +25,7 @@ RSpec.describe '新規ユーザー登録', type: :system do
       fill_in 'user[password_confirmation]', with: 'different_password'
       click_button 'Sign up'
 
-      expect(page).to have_text('エラー').or have_text('一致').or have_text("doesn't match")
+      expect(page).to have_css('#error_explanation')
     end
 
     it 'ログイン済みの場合は登録ページへのアクセスがリダイレクトされる' do
