@@ -10,9 +10,9 @@ RSpec.describe '新規ユーザー登録', type: :system do
       fill_in 'user[email]', with: 'newuser@example.com'
       fill_in 'user[password]', with: 'password123'
       fill_in 'user[password_confirmation]', with: 'password123'
-      click_button 'Sign up'
+      click_button '登録する'
 
-      # 登録成功後: Devise デフォルトで root_path へリダイレクト
+      # 登録成功後: registrations_controller の after_sign_up_path_for で books_path へリダイレクト
       # ヘッダーにログイン済みUI（ドロップダウン）が表示されることを確認
       expect(page).to have_css('.dropdown')
     end
@@ -23,9 +23,9 @@ RSpec.describe '新規ユーザー登録', type: :system do
       fill_in 'user[email]', with: 'newuser@example.com'
       fill_in 'user[password]', with: 'password123'
       fill_in 'user[password_confirmation]', with: 'different_password'
-      click_button 'Sign up'
+      click_button '登録する'
 
-      expect(page).to have_css('#error_explanation')
+      expect(page).to have_css('.auth-card__errors')
     end
 
     it 'ログイン済みの場合は登録ページへのアクセスがリダイレクトされる' do
@@ -35,7 +35,7 @@ RSpec.describe '新規ユーザー登録', type: :system do
       visit new_user_registration_path
 
       # 既存ユーザーはページアクセスがリダイレクトされる
-      expect(page).not_to have_button('Sign up')
+      expect(page).not_to have_button('登録する')
     end
   end
 end

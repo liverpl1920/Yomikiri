@@ -1,0 +1,71 @@
+<% content_for :title, "新規登録 | Yomikiri" %>
+
+<div class="auth-page">
+  <div class="auth-card">
+    <div class="auth-card__header">
+      <%= link_to 'Yomikiri', root_path, class: 'auth-card__logo' %>
+      <h1 class="auth-card__title">新規登録</h1>
+      <p class="auth-card__subtitle">積読を、行動に変えよう。</p>
+    </div>
+
+    <% if resource.errors.any? %>
+      <div class="auth-card__errors" role="alert">
+        <ul>
+          <% resource.errors.full_messages.each do |message| %>
+            <li><%= message %></li>
+          <% end %>
+        </ul>
+      </div>
+    <% end %>
+
+    <%= form_for(resource, as: resource_name, url: registration_path(resource_name)) do |f| %>
+      <div class="auth-card__body">
+        <div class="form-group">
+          <%= f.label :email, 'メールアドレス', class: 'form-label' %>
+          <%= f.email_field :email,
+                autofocus: true,
+                autocomplete: 'email',
+                class: 'form-input',
+                placeholder: 'example@example.com',
+                required: true %>
+        </div>
+
+        <div class="form-group">
+          <%= f.label :nickname, 'ニックネーム（任意）', class: 'form-label' %>
+          <%= f.text_field :nickname,
+                autocomplete: 'nickname',
+                class: 'form-input',
+                placeholder: '50文字以内',
+                maxlength: 50 %>
+        </div>
+
+        <div class="form-group">
+          <%= f.label :password, 'パスワード', class: 'form-label' %>
+          <%= f.password_field :password,
+                autocomplete: 'new-password',
+                class: 'form-input',
+                placeholder: '6文字以上',
+                required: true %>
+        </div>
+
+        <div class="form-group">
+          <%= f.label :password_confirmation, 'パスワード（確認）', class: 'form-label' %>
+          <%= f.password_field :password_confirmation,
+                autocomplete: 'new-password',
+                class: 'form-input',
+                placeholder: 'パスワードを再入力',
+                required: true %>
+        </div>
+
+        <%= f.submit '登録する', class: 'btn btn--primary btn--full' %>
+      </div>
+    <% end %>
+
+    <div class="auth-card__footer">
+      <p class="auth-card__link-text">
+        すでにアカウントをお持ちの方は
+        <%= link_to 'ログイン', new_user_session_path, class: 'auth-card__link' %>
+      </p>
+    </div>
+  </div>
+</div>
