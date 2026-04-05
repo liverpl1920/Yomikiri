@@ -861,3 +861,225 @@
   font-weight: 900;
   color: #15803d;
 }
+
+/* ========================
+   積読登録フォーム
+   ======================== */
+
+/* ---- ページヘッダー ---- */
+.page-header {
+  margin-bottom: var(--spacing-xl);
+}
+
+.page-header__title {
+  font-size: var(--font-size-2xl);
+  font-weight: 700;
+  color: var(--color-text);
+  margin-bottom: var(--spacing-xs);
+}
+
+.page-header__description {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+}
+
+/* ---- フォームラッパー ---- */
+.book-form-wrapper {
+  max-width: 540px;
+  margin: 0 auto;
+}
+
+.book-form-wrapper form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+}
+
+/* ---- フォームフィールド ---- */
+.form-field {
+  display: block;
+}
+
+.form-field > * + * {
+  margin-top: var(--spacing-xs);
+}
+
+.form-field__label {
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.form-field__required {
+  display: inline-block;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #ffffff;
+  background-color: var(--color-danger);
+  padding: 0.1rem 0.4rem;
+  border-radius: 9999px;
+  line-height: 1.4;
+  margin-left: var(--spacing-xs);
+  vertical-align: middle;
+}
+
+.form-field__optional {
+  display: inline-block;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  background-color: var(--color-bg-surface);
+  border: 1px solid var(--color-border);
+  padding: 0.1rem 0.4rem;
+  border-radius: 9999px;
+  line-height: 1.4;
+  margin-left: var(--spacing-xs);
+  vertical-align: middle;
+}
+
+.form-field__input {
+  display: block;
+  width: 100%;
+  padding: 0.625rem 0.875rem;
+  font-size: var(--font-size-base);
+  font-family: var(--font-sans);
+  color: var(--color-text);
+  background-color: var(--color-bg);
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--border-radius);
+  transition: border-color 0.15s, box-shadow 0.15s;
+  outline: none;
+}
+
+.form-field__input:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+}
+
+.form-field__input::placeholder {
+  color: var(--color-text-muted);
+  opacity: 0.7;
+}
+
+.form-field__input--narrow {
+  display: inline-block;
+  width: 9rem;
+}
+
+.form-field__input--date {
+  width: auto;
+}
+
+.form-field__input--error {
+  border-color: var(--color-danger);
+}
+
+.form-field__input--error:focus {
+  box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.15);
+}
+
+.form-field__error {
+  font-size: var(--font-size-sm);
+  color: var(--color-danger);
+  font-weight: 500;
+}
+
+.form-field__hint {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+}
+
+.form-field__unit {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+  align-self: center;
+}
+
+/* ---- フォームエラー一覧 ---- */
+.form-errors {
+  background-color: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: var(--border-radius);
+  padding: var(--spacing-md);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.form-errors__title {
+  font-size: var(--font-size-sm);
+  font-weight: 700;
+  color: var(--color-danger);
+}
+
+.form-errors__list {
+  padding-left: var(--spacing-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.form-errors__list li {
+  font-size: var(--font-size-sm);
+  color: var(--color-danger);
+}
+
+/* ---- フォームアクション ---- */
+.form-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  flex-wrap: wrap;
+  padding-top: var(--spacing-sm);
+}
+
+/* ---- ノルマプレビュー ---- */
+.quota-preview {
+  background-color: #fffbeb;
+  border: 1px solid #fcd34d;
+  border-radius: var(--border-radius-lg);
+  padding: var(--spacing-md) var(--spacing-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.quota-preview__label {
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  color: #92400e;
+}
+
+.quota-preview__value {
+  display: flex;
+  align-items: baseline;
+  gap: var(--spacing-xs);
+}
+
+.quota-preview__number {
+  font-size: var(--font-size-2xl);
+  font-weight: 900;
+  color: #b45309;
+  line-height: 1;
+}
+
+.quota-preview__unit {
+  font-size: var(--font-size-sm);
+  color: #92400e;
+}
+
+.quota-preview__note {
+  font-size: var(--font-size-sm);
+  color: #a16207;
+}
+
+/* ---- レスポンシブ（登録フォーム） ---- */
+@media (max-width: 640px) {
+  .book-form-wrapper {
+    max-width: 100%;
+  }
+
+  .form-field__input--narrow {
+    width: 7rem;
+  }
+}
