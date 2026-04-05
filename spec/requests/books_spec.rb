@@ -382,6 +382,8 @@ RSpec.describe 'Books', type: :request do
         expect(response.body).to include('value="30"')
         expect(response.body).to include('checked')
         expect(response.body).to include('MVPでは、Google側での予定の変更・削除はアプリ内に反映されません')
+        expect(response.body).to include('data-google-calendar-title-value="【Yomikiri】テスト書籍"')
+        expect(response.body).to include('data-google-calendar-description-value="【Yomikiri】「テスト書籍」の読書時間"')
       end
     end
 
