@@ -1,0 +1,108 @@
+<% content_for :title, "マイページ | Yomikiri" %>
+
+<section class="mypage">
+  <div class="container">
+    <div class="mypage__header">
+      <h1 class="mypage__title">マイページ</h1>
+      <%= link_to '← 一覧に戻る', books_path, class: 'btn btn--outline mypage__back-btn' %>
+    </div>
+
+    <%# ユーザー情報カード %>
+    <div class="mypage__card">
+      <h2 class="mypage__card-title">プロフィール</h2>
+      <dl class="mypage__info-list">
+        <div class="mypage__info-item">
+          <dt class="mypage__info-label">ニックネーム</dt>
+          <dd class="mypage__info-value"><%= current_user.display_name %></dd>
+        </div>
+        <div class="mypage__info-item">
+          <dt class="mypage__info-label">メールアドレス</dt>
+          <dd class="mypage__info-value"><%= current_user.email %></dd>
+        </div>
+        <div class="mypage__info-item">
+          <dt class="mypage__info-label">登録日</dt>
+          <dd class="mypage__info-value"><%= l(current_user.created_at.to_date, format: :long) %></dd>
+        </div>
+      </dl>
+
+      <%# ニックネーム編集フォーム %>
+      <div class="mypage__nickname-edit">
+        <h3 class="mypage__nickname-edit-title">ニックネームを変更する</h3>
+        <%= form_with model: current_user, url: mypage_path, method: :patch, class: 'mypage__form' do |f| %>
+          <% if current_user.errors[:nickname].any? %>
+            <div class="mypage__form-errors" role="alert">
+              <ul>
+                <% current_user.errors[:nickname].each do |message| %>
+                  <li>ニックネーム <%= message %></li>
+                <% end %>
+              </ul>
+            </div>
+          <% end %>
+          <div class="mypage__form-group">
+            <%= f.label :nickname, 'ニックネーム（最大50文字）', class: 'mypage__form-label' %>
+            <%= f.text_field :nickname,
+                  value: current_user.nickname,
+                  placeholder: 'ニックネームを入力（未設定の場合はメールアドレスが表示されます）',
+                  maxlength: 50,
+                  class: 'mypage__form-input',
+                  autocomplete: 'nickname' %>
+          </div>
+          <%= f.submit '更新する', class: 'btn btn--primary' %>
+        <% end %>
+      </div>
+    </div>
+
+    <%# 読書実績カード %>
+    <div class="mypage__card">
+      <h2 class="mypage__card-title">読書実績</h2>
+      <div class="mypage__stats">
+        <div class="mypage__stat-item">
+          <span class="mypage__stat-number"><%= current_user.completed_books_count %></span>
+          <span class="mypage__stat-label">読了冊数</span>
+        </div>
+        <div class="mypage__stat-item">
+          <span class="mypage__stat-number"><%= current_user.completed_pages_total %></span>
+          <span class="mypage__stat-label">総読了ページ数</span>
+        </div>
+        <div class="mypage__stat-item">
+          <span class="mypage__stat-number"><%= current_user.consecutive_reading_days %></span>
+          <span class="mypage__stat-label">連続読書日数</span>
+        </div>
+      </div>
+    </div>
+
+    <%# 読了履歴 %>
+    <div class="mypage__card">
+      <h2 class="mypage__card-title">読了履歴</h2>
+      <% if @completed_books.empty? %>
+        <p class="mypage__empty-message">読了した本はまだありません。</p>
+      <% else %>
+        <ul class="mypage__history-list">
+          <% @completed_books.each do |book| %>
+            <li class="mypage__history-item">
+              <%= link_to book_path(book), class: 'mypage__history-link' do %>
+                <span class="mypage__history-title"><%= book.title %></span>
+                <% if book.author.present? %>
+                  <span class="mypage__history-author"><%= book.author %></span>
+                <% end %>
+                <span class="mypage__history-date">
+                  読了日: <%= book.completed_at ? l(book.completed_at.to_date, format: :default) : '不明' %>
+                </span>
+              <% end %>
+            </li>
+          <% end %>
+        </ul>
+      <% end %>
+    </div>
+
+    <%# アカウント設定 %>
+    <div class="mypage__card">
+      <h2 class="mypage__card-title">アカウント設定</h2>
+      <ul class="mypage__settings-list">
+        <li>
+          <%= link_to 'パスワードを変更する', edit_user_registration_path, class: 'mypage__settings-link' %>
+        </li>
+      </ul>
+    </div>
+  </div>
+</section>

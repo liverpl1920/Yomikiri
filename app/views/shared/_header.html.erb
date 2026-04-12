@@ -25,7 +25,7 @@
           </button>
           <ul class="dropdown__menu" data-dropdown-target="menu" role="menu">
             <li role="none">
-              <%= link_to 'マイページ', edit_user_registration_path, class: 'dropdown__item', role: 'menuitem' %>
+              <%= link_to 'マイページ', mypage_path, class: 'dropdown__item', role: 'menuitem' %>
             </li>
             <li role="none">
               <%= button_to 'ログアウト', destroy_user_session_path,

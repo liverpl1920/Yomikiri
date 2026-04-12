@@ -5,6 +5,8 @@ Rails.application.routes.draw do
   }
   root "top#index"
 
+  resource :mypage, only: [ :show, :update ]
+
   resources :books, only: [ :index, :new, :create, :show, :destroy ] do
     member do
       patch :update_progress
