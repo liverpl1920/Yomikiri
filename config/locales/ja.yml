@@ -26,6 +26,7 @@ ja:
         deadline: "読了期限"
         status: "ステータス"
         extension_count: "延長回数"
+        cover_image: "書影"
       user:
         email: "メールアドレス"
         nickname: "ニックネーム"
@@ -40,3 +41,6 @@ ja:
               less_than_or_equal_to: "は総ページ数（%{count}ページ）以下にしてください"
             current_page:
               less_than_or_equal_to: "は読了対象ページ数（%{count}ページ）以下にしてください"
+            cover_image:
+              invalid_content_type: "はJPEG、PNG、GIF、WebP形式のファイルを選択してください"
+              file_size_too_large: "は5MB以下のファイルを選択してください"
