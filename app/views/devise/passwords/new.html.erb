@@ -1,0 +1,43 @@
+<% content_for :title, "パスワード再設定 | Yomikiri" %>
+
+<div class="auth-page">
+  <div class="auth-card">
+    <div class="auth-card__header">
+      <%= link_to 'Yomikiri', root_path, class: 'auth-card__logo' %>
+      <h1 class="auth-card__title">パスワード再設定</h1>
+      <p class="auth-card__subtitle">登録済みのメールアドレスを入力してください。</p>
+    </div>
+
+    <% if resource.errors.any? %>
+      <div class="auth-card__errors" role="alert">
+        <ul>
+          <% resource.errors.full_messages.each do |message| %>
+            <li><%= message %></li>
+          <% end %>
+        </ul>
+      </div>
+    <% end %>
+
+    <%= form_for(resource, as: resource_name, url: password_path(resource_name), html: { method: :post }) do |f| %>
+      <div class="auth-card__body">
+        <div class="form-group">
+          <%= f.label :email, 'メールアドレス', class: 'form-label' %>
+          <%= f.email_field :email,
+                autofocus: true,
+                autocomplete: 'email',
+                class: 'form-input',
+                placeholder: 'example@example.com',
+                required: true %>
+        </div>
+
+        <%= f.submit '再設定メールを送信', class: 'btn btn--primary btn--full' %>
+      </div>
+    <% end %>
+
+    <div class="auth-card__footer">
+      <p class="auth-card__link-text">
+        <%= link_to 'ログイン画面に戻る', new_user_session_path, class: 'auth-card__link' %>
+      </p>
+    </div>
+  </div>
+</div>
