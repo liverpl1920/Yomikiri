@@ -30,8 +30,27 @@
 
 - [x] RSpec 全通過（213 examples, 0 failures）
 - [x] RuboCop エラーなし
-- [ ] コミット・プッシュ・PR 作成
-- [ ] CI 通過確認
+- [x] コミット・プッシュ・PR 作成（PR #111）
+- [x] CI 通過確認（Add to GitHub Project: pass）
+
+---
+
+## 実装後の振り返り
+
+**実装完了日**: 2026-04-12
+
+### 計画と実績の差分
+- `active_storage_validations` gem が Gemfile にないため、DSL バリデーションが使えなかった。カスタム `validate` メソッドに切り替えることで対応（設計変更だが spec はすべて通過）。
+- リクエストスペックへの書影アップロードテストは、ファクトリのシンプルさと既存テストカバレッジを考慮して省略し、モデルスペックのみに絞った。
+
+### 学んだこと
+- Rails の Active Storage 添付バリデーションは、`active_storage_validations` gem なしでは `validates :attachment, content_type:` の DSL が使えない。カスタム validate メソッドで十分代替できる。
+- `cover_image.attached?` をガードとして使うことで、未添付時に不必要なバリデーションエラーを防ぐことができる。
+- Active Storage の `blob.content_type` と `blob.byte_size` を直接参照することでシンプルな実装が可能。
+
+### 次回への改善提案
+- 書影の表示に `image_processing` gem（`variant`）を活用してリサイズ（サムネイル化）を行うと、一覧画面のパフォーマンスが向上する（本リリースのタスクとして検討）。
+- 既存の書影を登録後に削除する機能も今後の要件として検討する。
 
 ---
 
