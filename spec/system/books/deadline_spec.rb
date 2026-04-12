@@ -42,11 +42,9 @@ RSpec.describe '期限延長フロー', type: :system do
       page.execute_script("document.querySelector('[data-action=\"click->modal#openExtend\"]').click()")
       expect(page).to have_css('.modal-overlay[data-modal-target="extendOverlay"]:not([hidden])')
 
-      new_deadline = (Date.current + 30).to_s
+      new_deadline = (Date.current + 30).strftime('%Y-%m-%d')
       within('.modal-overlay[data-modal-target="extendOverlay"]') do
-        # type="date" 入力は JS で直接セットしないとロケール依存の問題が起きる
-        date_input = find('#deadline')
-        page.execute_script("arguments[0].value = '#{new_deadline}'", date_input)
+        fill_in 'deadline', with: new_deadline
         click_button '延長する'
       end
 
