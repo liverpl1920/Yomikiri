@@ -104,6 +104,8 @@ RSpec.describe '書籍管理', type: :system do
       wait_for_stimulus
 
       page.execute_script("document.querySelector('[data-action=\"click->modal#open\"]').click()")
+      expect(page).to have_text('本の削除')
+
       within('.modal') do
         click_button '削除する'
       end
