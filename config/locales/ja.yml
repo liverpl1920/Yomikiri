@@ -30,6 +30,7 @@ ja:
       user:
         email: "メールアドレス"
         nickname: "ニックネーム"
+        current_password: "現在のパスワード"
     errors:
       models:
         book:
@@ -43,3 +44,6 @@ ja:
               less_than_or_equal_to: "は読了対象ページ数（%{count}ページ）以下にしてください"
             cover_image_url:
               invalid_url: "は有効なURL（http://またはhttps://）を入力してください"
+
+  email_change:
+    confirmation_sent: "確認メールを送信しました。メールのリンクをクリックしてメールアドレスの変更を完了してください。"

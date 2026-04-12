@@ -1,0 +1,11 @@
+<p>Yomikiri をご利用いただきありがとうございます。</p>
+
+<p>以下のリンクをクリックして、新しいメールアドレスの変更を確定してください。</p>
+
+<p><%= link_to 'メールアドレスの変更を確定する', confirmation_url(@resource, confirmation_token: @token) %></p>
+
+<p>このリンクの有効期限は <%= Devise.confirm_within.inspect %> です。</p>
+
+<p>このメールに心当たりがない場合は、無視していただいて問題ありません。</p>
+
+<p>Yomikiri チーム</p>
