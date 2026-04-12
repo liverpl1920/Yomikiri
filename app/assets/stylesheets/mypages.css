@@ -1,0 +1,240 @@
+/* ========================
+   マイページ スタイル
+   BEM 命名規則に従う
+   ======================== */
+
+/* ---- マイページ全体 ---- */
+.mypage {
+  padding: var(--spacing-xl) 0 var(--spacing-3xl);
+}
+
+.mypage__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--spacing-xl);
+  flex-wrap: wrap;
+  gap: var(--spacing-md);
+}
+
+.mypage__title {
+  font-size: var(--font-size-2xl);
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+/* ---- カード ---- */
+.mypage__card {
+  background-color: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--shadow-sm);
+  padding: var(--spacing-xl);
+  margin-bottom: var(--spacing-lg);
+}
+
+.mypage__card-title {
+  font-size: var(--font-size-xl);
+  font-weight: 700;
+  color: var(--color-text);
+  margin-bottom: var(--spacing-lg);
+  padding-bottom: var(--spacing-sm);
+  border-bottom: 2px solid var(--color-border);
+}
+
+/* ---- ユーザー情報リスト ---- */
+.mypage__info-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-xl);
+}
+
+.mypage__info-item {
+  display: flex;
+  align-items: baseline;
+  gap: var(--spacing-md);
+  flex-wrap: wrap;
+}
+
+.mypage__info-label {
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  color: var(--color-text-muted);
+  min-width: 10rem;
+  flex-shrink: 0;
+}
+
+.mypage__info-value {
+  font-size: var(--font-size-base);
+  color: var(--color-text);
+}
+
+/* ---- ニックネーム編集 ---- */
+.mypage__nickname-edit {
+  border-top: 1px solid var(--color-border);
+  padding-top: var(--spacing-lg);
+}
+
+.mypage__nickname-edit-title {
+  font-size: var(--font-size-lg);
+  font-weight: 600;
+  color: var(--color-text);
+  margin-bottom: var(--spacing-md);
+}
+
+.mypage__form-errors {
+  background-color: #fef2f2;
+  border: 1px solid #fca5a5;
+  border-radius: var(--border-radius);
+  padding: var(--spacing-sm) var(--spacing-md);
+  margin-bottom: var(--spacing-md);
+  color: var(--color-danger);
+  font-size: var(--font-size-sm);
+}
+
+.mypage__form-errors ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.mypage__form-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+  margin-bottom: var(--spacing-md);
+}
+
+.mypage__form-label {
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.mypage__form-input {
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius);
+  padding: var(--spacing-sm) var(--spacing-md);
+  font-size: var(--font-size-base);
+  font-family: var(--font-sans);
+  color: var(--color-text);
+  background-color: var(--color-bg);
+  transition: border-color 0.2s, box-shadow 0.2s;
+  width: 100%;
+  max-width: 30rem;
+}
+
+.mypage__form-input:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+}
+
+/* ---- 読書実績 ---- */
+.mypage__stats {
+  display: flex;
+  gap: var(--spacing-xl);
+  flex-wrap: wrap;
+}
+
+.mypage__stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-xs);
+  min-width: 8rem;
+  padding: var(--spacing-lg);
+  background-color: var(--color-bg-surface);
+  border-radius: var(--border-radius-lg);
+  text-align: center;
+}
+
+.mypage__stat-number {
+  font-size: var(--font-size-3xl);
+  font-weight: 700;
+  color: var(--color-primary);
+  line-height: 1;
+}
+
+.mypage__stat-label {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+  font-weight: 500;
+}
+
+/* ---- 読了履歴 ---- */
+.mypage__empty-message {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+}
+
+.mypage__history-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.mypage__history-item {
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius);
+}
+
+.mypage__history-link {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  padding: var(--spacing-md);
+  text-decoration: none;
+  color: inherit;
+  border-radius: var(--border-radius);
+  transition: background-color 0.15s;
+  flex-wrap: wrap;
+}
+
+.mypage__history-link:hover {
+  background-color: var(--color-bg-surface);
+  text-decoration: none;
+}
+
+.mypage__history-title {
+  font-weight: 600;
+  color: var(--color-text);
+  flex: 1;
+  min-width: 0;
+}
+
+.mypage__history-author {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+}
+
+.mypage__history-date {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+  white-space: nowrap;
+}
+
+/* ---- アカウント設定 ---- */
+.mypage__settings-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.mypage__settings-link {
+  color: var(--color-primary);
+  text-decoration: none;
+  font-size: var(--font-size-base);
+  font-weight: 500;
+}
+
+.mypage__settings-link:hover {
+  text-decoration: underline;
+}
