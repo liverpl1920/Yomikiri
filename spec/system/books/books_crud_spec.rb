@@ -94,11 +94,9 @@ RSpec.describe '書籍管理', type: :system do
       page.execute_script("document.querySelector('[data-action=\"click->modal#open\"]').click()")
       expect(page).to have_text('本の削除')
 
-      within('.modal') do
-        click_button 'キャンセル'
-      end
+      page.execute_script("document.querySelector('[data-action=\"click->modal#close\"]').click()")
 
-      expect(page).not_to have_css('.modal-overlay[aria-hidden="false"]')
+      expect(page).to have_css('[data-modal-target="overlay"]', visible: :hidden)
     end
 
     it '削除確認後に書籍が削除されて一覧画面へ遷移する' do

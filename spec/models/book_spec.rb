@@ -114,6 +114,48 @@ RSpec.describe Book, type: :model do
         expect(build(:book, author: nil)).to be_valid
       end
     end
+
+    describe 'cover_image_url' do
+      it 'nilでも有効' do
+        expect(build(:book, cover_image_url: nil)).to be_valid
+      end
+
+      it '空文字でも有効' do
+        expect(build(:book, cover_image_url: '')).to be_valid
+      end
+
+      it '有効なhttpsのURLであれば有効' do
+        expect(build(:book, cover_image_url: 'https://cover.openbd.jp/9784873115658.jpg')).to be_valid
+      end
+
+      it '有効なhttpのURLであれば有効' do
+        expect(build(:book, cover_image_url: 'http://example.com/cover.jpg')).to be_valid
+      end
+
+      it 'URLでない文字列は無効' do
+        book = build(:book, cover_image_url: 'not-a-url')
+        expect(book).not_to be_valid
+        expect(book.errors[:cover_image_url]).not_to be_empty
+      end
+
+      it 'ftp:// のURLは無効' do
+        book = build(:book, cover_image_url: 'ftp://example.com/cover.jpg')
+        expect(book).not_to be_valid
+        expect(book.errors[:cover_image_url]).not_to be_empty
+      end
+
+      it '2048文字以下であれば有効' do
+        url = "https://example.com/#{'a' * 2000}"
+        expect(build(:book, cover_image_url: url)).to be_valid
+      end
+
+      it '2049文字以上は無効' do
+        url = "https://example.com/#{'a' * 2050}"
+        book = build(:book, cover_image_url: url)
+        expect(book).not_to be_valid
+        expect(book.errors[:cover_image_url]).not_to be_empty
+      end
+    end
   end
 
   describe 'アソシエーション' do

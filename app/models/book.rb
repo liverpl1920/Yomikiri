@@ -5,6 +5,7 @@ class Book < ApplicationRecord
 
   validates :title, presence: true, length: { maximum: 255 }
   validates :author, length: { maximum: 255 }, allow_blank: true
+  validates :cover_image_url, length: { maximum: 2048 }, allow_blank: true
   validates :total_pages, presence: true, numericality: { only_integer: true, greater_than: 0 }
   validates :target_pages, presence: true, numericality: { only_integer: true, greater_than: 0 }
   validates :current_page, presence: true, numericality: { only_integer: true, greater_than_or_equal_to: 0 }
@@ -14,6 +15,7 @@ class Book < ApplicationRecord
   validate :target_pages_not_exceed_total_pages
   validate :current_page_not_exceed_target_pages
   validate :deadline_cannot_be_in_the_past, if: -> { new_record? || will_save_change_to_deadline? }
+  validate :cover_image_url_must_be_valid_url, if: -> { cover_image_url.present? }
 
   before_save :auto_set_reading_status
 
@@ -102,6 +104,13 @@ class Book < ApplicationRecord
     return if deadline.blank?
 
     errors.add(:deadline, :past_date) if deadline < Date.current
+  end
+
+  def cover_image_url_must_be_valid_url
+    uri = URI.parse(cover_image_url)
+    errors.add(:cover_image_url, :invalid_url) unless uri.is_a?(URI::HTTP) || uri.is_a?(URI::HTTPS)
+  rescue URI::InvalidURIError
+    errors.add(:cover_image_url, :invalid_url)
   end
 
   # 初回の進捗記録（current_page が 0 → 1 以上）時に unread → reading へ自動遷移する
