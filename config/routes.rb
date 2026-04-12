@@ -2,11 +2,14 @@ Rails.application.routes.draw do
   devise_for :users, controllers: {
     sessions: "users/sessions",
     registrations: "users/registrations",
-    passwords: "users/passwords"
+    passwords: "users/passwords",
+    confirmations: "users/confirmations"
   }
   root "top#index"
 
   resource :mypage, only: [ :show, :update ]
+  resource :email_change, only: [ :edit, :update ], controller: "users/email_changes"
+  get "email_change/complete", to: "users/email_changes#complete", as: :email_change_complete
 
   resources :books, only: [ :index, :new, :create, :show, :destroy ] do
     member do
