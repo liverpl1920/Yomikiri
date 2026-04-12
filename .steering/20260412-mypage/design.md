@@ -67,7 +67,7 @@ resource :mypage, only: [:show, :update]
 2. ニックネーム編集フォーム（インライン）
 3. 読書実績カード（読了冊数・総ページ・連続読書日数）
 4. 読了履歴テーブル（completed_at 降順）
-5. アカウント設定リンク（パスワード変更・メールアドレス変更）
+5. アカウント設定リンク（パスワード変更）
 6. 「一覧に戻る」ボタン
 
 ### 5. CSS (app/assets/stylesheets/mypages.css)

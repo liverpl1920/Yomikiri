@@ -7,13 +7,15 @@
       <%= link_to '← 一覧に戻る', books_path, class: 'btn btn--outline mypage__back-btn' %>
     </div>
 
+    <% persisted_nickname = current_user.attribute_in_database(:nickname) %>
+    <% persisted_display_name = persisted_nickname.presence || current_user.email %>
     <%# ユーザー情報カード %>
     <div class="mypage__card">
       <h2 class="mypage__card-title">プロフィール</h2>
       <dl class="mypage__info-list">
         <div class="mypage__info-item">
           <dt class="mypage__info-label">ニックネーム</dt>
-          <dd class="mypage__info-value"><%= current_user.display_name %></dd>
+          <dd class="mypage__info-value"><%= persisted_display_name %></dd>
         </div>
         <div class="mypage__info-item">
           <dt class="mypage__info-label">メールアドレス</dt>
