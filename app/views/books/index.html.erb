@@ -25,7 +25,11 @@
               <%# 書影 %>
               <div class="book-card__cover-wrapper">
                 <div class="book-card__cover <%= book.deadline_urgency_class %>">
-                  <span class="book-card__cover-placeholder" aria-hidden="true">📖</span>
+                  <% if book.cover_image.attached? %>
+                    <%= image_tag book.cover_image, class: 'book-card__cover-image', alt: book.title %>
+                  <% else %>
+                    <span class="book-card__cover-placeholder" aria-hidden="true">📖</span>
+                  <% end %>
                 </div>
                 <% if book.deadline_urgency_class.present? %>
                   <span class="book-card__urgency-badge">

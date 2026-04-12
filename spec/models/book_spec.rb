@@ -114,6 +114,46 @@ RSpec.describe Book, type: :model do
         expect(build(:book, author: nil)).to be_valid
       end
     end
+
+    describe 'cover_image' do
+      it '画像が添付されていない場合は有効' do
+        expect(build(:book)).to be_valid
+      end
+
+      it '有効な PNG 画像を添付した場合は有効' do
+        book = build(:book)
+        book.cover_image.attach(
+          io: File.open(Rails.root.join('spec/fixtures/files/test_image.png')),
+          filename: 'test_image.png',
+          content_type: 'image/png'
+        )
+        expect(book).to be_valid
+      end
+
+      it '無効な形式（text/plain）のファイルを添付した場合は無効' do
+        book = build(:book)
+        book.cover_image.attach(
+          io: StringIO.new('not an image'),
+          filename: 'test.txt',
+          content_type: 'text/plain'
+        )
+        expect(book).not_to be_valid
+        expect(book.errors[:cover_image]).not_to be_empty
+      end
+
+      it '5MB を超えるファイルを添付した場合は無効' do
+        book = build(:book)
+        # 5MB + 1byte の大きさのコンテンツを生成
+        large_content = 'a' * (5.megabytes + 1)
+        book.cover_image.attach(
+          io: StringIO.new(large_content),
+          filename: 'large.png',
+          content_type: 'image/png'
+        )
+        expect(book).not_to be_valid
+        expect(book.errors[:cover_image]).not_to be_empty
+      end
+    end
   end
 
   describe 'アソシエーション' do

@@ -1,5 +1,6 @@
 class Book < ApplicationRecord
   belongs_to :user
+  has_one_attached :cover_image
 
   enum :status, { unread: 0, reading: 1, completed: 2 }
 
@@ -10,6 +11,8 @@ class Book < ApplicationRecord
   validates :current_page, presence: true, numericality: { only_integer: true, greater_than_or_equal_to: 0 }
   validates :deadline, presence: true
   validates :status, presence: true
+
+  validate :cover_image_content_type_and_size, if: :cover_image_attached?
 
   validate :target_pages_not_exceed_total_pages
   validate :current_page_not_exceed_target_pages
@@ -102,6 +105,23 @@ class Book < ApplicationRecord
     return if deadline.blank?
 
     errors.add(:deadline, :past_date) if deadline < Date.current
+  end
+
+  def cover_image_attached?
+    cover_image.attached?
+  end
+
+  COVER_IMAGE_ALLOWED_TYPES = %w[image/png image/jpg image/jpeg image/gif image/webp].freeze
+  COVER_IMAGE_MAX_SIZE = 5.megabytes
+
+  def cover_image_content_type_and_size
+    blob = cover_image.blob
+    unless COVER_IMAGE_ALLOWED_TYPES.include?(blob.content_type)
+      errors.add(:cover_image, :invalid_content_type)
+    end
+    if blob.byte_size > COVER_IMAGE_MAX_SIZE
+      errors.add(:cover_image, :file_size_too_large)
+    end
   end
 
   # 初回の進捗記録（current_page が 0 → 1 以上）時に unread → reading へ自動遷移する

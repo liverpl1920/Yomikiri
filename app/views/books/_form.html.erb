@@ -40,6 +40,24 @@
           autocomplete: 'off' %>
   </div>
 
+  <%# 書影 %>
+  <div class="form-field">
+    <%= f.label :cover_image, '書影', class: 'form-field__label' %>
+    <span class="form-field__optional">任意</span>
+    <% if book.cover_image.attached? %>
+      <div class="form-field__preview">
+        <%= image_tag book.cover_image, class: 'form-field__cover-preview', alt: '現在の書影' %>
+      </div>
+    <% end %>
+    <%= f.file_field :cover_image,
+          class: "form-field__input #{'form-field__input--error' if book.errors[:cover_image].any?}",
+          accept: 'image/png,image/jpeg,image/gif,image/webp' %>
+    <small class="form-field__hint">JPEG・PNG・GIF・WebP、5MB以下</small>
+    <% if book.errors[:cover_image].any? %>
+      <span class="form-field__error"><%= book.errors[:cover_image].first %></span>
+    <% end %>
+  </div>
+
   <%# 総ページ数 %>
   <div class="form-field">
     <%= f.label :total_pages, '総ページ数', class: 'form-field__label' %>
