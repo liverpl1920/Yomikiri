@@ -1,0 +1,54 @@
+<% content_for :title, "パスワード変更 | Yomikiri" %>
+
+<div class="auth-page">
+  <div class="auth-card">
+    <div class="auth-card__header">
+      <%= link_to 'Yomikiri', root_path, class: 'auth-card__logo' %>
+      <h1 class="auth-card__title">パスワード変更</h1>
+      <p class="auth-card__subtitle">新しいパスワードを設定してください。</p>
+    </div>
+
+    <% if resource.errors.any? %>
+      <div class="auth-card__errors" role="alert">
+        <ul>
+          <% resource.errors.full_messages.each do |message| %>
+            <li><%= message %></li>
+          <% end %>
+        </ul>
+      </div>
+    <% end %>
+
+    <%= form_for(resource, as: resource_name, url: password_path(resource_name), html: { method: :put }) do |f| %>
+      <%= f.hidden_field :reset_password_token %>
+
+      <div class="auth-card__body">
+        <div class="form-group">
+          <%= f.label :password, '新しいパスワード', class: 'form-label' %>
+          <%= f.password_field :password,
+                autofocus: true,
+                autocomplete: 'new-password',
+                class: 'form-input',
+                placeholder: '6文字以上',
+                required: true %>
+        </div>
+
+        <div class="form-group">
+          <%= f.label :password_confirmation, '新しいパスワード（確認）', class: 'form-label' %>
+          <%= f.password_field :password_confirmation,
+                autocomplete: 'new-password',
+                class: 'form-input',
+                placeholder: 'パスワードを再入力',
+                required: true %>
+        </div>
+
+        <%= f.submit 'パスワードを変更する', class: 'btn btn--primary btn--full' %>
+      </div>
+    <% end %>
+
+    <div class="auth-card__footer">
+      <p class="auth-card__link-text">
+        <%= link_to 'ログイン画面に戻る', new_user_session_path, class: 'auth-card__link' %>
+      </p>
+    </div>
+  </div>
+</div>
