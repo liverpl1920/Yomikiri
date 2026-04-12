@@ -60,7 +60,7 @@ class BooksController < ApplicationController
 
   def destroy
     @book.destroy
-    redirect_to books_path, notice: "#{@book.title}を削除しました。"
+    redirect_to books_path, notice: "#{@book.title}を削除しました。", status: :see_other
   end
 
   private
