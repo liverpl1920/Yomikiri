@@ -20,6 +20,7 @@ ja:
       book:
         title: "タイトル"
         author: "著者"
+        cover_image_url: "書影URL"
         total_pages: "総ページ数"
         target_pages: "読了対象ページ数"
         current_page: "現在ページ"
@@ -40,3 +41,5 @@ ja:
               less_than_or_equal_to: "は総ページ数（%{count}ページ）以下にしてください"
             current_page:
               less_than_or_equal_to: "は読了対象ページ数（%{count}ページ）以下にしてください"
+            cover_image_url:
+              invalid_url: "は有効なURL（http://またはhttps://）を入力してください"

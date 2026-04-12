@@ -9,7 +9,6 @@ gem "turbo-rails"
 gem "stimulus-rails"
 gem "jbuilder"
 gem "devise", "~> 5.0"
-gem "aws-sdk-s3", ">= 1.14", require: false
 gem "tzinfo-data", platforms: %i[ windows jruby ]
 gem "bootsnap", require: false
 
