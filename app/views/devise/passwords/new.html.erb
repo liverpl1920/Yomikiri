@@ -10,11 +10,7 @@
 
     <% if resource.errors.any? %>
       <div class="auth-card__errors" role="alert">
-        <ul>
-          <% resource.errors.full_messages.each do |message| %>
-            <li><%= message %></li>
-          <% end %>
-        </ul>
+        <p>入力内容をご確認のうえ、問題が解消しない場合は時間をおいて再度お試しください。</p>
       </div>
     <% end %>
 

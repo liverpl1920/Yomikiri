@@ -80,19 +80,26 @@ Rails.application.configure do
   # config.action_mailer.raise_delivery_errors = false
 
   # ActionMailer / SendGrid SMTP 設定
-  config.action_mailer.delivery_method = :smtp
-  config.action_mailer.perform_deliveries = true
-  config.action_mailer.raise_delivery_errors = true
-  config.action_mailer.default_url_options = { host: ENV.fetch("APP_HOST", "yomikiri.onrender.com"), protocol: "https" }
-  config.action_mailer.smtp_settings = {
-    address: "smtp.sendgrid.net",
-    port: 587,
-    domain: ENV.fetch("APP_HOST", "yomikiri.onrender.com"),
-    user_name: "apikey",
-    password: ENV.fetch("SENDGRID_API_KEY"),
-    authentication: :plain,
-    enable_starttls_auto: true
-  }
+  # SENDGRID_API_KEY が未設定の場合はメール送信を無効化して起動を継続する
+  sendgrid_api_key = ENV["SENDGRID_API_KEY"]
+  if sendgrid_api_key.present?
+    config.action_mailer.delivery_method = :smtp
+    config.action_mailer.perform_deliveries = true
+    config.action_mailer.raise_delivery_errors = true
+    config.action_mailer.default_url_options = { host: ENV.fetch("APP_HOST", "yomikiri.onrender.com"), protocol: "https" }
+    config.action_mailer.smtp_settings = {
+      address: "smtp.sendgrid.net",
+      port: 587,
+      domain: ENV.fetch("APP_HOST", "yomikiri.onrender.com"),
+      user_name: "apikey",
+      password: sendgrid_api_key,
+      authentication: :plain,
+      enable_starttls_auto: true
+    }
+  else
+    config.action_mailer.perform_deliveries = false
+    Rails.logger.warn "[ActionMailer] SENDGRID_API_KEY is not set. Email delivery is disabled."
+  end
 
   # Enable locale fallbacks for I18n (makes lookups for any locale fall back to
   # the I18n.default_locale when a translation cannot be found).
