@@ -5,7 +5,14 @@
     <%# 書影エリア（賞味期限ビジュアライザー） %>
     <div class="book-show__cover-wrapper">
       <div class="book-show__cover <%= @book.deadline_urgency_class %>">
-        <span class="book-show__cover-placeholder" aria-hidden="true">📖</span>
+        <% if @book.cover_image_url.present? %>
+          <img src="<%= @book.cover_image_url %>"
+               alt="<%= @book.title %>の書影"
+               class="book-show__cover-image"
+               loading="lazy">
+        <% else %>
+          <span class="book-show__cover-placeholder" aria-hidden="true">📖</span>
+        <% end %>
       </div>
       <% if @book.deadline_urgency_class.present? %>
         <span class="book-show__urgency-badge">

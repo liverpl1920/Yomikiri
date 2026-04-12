@@ -203,6 +203,52 @@ RSpec.describe 'Books', type: :request do
         end
       end
 
+      context 'cover_image_urlを含む有効なパラメータの場合' do
+        let(:params_with_cover) do
+          {
+            book: {
+              title: '書影付きの本',
+              total_pages: 200,
+              target_pages: 200,
+              current_page: 0,
+              deadline: Date.current + 14,
+              cover_image_url: 'https://cover.openbd.jp/9784873115658.jpg'
+            }
+          }
+        end
+
+        it '書籍がcover_image_urlつきで作成される' do
+          post books_path, params: params_with_cover
+          expect(Book.last.cover_image_url).to eq('https://cover.openbd.jp/9784873115658.jpg')
+        end
+      end
+
+      context '無効なcover_image_urlの場合' do
+        let(:invalid_cover_params) do
+          {
+            book: {
+              title: '不正URL書影の本',
+              total_pages: 200,
+              target_pages: 200,
+              current_page: 0,
+              deadline: Date.current + 14,
+              cover_image_url: 'not-a-url'
+            }
+          }
+        end
+
+        it '書籍が作成されない' do
+          expect {
+            post books_path, params: invalid_cover_params
+          }.not_to change(Book, :count)
+        end
+
+        it 'フォームを再表示する（422）' do
+          post books_path, params: invalid_cover_params
+          expect(response).to have_http_status(:unprocessable_entity)
+        end
+      end
+
       context '無効なパラメータ（タイトルなし）の場合' do
         let(:invalid_params) do
           {
@@ -271,6 +317,19 @@ RSpec.describe 'Books', type: :request do
         get book_path(book)
         expect(response).to have_http_status(:ok)
         expect(response.body).to include(book.title)
+      end
+
+      it 'cover_image_urlがある場合は<img>タグで表示される' do
+        book = create(:book, user: user, cover_image_url: 'https://cover.openbd.jp/9784873115658.jpg')
+        get book_path(book)
+        expect(response.body).to include('https://cover.openbd.jp/9784873115658.jpg')
+        expect(response.body).to include('<img')
+      end
+
+      it 'cover_image_urlがない場合はプレースホルダーが表示される' do
+        book = create(:book, user: user, cover_image_url: nil)
+        get book_path(book)
+        expect(response.body).to include('book-show__cover-placeholder')
       end
 
       it '他ユーザーの書籍は表示できない（404）' do

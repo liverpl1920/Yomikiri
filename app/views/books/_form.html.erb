@@ -40,6 +40,20 @@
           autocomplete: 'off' %>
   </div>
 
+  <%# 書影URL %>
+  <div class="form-field">
+    <%= f.label :cover_image_url, '書影URL', class: 'form-field__label' %>
+    <span class="form-field__optional">任意</span>
+    <%= f.url_field :cover_image_url,
+          class: "form-field__input #{'form-field__input--error' if book.errors[:cover_image_url].any?}",
+          placeholder: '例: https://cover.openbd.jp/9784873115658.jpg',
+          autocomplete: 'off' %>
+    <small class="form-field__hint">openBD等の書影画像URLを入力してください</small>
+    <% if book.errors[:cover_image_url].any? %>
+      <span class="form-field__error"><%= book.errors[:cover_image_url].first %></span>
+    <% end %>
+  </div>
+
   <%# 総ページ数 %>
   <div class="form-field">
     <%= f.label :total_pages, '総ページ数', class: 'form-field__label' %>
