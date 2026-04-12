@@ -1,0 +1,19 @@
+<% content_for :title, "メールアドレスの変更完了 | Yomikiri" %>
+
+<div class="auth-page">
+  <div class="auth-card">
+    <div class="auth-card__header">
+      <%= link_to 'Yomikiri', root_path, class: 'auth-card__logo' %>
+      <h1 class="auth-card__title">メールアドレスの変更完了</h1>
+    </div>
+
+    <div class="auth-card__body">
+      <div class="auth-card__success-message" role="status">
+        <p>メールアドレスの変更が完了しました。</p>
+        <p>新しいメールアドレスでログインしてください。</p>
+      </div>
+
+      <%= link_to 'ログイン画面へ', new_user_session_path, class: 'btn btn--primary btn--full-width' %>
+    </div>
+  </div>
+</div>

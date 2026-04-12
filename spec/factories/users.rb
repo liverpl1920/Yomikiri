@@ -4,5 +4,6 @@ FactoryBot.define do
     password { 'password123' }
     password_confirmation { 'password123' }
     nickname { 'テストユーザー' }
+    confirmed_at { Time.current }
   end
 end
