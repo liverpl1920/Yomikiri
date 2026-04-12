@@ -42,7 +42,7 @@ devise :database_authenticatable, :registerable,
 
 ### コントローラー設計
 
-#### UsersController::EmailChangesController
+#### Users::EmailChangesController
 
 | アクション | HTTP | パス | 説明 |
 |-----------|------|------|------|

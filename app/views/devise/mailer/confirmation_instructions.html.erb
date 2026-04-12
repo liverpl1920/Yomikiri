@@ -4,7 +4,9 @@
 
 <p><%= link_to 'メールアドレスの変更を確定する', confirmation_url(@resource, confirmation_token: @token) %></p>
 
+<% if Devise.confirm_within.present? %>
 <p>このリンクの有効期限は <%= Devise.confirm_within.inspect %> です。</p>
+<% end %>
 
 <p>このメールに心当たりがない場合は、無視していただいて問題ありません。</p>
 

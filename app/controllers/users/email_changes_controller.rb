@@ -16,6 +16,12 @@ module Users
         return
       end
 
+      if new_email == current_user.email
+        current_user.errors.add(:email, :same_email)
+        render :edit, status: :unprocessable_entity
+        return
+      end
+
       current_user.email = new_email
       if current_user.save
         redirect_to mypage_path, notice: t("email_change.confirmation_sent")

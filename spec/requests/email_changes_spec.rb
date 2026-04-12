@@ -116,6 +116,62 @@ RSpec.describe 'EmailChanges', type: :request do
           expect(response).to have_http_status(:unprocessable_entity)
         end
       end
+
+      context '現在と同じメールアドレスを入力した場合' do
+        it '422 Unprocessable Entity を返す' do
+          patch email_change_path, params: {
+            email: user.email,
+            current_password: 'password123'
+          }
+
+          expect(response).to have_http_status(:unprocessable_entity)
+        end
+
+        it 'エラーメッセージが表示される' do
+          patch email_change_path, params: {
+            email: user.email,
+            current_password: 'password123'
+          }
+
+          expect(response.body).to include('現在のメールアドレスと同じものは設定できません')
+        end
+      end
+    end
+  end
+
+  describe 'GET /users/confirmation（確認メールリンク）' do
+    context '有効なトークンの場合（reconfirmable）' do
+      let(:new_email) { 'confirmed@example.com' }
+
+      before do
+        sign_in user
+        patch email_change_path, params: {
+          email: new_email,
+          current_password: 'password123'
+        }
+        user.reload
+      end
+
+      it 'email_change_complete へリダイレクトされる' do
+        get user_confirmation_path, params: { confirmation_token: user.confirmation_token }
+
+        expect(response).to redirect_to(email_change_complete_path)
+      end
+
+      it 'email が新しいメールアドレスに更新される' do
+        get user_confirmation_path, params: { confirmation_token: user.confirmation_token }
+
+        user.reload
+        expect(user.email).to eq(new_email)
+        expect(user.unconfirmed_email).to be_nil
+      end
+
+      it '確認後はサインアウト状態になる' do
+        get user_confirmation_path, params: { confirmation_token: user.confirmation_token }
+        get mypage_path
+
+        expect(response).to redirect_to(new_user_session_path)
+      end
     end
   end
 
