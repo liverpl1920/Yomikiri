@@ -104,10 +104,8 @@ RSpec.describe '書籍管理', type: :system do
       wait_for_stimulus
 
       page.execute_script("document.querySelector('[data-action=\"click->modal#open\"]').click()")
-      accept_confirm do
-        within('.modal') do
-          click_button '削除する'
-        end
+      within('.modal') do
+        click_button '削除する'
       end
 
       expect(page).to have_current_path(books_path)
