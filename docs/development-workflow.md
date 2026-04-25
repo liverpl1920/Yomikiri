@@ -313,6 +313,35 @@ services:
 
 > **Note**: `sync: false` の環境変数は Render Dashboard の Environment タブで手動設定してください。
 
+### Active Storage（S3）反映時の事前チェック（Issue #112 対応）
+
+`feature/#25-active-storage-setup` を main にマージする前に、以下を必ず実施してください。
+
+1. AWS 側で S3 バケットを作成済みであること
+2. Render Dashboard の Environment に次を設定済みであること
+  - `AWS_ACCESS_KEY_ID`
+  - `AWS_SECRET_ACCESS_KEY`
+  - `AWS_REGION`（例: `ap-northeast-1`）
+  - `AWS_BUCKET`
+3. `render.yaml` の `sync: false` は「値は Git 管理せず、Render 側で手動設定する」意味であることを理解していること
+
+上記が未実施のまま `feature/#25-active-storage-setup` をマージすると、本番起動時に環境変数不足で起動不能になるリスクがあります。
+
+### Active Storage 関連ブランチの推奨マージ順序
+
+1. `feature/#25-active-storage-setup`
+2. Render の自動デプロイ成功と `/up` 正常応答を確認
+3. `feature/#26-cover-image-upload`
+
+順序を逆にすると、`:local` ストレージ運用による再デプロイ時の画像消失リスクが残ります。
+
+### PR レビュー時チェックリスト（Active Storage 反映時）
+
+- [ ] Render Dashboard に `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `AWS_REGION`, `AWS_BUCKET` が設定済み
+- [ ] `feature/#25-active-storage-setup` の反映後に `/up` が正常応答することを確認済み
+- [ ] `feature/#26-cover-image-upload` は `feature/#25` のデプロイ確認後にマージする
+- [ ] `sync: false` の環境変数が「手動設定前提」であることをレビューで確認済み
+
 ---
 
 ## ステップ 4: GitHub Project の自動化

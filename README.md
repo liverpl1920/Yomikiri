@@ -331,6 +331,17 @@ Renderダッシュボードで以下の環境変数を設定してください�
 | `DATABASE_URL` | NeonのPostgreSQL接続文字列 | Neonダッシュボード → Connection Details → Connection String（末尾に `?sslmode=require` を付与） |
 | `RAILS_MASTER_KEY` | Railsのマスターキー | `config/master.key` の内容（本番用は別途生成推奨） |
 
+#### Active Storage（S3）を有効化する場合に追加で必要な環境変数
+
+以下 4 つは `feature/#25-active-storage-setup` を反映する場合のみ必須です。
+
+| 環境変数 | 説明 | 取得方法 |
+|----------|------|---------|
+| `AWS_ACCESS_KEY_ID` | Active Storage (S3) のアクセスキー | AWS IAM ユーザーのアクセスキー |
+| `AWS_SECRET_ACCESS_KEY` | Active Storage (S3) のシークレットキー | AWS IAM ユーザーのシークレットキー |
+| `AWS_REGION` | S3 バケットのリージョン | 例: `ap-northeast-1` |
+| `AWS_BUCKET` | 保存先 S3 バケット名 | 作成した S3 バケット名 |
+
 ### セットアップ手順
 
 #### 1. Neonでデータベースを作成する
@@ -368,6 +379,15 @@ Renderのサービスダッシュボード → **Environment** タブで以下�
 | `RAILS_LOG_TO_STDOUT` | `true` |
 | `RAILS_SERVE_STATIC_FILES` | `true` |
 
+Active Storage（S3）有効化時のみ、以下も設定してください。
+
+| キー | 値 |
+|------|----|
+| `AWS_ACCESS_KEY_ID` | AWS IAM アクセスキー |
+| `AWS_SECRET_ACCESS_KEY` | AWS IAM シークレットキー |
+| `AWS_REGION` | S3 のリージョン |
+| `AWS_BUCKET` | S3 バケット名 |
+
 #### 4. 初回デプロイを実行する
 
 1. **Manual Deploy** → **Deploy latest commit** を実行
@@ -383,3 +403,6 @@ Renderのサービスダッシュボード → **Environment** タブで以下�
 - **Free Planの制限**: Renderの無料プランではサービスが15分間アクセスがないとスリープします。最初のリクエストに数十秒かかる場合があります
 - **Neonの無料枠**: ストレージ上限に注意してください（無料枠: 0.5GB）
 - **HTTPS**: Renderは自動でSSL証明書を発行します（`config.force_ssl = true` に対応済み）
+- **Active Storageの順序依存**: `feature/#25-active-storage-setup` を先にマージして Render 側の AWS 環境変数設定と起動確認を完了してから、`feature/#26-cover-image-upload` をマージしてください
+- **`sync: false` の意味**: `render.yaml` に `sync: false` とある環境変数は値が自動投入されないため、Render ダッシュボードで手動設定が必要です
+- **`:local` ストレージの注意**: Render の無料プランはエフェメラルストレージのため、`:local` 保存の画像は再デプロイ/再起動で消失します。書影を永続化する場合は S3 を使用してください
