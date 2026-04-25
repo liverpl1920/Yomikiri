@@ -23,7 +23,7 @@ RSpec.describe 'トップ画面遷移', type: :system do
   describe 'ログアウト後遷移', js: true do
     it 'ログアウトするとトップ画面へ遷移しゲストヘッダーになる' do
       user = create(:user)
-      Warden.instance_variable_set(:@test_mode, false)
+      Warden.test_reset!
       sign_in_via_form(user)
 
       visit books_path

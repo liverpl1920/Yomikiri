@@ -55,7 +55,7 @@ RSpec.describe 'マイページ', type: :system do
       expect(user.reload.nickname).to eq('更新後ニックネーム')
     end
 
-    it '51文字以上はエラーになる' do
+    it 'ニックネーム入力欄はmaxlength=50が効いている' do
       fill_in 'ニックネーム（最大50文字）', with: 'a' * 51
 
       # maxlength=50 が効いていることを確認する
