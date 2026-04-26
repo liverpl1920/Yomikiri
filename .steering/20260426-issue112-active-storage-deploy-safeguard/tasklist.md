@@ -48,9 +48,9 @@
 ## フェーズ4: 仕上げ
 
 - [x] tasklist の振り返りを記入する
-- [ ] 変更をコミットする（Issue番号付き）
-- [ ] ブランチを push して PR を作成する
-- [ ] `gh pr checks --watch` で CI 完了を確認する
+- [x] 変更をコミットする（Issue番号付き）
+- [x] ブランチを push して PR を作成する
+- [x] `gh pr checks --watch` で CI 完了を確認する
 
 ---
 
