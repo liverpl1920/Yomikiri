@@ -135,13 +135,13 @@ class BooksController < ApplicationController
     items = data&.dig("items") || []
 
     items.map do |item|
-      info = item["volumeInfo"]
-      thumbnail = info.dig("imageLinks", "thumbnail").to_s.sub("http://", "https://")
+      info = item["volumeInfo"] || {}
+      isbn = extract_isbn_from_identifiers(info["industryIdentifiers"])
       {
         title: info["title"].to_s,
         author: Array(info["authors"]).join(", "),
         total_pages: info["pageCount"],
-        cover_image_url: thumbnail
+        cover_image_url: lookup_openbd_cover_url(isbn)
       }
     end
   end
@@ -189,6 +189,18 @@ class BooksController < ApplicationController
     extents = Array(onix.dig("DescriptiveDetail", "Extent"))
     page_extent = extents.find { |e| e["ExtentType"] == "11" }
     page_extent&.dig("ExtentValue")&.to_i
+  end
+
+  def lookup_openbd_cover_url(isbn)
+    return "" if isbn.blank?
+
+    data = fetch_json("https://api.openbd.jp/v1/get?isbn=#{isbn}")
+    return "" if data.nil? || data.first.nil?
+
+    summary_isbn = data.first.dig("summary", "isbn").to_s.gsub(/[^0-9]/, "")
+    return "" unless summary_isbn.match?(/\A\d{13}\z/)
+
+    "https://cover.openbd.jp/#{summary_isbn}.jpg"
   end
 
   def extract_isbn_from_identifiers(identifiers)

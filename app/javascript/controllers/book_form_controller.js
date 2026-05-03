@@ -6,12 +6,56 @@ export default class extends Controller {
 
   connect () {
     this.calculateQuota()
+    this.fetchingTitle = null
+    this.fetchPromise = null
+    this.lastAutoFetchedTitle = ''
+    this.resubmitting = false
   }
 
   async autoFetchByTitle () {
     const title = this.hasTitleTarget ? this.titleTarget.value.trim() : ''
+    if (!title) return false
+
+    return this._fetchBookByTitle(title)
+  }
+
+  async submitWithAutoFetch (event) {
+    if (this.resubmitting) {
+      this.resubmitting = false
+      return
+    }
+
+    const title = this.hasTitleTarget ? this.titleTarget.value.trim() : ''
     if (!title) return
 
+    const coverUrlInput = document.getElementById('book_cover_image_url')
+    const hasCoverImage = coverUrlInput && coverUrlInput.value.trim() !== ''
+    if (hasCoverImage || this.lastAutoFetchedTitle === title) return
+
+    event.preventDefault()
+    await this._fetchBookByTitle(title)
+
+    this.resubmitting = true
+    this.element.requestSubmit()
+  }
+
+  async _fetchBookByTitle (title) {
+    if (this.fetchPromise && this.fetchingTitle === title) {
+      await this.fetchPromise
+      return true
+    }
+
+    this.fetchingTitle = title
+    this.fetchPromise = this._performFetchByTitle(title)
+
+    try {
+      return await this.fetchPromise
+    } finally {
+      this.fetchPromise = null
+    }
+  }
+
+  async _performFetchByTitle (title) {
     this._setTitleStatus('書影を取得中...')
 
     try {
@@ -23,26 +67,31 @@ export default class extends Controller {
       const data = await res.json()
       if (data.error) {
         this._setTitleStatus(data.error)
-        return
+        return false
       }
 
       const books = data.books || []
       if (books.length === 0) {
         this._setTitleStatus('タイトルから書籍情報を取得できませんでした。')
-        return
+        return false
       }
 
       const book = books[0]
       this._fillFormFromSearch(book)
       this._setTitleStatus('書籍情報を自動入力しました。')
+      return true
     } catch (_e) {
       this._setTitleStatus('取得中にエラーが発生しました。')
+      return false
+    } finally {
+      this.lastAutoFetchedTitle = title
     }
   }
 
-  _fillFormFromSearch ({ author, total_pages: totalPages }) {
+  _fillFormFromSearch ({ author, total_pages: totalPages, cover_image_url: coverUrl }) {
     const authorInput = document.getElementById('book_author')
     const totalPagesInput = document.getElementById('book_total_pages')
+    const coverUrlInput = document.getElementById('book_cover_image_url')
 
     if (authorInput && author) authorInput.value = author
 
@@ -50,6 +99,8 @@ export default class extends Controller {
       totalPagesInput.value = totalPages
       totalPagesInput.dispatchEvent(new Event('input'))
     }
+
+    if (coverUrlInput && coverUrl) coverUrlInput.value = coverUrl
   }
 
   _setTitleStatus (message) {

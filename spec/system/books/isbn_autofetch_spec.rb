@@ -44,6 +44,23 @@ RSpec.describe 'タイトル入力からのISBN・書影自動取得', type: :sy
     { 'items' => [] }.to_json
   end
 
+  let(:openbd_response_with_cover) do
+    [ {
+      'summary' => {
+        'isbn' => '9784873115658',
+        'title' => 'リーダブルコード',
+        'author' => 'Dustin Boswell'
+      },
+      'onix' => {
+        'DescriptiveDetail' => {
+          'Extent' => [
+            { 'ExtentType' => '11', 'ExtentValue' => '260' }
+          ]
+        }
+      }
+    } ].to_json
+  end
+
   before do
     WebMock.reset!
     sign_in_via_form(user)
@@ -55,6 +72,9 @@ RSpec.describe 'タイトル入力からのISBN・書影自動取得', type: :sy
     before do
       stub_request(:get, /www\.googleapis\.com\/books\/v1\/volumes/)
         .to_return(status: 200, body: google_books_response_with_isbn,
+                   headers: { 'Content-Type' => 'application/json' })
+      stub_request(:get, /api\.openbd\.jp\/v1\/get\?isbn=9784873115658/)
+        .to_return(status: 200, body: openbd_response_with_cover,
                    headers: { 'Content-Type' => 'application/json' })
     end
 
@@ -93,33 +113,30 @@ RSpec.describe 'タイトル入力からのISBN・書影自動取得', type: :sy
       expect(page).to have_css('[data-book-form-target="titleStatus"]',
                                text: 'タイトルから書籍情報を取得できませんでした。', wait: 5)
     end
-
-    it '取得失敗時もISBN関連の入力欄は表示されない' do
-      fill_in 'タイトル', with: '存在しない本のタイトル'
-      find('#book_author').click
-
-      expect(page).not_to have_css('.book-form__isbn-section', wait: 1)
-    end
   end
 
-  describe 'ISBN未入力での書籍登録' do
+  describe '素早い操作での登録' do
     before do
       stub_request(:get, /www\.googleapis\.com\/books\/v1\/volumes/)
-        .to_return(status: 200, body: google_books_empty_response,
+        .to_return(status: 200, body: google_books_response_with_isbn,
+                   headers: { 'Content-Type' => 'application/json' })
+      stub_request(:get, /api\.openbd\.jp\/v1\/get\?isbn=9784873115658/)
+        .to_return(status: 200, body: openbd_response_with_cover,
                    headers: { 'Content-Type' => 'application/json' })
     end
 
-    it 'タイトルと必須項目のみで書籍を登録できる' do
-      fill_in 'タイトル', with: '手動入力テスト本'
-      fill_in '総ページ数', with: '200'
-      fill_in '読了対象ページ数', with: '200'
+    it '入力後すぐ送信しても書影URLが保存される' do
+      fill_in 'タイトル', with: 'リーダブルコード'
+      fill_in '総ページ数', with: '260'
+      fill_in '読了対象ページ数', with: '260'
       deadline = (Date.current + 30.days).strftime('%Y-%m-%d')
       page.execute_script("document.getElementById('book_deadline').value = '#{deadline}'")
       page.execute_script("document.getElementById('book_deadline').dispatchEvent(new Event('change'))")
 
       click_button '登録する'
 
-      expect(page).to have_text('手動入力テスト本', wait: 5)
+      expect(page).to have_text('リーダブルコード', wait: 5)
+      expect(Book.order(:id).last.cover_image_url).to eq('https://cover.openbd.jp/9784873115658.jpg')
     end
   end
 

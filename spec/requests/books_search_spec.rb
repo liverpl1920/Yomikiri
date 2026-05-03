@@ -152,6 +152,8 @@ RSpec.describe 'Books Search', type: :request do
         before do
           stub_request(:get, /www\.googleapis\.com\/books\/v1\/volumes/)
             .to_return(status: 200, body: google_books_response, headers: { 'Content-Type' => 'application/json' })
+          stub_request(:get, /api\.openbd\.jp\/v1\/get\?isbn=9784873115658/)
+            .to_return(status: 200, body: openbd_found_response, headers: { 'Content-Type' => 'application/json' })
         end
 
         it '200 OK を返す' do
@@ -175,15 +177,15 @@ RSpec.describe 'Books Search', type: :request do
           expect(book['title']).to eq('リーダブルコード')
           expect(book['author']).to eq('Dustin Boswell, Trevor Foucher')
           expect(book['total_pages']).to eq(260)
-          expect(book['cover_image_url']).to eq('https://books.google.com/books/content?id=abc&printsec=frontcover&img=1')
+          expect(book['cover_image_url']).to eq('https://cover.openbd.jp/9784873115658.jpg')
         end
 
-        it '書影URLのhttp:// は https:// に変換される' do
+        it 'Google thumbnailではなくopenBDの書影URLを優先する' do
           get search_books_path, params: { q: 'リーダブルコード' }
 
           json = JSON.parse(response.body)
           book = json['books'].first
-          expect(book['cover_image_url']).to start_with('https://')
+          expect(book['cover_image_url']).to start_with('https://cover.openbd.jp/')
         end
 
         it 'imageLinksがない候補は書影URLが空文字' do
