@@ -1184,3 +1184,48 @@
   background-color: var(--color-surface-hover, #f1f5f9);
   outline: none;
 }
+
+/* ── ISBN フォールバックセクション ── */
+
+.book-form__isbn-section {
+  background-color: var(--color-surface-secondary, #f8fafc);
+  border: 1px solid var(--color-border);
+  border-radius: 0.5rem;
+  padding: 0.875rem 1rem;
+  margin-bottom: 1.25rem;
+}
+
+.book-form__isbn-section--hidden {
+  display: none;
+}
+
+.book-form__isbn-hint {
+  font-size: 0.875rem;
+  color: var(--color-text-secondary);
+  margin-bottom: 0.625rem;
+}
+
+.book-form__isbn-input-group {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.book-form__isbn-input-group .form-field__input {
+  flex: 1;
+  margin-bottom: 0;
+}
+
+.book-form__title-status {
+  font-size: 0.8125rem;
+  color: var(--color-text-secondary);
+  margin-top: 0.25rem;
+  min-height: 1.25rem;
+}
+
+.book-form__isbn-status {
+  font-size: 0.8125rem;
+  color: var(--color-text-secondary);
+  margin-top: 0.5rem;
+  min-height: 1.25rem;
+}
