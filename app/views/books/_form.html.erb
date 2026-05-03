@@ -17,25 +17,6 @@
     </div>
   <% end %>
 
-  <%# ISBN・書籍名検索 %>
-  <div class="book-search" data-controller="book-search">
-    <label class="book-search__label" for="book_search_query">ISBNまたは書籍名から自動入力</label>
-    <div class="book-search__input-group">
-      <input type="text"
-             id="book_search_query"
-             class="book-search__input"
-             placeholder="例: 9784873115658 または リーダブルコード"
-             data-book-search-target="query"
-             data-action="keydown->book-search#handleKeydown"
-             autocomplete="off" />
-      <button type="button"
-              class="book-search__button"
-              data-action="click->book-search#search">検索</button>
-    </div>
-    <p class="book-search__status" aria-live="polite" data-book-search-target="status"></p>
-    <ul class="book-search__results" data-book-search-target="results"></ul>
-  </div>
-
   <%# タイトル %>
   <div class="form-field">
     <%= f.label :title, 'タイトル', class: 'form-field__label' %>
@@ -54,22 +35,6 @@
     <p class="book-form__title-status" data-book-form-target="titleStatus" aria-live="polite"></p>
   </div>
 
-  <%# ISBNフォールバック（自動取得失敗時のみ表示） %>
-  <div class="book-form__isbn-section book-form__isbn-section--hidden" data-book-form-target="isbnSection">
-    <p class="book-form__isbn-hint">ISBNが分かる場合は入力すると書影を取得できます（任意）</p>
-    <div class="book-form__isbn-input-group">
-      <input type="text"
-             class="form-field__input"
-             placeholder="例: 9784873115658"
-             data-book-form-target="isbn"
-             autocomplete="off" />
-      <button type="button"
-              class="btn btn--secondary btn--sm"
-              data-action="click->book-form#fetchByIsbn">取得する</button>
-    </div>
-    <p class="book-form__isbn-status" data-book-form-target="isbnStatus" aria-live="polite"></p>
-  </div>
-
   <%# 著者 %>
   <div class="form-field">
     <%= f.label :author, '著者', class: 'form-field__label' %>
@@ -78,20 +43,6 @@
           class: 'form-field__input',
           placeholder: '例: Dustin Boswell',
           autocomplete: 'off' %>
-  </div>
-
-  <%# 書影URL %>
-  <div class="form-field">
-    <%= f.label :cover_image_url, '書影URL', class: 'form-field__label' %>
-    <span class="form-field__optional">任意</span>
-    <%= f.url_field :cover_image_url,
-          class: "form-field__input #{'form-field__input--error' if book.errors[:cover_image_url].any?}",
-          placeholder: '例: https://cover.openbd.jp/9784873115658.jpg',
-          autocomplete: 'off' %>
-    <small class="form-field__hint">openBD等の書影画像URLを入力してください</small>
-    <% if book.errors[:cover_image_url].any? %>
-      <span class="form-field__error"><%= book.errors[:cover_image_url].first %></span>
-    <% end %>
   </div>
 
   <%# 総ページ数 %>
