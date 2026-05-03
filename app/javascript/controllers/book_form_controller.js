@@ -127,6 +127,10 @@ export default class extends Controller {
       img.src = coverUrl
       img.alt = '書影プレビュー'
       img.className = 'book-cover-preview__image'
+      img.onerror = () => {
+        container.replaceChildren()
+        container.hidden = true
+      }
       container.replaceChildren(img)
       container.hidden = false
     } else {

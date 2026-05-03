@@ -88,11 +88,14 @@ RSpec.describe '積読登録画面でのタイトル検索結果フィードバ�
                                text: 'タイトル・著者・ページ数・書影をすべて取得しました。', wait: 5)
     end
 
-    it '書影プレビュー画像が表示される' do
+    it '書影URLが hidden input にセットされる' do
       fill_in 'タイトル', with: 'リーダブルコード'
       find('#book_author').click
 
-      expect(page).to have_css('[data-book-form-target="coverPreview"] img', wait: 5)
+      expect(page).to have_css('[data-book-form-target="titleStatus"]',
+                               text: 'タイトル・著者・ページ数・書影をすべて取得しました。', wait: 5)
+      cover_url = page.evaluate_script("document.getElementById('book_cover_image_url').value")
+      expect(cover_url).to eq('https://cover.openbd.jp/9784873115658.jpg')
     end
   end
 
