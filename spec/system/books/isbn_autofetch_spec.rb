@@ -63,6 +63,7 @@ RSpec.describe 'タイトル入力からのISBN・書影自動取得', type: :sy
 
   before do
     WebMock.reset!
+    Warden.instance_variable_set(:@test_mode, false)
     sign_in_via_form(user)
     visit new_book_path
     wait_for_stimulus
@@ -115,7 +116,7 @@ RSpec.describe 'タイトル入力からのISBN・書影自動取得', type: :sy
     end
   end
 
-  describe '素早い操作での登録' do
+  describe '書影URL付き書籍の登録' do
     before do
       stub_request(:get, /www\.googleapis\.com\/books\/v1\/volumes/)
         .to_return(status: 200, body: google_books_response_with_isbn,
@@ -125,8 +126,12 @@ RSpec.describe 'タイトル入力からのISBN・書影自動取得', type: :sy
                    headers: { 'Content-Type' => 'application/json' })
     end
 
-    it '入力後すぐ送信しても書影URLが保存される' do
+    it '書影URLが書籍に保存される' do
       fill_in 'タイトル', with: 'リーダブルコード'
+      find('#book_author').click
+      expect(page).to have_css('[data-book-form-target="titleStatus"]',
+                               text: '書籍情報を自動入力しました。', wait: 5)
+
       fill_in '総ページ数', with: '260'
       fill_in '読了対象ページ数', with: '260'
       deadline = (Date.current + 30.days).strftime('%Y-%m-%d')

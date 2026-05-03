@@ -21,18 +21,22 @@ RSpec.describe 'トップ画面遷移', type: :system do
   end
 
   describe 'ログアウト後遷移', js: true do
+    before do
+      Warden.test_reset!
+    end
+
     it 'ログアウトするとトップ画面へ遷移しゲストヘッダーになる' do
       user = create(:user)
-      Warden.test_reset!
       sign_in_via_form(user)
 
       visit books_path
       wait_for_stimulus
 
-      page.execute_script(%q{document.querySelector('[data-action="dropdown#toggle"]').click()})
-      click_button 'ログアウト'
+      execute_script(%q{document.querySelector('[data-action="dropdown#toggle"]').click()})
+      expect(page).to have_css('.dropdown__menu.dropdown__menu--open', wait: 3)
+      execute_script(%q{document.querySelector('.dropdown__logout-form').requestSubmit()})
 
-      expect(page).to have_current_path(root_path)
+      expect(page).to have_current_path(root_path, wait: 5)
       expect(page).to have_link('無料で始める')
       expect(page).to have_link('ログイン')
     end

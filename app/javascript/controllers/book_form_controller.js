@@ -9,7 +9,6 @@ export default class extends Controller {
     this.fetchingTitle = null
     this.fetchPromise = null
     this.lastAutoFetchedTitle = ''
-    this.resubmitting = false
   }
 
   async autoFetchByTitle () {
@@ -20,11 +19,6 @@ export default class extends Controller {
   }
 
   async submitWithAutoFetch (event) {
-    if (this.resubmitting) {
-      this.resubmitting = false
-      return
-    }
-
     const title = this.hasTitleTarget ? this.titleTarget.value.trim() : ''
     if (!title) return
 
@@ -33,10 +27,11 @@ export default class extends Controller {
     if (hasCoverImage || this.lastAutoFetchedTitle === title) return
 
     event.preventDefault()
-    await this._fetchBookByTitle(title)
-
-    this.resubmitting = true
-    this.element.requestSubmit()
+    try {
+      await this._fetchBookByTitle(title)
+    } finally {
+      setTimeout(() => this.element.submit(), 0)
+    }
   }
 
   async _fetchBookByTitle (title) {
