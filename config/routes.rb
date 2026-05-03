@@ -12,14 +12,13 @@ Rails.application.routes.draw do
   get "email_change/complete", to: "users/email_changes#complete", as: :email_change_complete
 
   resources :books, only: [ :index, :new, :create, :show, :destroy ] do
+    collection do
+      get :search
+    end
     member do
       patch :update_progress
       patch :change_deadline
-      # 後続 Issue で実装予定
-      # patch :complete
       patch :complete
-      # 後続 Issue で実装予定
-      # patch :change_deadline
     end
   end
 

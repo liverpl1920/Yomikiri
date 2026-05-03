@@ -17,6 +17,25 @@
     </div>
   <% end %>
 
+  <%# ISBN・書籍名検索 %>
+  <div class="book-search" data-controller="book-search">
+    <label class="book-search__label" for="book_search_query">ISBNまたは書籍名から自動入力</label>
+    <div class="book-search__input-group">
+      <input type="text"
+             id="book_search_query"
+             class="book-search__input"
+             placeholder="例: 9784873115658 または リーダブルコード"
+             data-book-search-target="query"
+             data-action="keydown->book-search#handleKeydown"
+             autocomplete="off" />
+      <button type="button"
+              class="book-search__button"
+              data-action="click->book-search#search">検索</button>
+    </div>
+    <p class="book-search__status" aria-live="polite" data-book-search-target="status"></p>
+    <ul class="book-search__results" data-book-search-target="results"></ul>
+  </div>
+
   <%# タイトル %>
   <div class="form-field">
     <%= f.label :title, 'タイトル', class: 'form-field__label' %>

@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require "net/http"
+
 class BooksController < ApplicationController
   before_action :authenticate_user!
   before_action :set_book, only: [ :show, :destroy, :update_progress, :complete, :change_deadline ]
@@ -63,6 +65,16 @@ class BooksController < ApplicationController
     redirect_to books_path, notice: "#{@book.title}を削除しました。", status: :see_other
   end
 
+  def search
+    query = params[:q].to_s.strip
+    return render json: { books: [] } if query.blank?
+
+    books = isbn_query?(query) ? search_by_isbn(sanitize_isbn(query)) : search_by_title(query)
+    render json: { books: }
+  rescue StandardError
+    render json: { books: [], error: "検索中にエラーが発生しました" }
+  end
+
   private
 
   def set_book
@@ -86,5 +98,73 @@ class BooksController < ApplicationController
 
   def book_params
     params.require(:book).permit(:title, :author, :total_pages, :target_pages, :current_page, :deadline, :status, :cover_image_url)
+  end
+
+  def isbn_query?(query)
+    sanitize_isbn(query).match?(/\A\d{10,13}\z/)
+  end
+
+  def sanitize_isbn(query)
+    query.gsub(/[^0-9X]/, "")
+  end
+
+  def search_by_isbn(isbn)
+    data = fetch_json("https://api.openbd.jp/v1/get?isbn=#{isbn}")
+    return [] if data.nil? || data.first.nil?
+
+    book = data.first
+    total_pages = extract_pages_from_onix(book["onix"])
+    [ {
+      title: book.dig("summary", "title").to_s,
+      author: book.dig("summary", "author").to_s,
+      total_pages: total_pages,
+      cover_image_url: "https://cover.openbd.jp/#{isbn}.jpg"
+    } ]
+  end
+
+  def search_by_title(title)
+    uri = URI("https://www.googleapis.com/books/v1/volumes")
+    uri.query = URI.encode_www_form(q: "intitle:#{title}", langRestrict: "ja", maxResults: 5)
+    data = fetch_json(uri.to_s)
+    items = data&.dig("items") || []
+
+    items.map do |item|
+      info = item["volumeInfo"]
+      isbn = extract_isbn_from_identifiers(info["industryIdentifiers"])
+      {
+        title: info["title"].to_s,
+        author: Array(info["authors"]).join(", "),
+        total_pages: info["pageCount"],
+        cover_image_url: isbn ? "https://cover.openbd.jp/#{isbn}.jpg" : ""
+      }
+    end
+  end
+
+  def fetch_json(url)
+    uri = URI(url)
+    response = Net::HTTP.start(uri.host, uri.port, use_ssl: uri.scheme == "https",
+                                                   open_timeout: 5, read_timeout: 5) do |http|
+      http.get(uri.request_uri)
+    end
+    return nil unless response.is_a?(Net::HTTPSuccess)
+
+    JSON.parse(response.body)
+  rescue StandardError
+    nil
+  end
+
+  def extract_pages_from_onix(onix)
+    return nil if onix.blank?
+
+    extents = Array(onix.dig("DescriptiveDetail", "Extent"))
+    page_extent = extents.find { |e| e["ExtentType"] == "11" }
+    page_extent&.dig("ExtentValue")&.to_i
+  end
+
+  def extract_isbn_from_identifiers(identifiers)
+    return nil if identifiers.blank?
+
+    isbn13 = identifiers.find { |id| id["type"] == "ISBN_13" }
+    isbn13&.dig("identifier")&.gsub(/[^0-9]/, "")
   end
 end

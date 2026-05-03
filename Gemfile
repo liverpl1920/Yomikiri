@@ -34,4 +34,5 @@ group :test do
   gem "rspec_junit_formatter"
   gem "simplecov", require: false
   gem "bundler-audit", require: false
+  gem "webmock"
 end
