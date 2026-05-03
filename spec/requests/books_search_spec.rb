@@ -260,6 +260,65 @@ RSpec.describe 'Books Search', type: :request do
           expect(json['error']).to include('タイムアウト')
         end
       end
+
+      context 'openBDに書影がなくGoogle Books thumbnailがある場合' do
+        let(:google_books_thumbnail_only_response) do
+          {
+            'items' => [
+              {
+                'volumeInfo' => {
+                  'title' => 'サムネイル書籍',
+                  'authors' => [ '著者名' ],
+                  'pageCount' => 100,
+                  'industryIdentifiers' => [
+                    { 'type' => 'ISBN_13', 'identifier' => '9780000000001' }
+                  ],
+                  'imageLinks' => {
+                    'thumbnail' => 'http://books.google.com/books/content?id=xyz&img=1'
+                  }
+                }
+              }
+            ]
+          }.to_json
+        end
+
+        before do
+          stub_request(:get, /www\.googleapis\.com\/books\/v1\/volumes/)
+            .to_return(status: 200, body: google_books_thumbnail_only_response,
+                       headers: { 'Content-Type' => 'application/json' })
+          stub_request(:get, /api\.openbd\.jp\/v1\/get\?isbn=9780000000001/)
+            .to_return(status: 200, body: [ nil ].to_json,
+                       headers: { 'Content-Type' => 'application/json' })
+        end
+
+        it 'Google Books thumbnail URL（https正規化済み）を返す' do
+          get search_books_path, params: { q: 'サムネイル書籍' }
+
+          json = JSON.parse(response.body)
+          book = json['books'].first
+          expect(book['cover_image_url']).to eq('https://books.google.com/books/content?id=xyz&img=1')
+        end
+      end
+
+      context 'openBDに書影があればopenBD URLを優先する' do
+        before do
+          stub_request(:get, /www\.googleapis\.com\/books\/v1\/volumes/)
+            .to_return(status: 200, body: google_books_response,
+                       headers: { 'Content-Type' => 'application/json' })
+          stub_request(:get, /api\.openbd\.jp\/v1\/get\?isbn=9784873115658/)
+            .to_return(status: 200, body: openbd_found_response,
+                       headers: { 'Content-Type' => 'application/json' })
+        end
+
+        it 'openBD URLを返し、Google thumbnail URLは返さない' do
+          get search_books_path, params: { q: 'リーダブルコード' }
+
+          json = JSON.parse(response.body)
+          book = json['books'].first
+          expect(book['cover_image_url']).to start_with('https://cover.openbd.jp/')
+          expect(book['cover_image_url']).not_to include('books.google.com')
+        end
+      end
     end
   end
 end

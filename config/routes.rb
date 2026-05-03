@@ -14,6 +14,7 @@ Rails.application.routes.draw do
   resources :books, only: [ :index, :new, :create, :show, :destroy ] do
     collection do
       get :search
+      get :cover_proxy
     end
     member do
       patch :update_progress

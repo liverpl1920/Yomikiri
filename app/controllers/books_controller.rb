@@ -4,6 +4,7 @@ require "net/http"
 
 class BooksController < ApplicationController
   GoogleBooksApiError = Class.new(StandardError)
+  ALLOWED_COVER_HOSTS = %w[books.google.com].freeze
 
   before_action :authenticate_user!
   before_action :set_book, only: [ :show, :destroy, :update_progress, :complete, :change_deadline ]
@@ -79,6 +80,30 @@ class BooksController < ApplicationController
     render json: { books: [], error: "検索中にエラーが発生しました" }
   end
 
+  def cover_proxy
+    url = params[:url].to_s
+    uri = URI.parse(url)
+    return head :forbidden unless ALLOWED_COVER_HOSTS.include?(uri.host)
+
+    response = Net::HTTP.start(uri.host, uri.port, use_ssl: uri.scheme == "https",
+                                                    open_timeout: 5, read_timeout: 5) do |http|
+      http.get(uri.request_uri)
+    end
+
+    unless response.is_a?(Net::HTTPSuccess)
+      return head :not_found
+    end
+
+    content_type = response["content-type"] || "image/jpeg"
+    send_data response.body, type: content_type, disposition: "inline"
+  rescue URI::InvalidURIError
+    head :bad_request
+  rescue Net::OpenTimeout, Net::ReadTimeout
+    head :not_found
+  rescue StandardError
+    head :not_found
+  end
+
   private
 
   def set_book
@@ -137,11 +162,13 @@ class BooksController < ApplicationController
     items.map do |item|
       info = item["volumeInfo"] || {}
       isbn = extract_isbn_from_identifiers(info["industryIdentifiers"])
+      openbd_url = lookup_openbd_cover_url(isbn)
+      google_thumbnail = info.dig("imageLinks", "thumbnail").to_s.sub(/\Ahttp:/, "https:")
       {
         title: info["title"].to_s,
         author: Array(info["authors"]).join(", "),
         total_pages: info["pageCount"],
-        cover_image_url: lookup_openbd_cover_url(isbn)
+        cover_image_url: openbd_url.present? ? openbd_url : google_thumbnail
       }
     end
   end
