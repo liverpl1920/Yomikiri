@@ -34,7 +34,10 @@ RSpec.describe 'Books Search', type: :request do
             'pageCount' => 260,
             'industryIdentifiers' => [
               { 'type' => 'ISBN_13', 'identifier' => '9784873115658' }
-            ]
+            ],
+            'imageLinks' => {
+              'thumbnail' => 'http://books.google.com/books/content?id=abc&printsec=frontcover&img=1'
+            }
           }
         },
         {
@@ -172,10 +175,18 @@ RSpec.describe 'Books Search', type: :request do
           expect(book['title']).to eq('リーダブルコード')
           expect(book['author']).to eq('Dustin Boswell, Trevor Foucher')
           expect(book['total_pages']).to eq(260)
-          expect(book['cover_image_url']).to eq('https://cover.openbd.jp/9784873115658.jpg')
+          expect(book['cover_image_url']).to eq('https://books.google.com/books/content?id=abc&printsec=frontcover&img=1')
         end
 
-        it 'ISBN不明の候補は書影URLが空文字' do
+        it '書影URLのhttp:// は https:// に変換される' do
+          get search_books_path, params: { q: 'リーダブルコード' }
+
+          json = JSON.parse(response.body)
+          book = json['books'].first
+          expect(book['cover_image_url']).to start_with('https://')
+        end
+
+        it 'imageLinksがない候補は書影URLが空文字' do
           get search_books_path, params: { q: 'リーダブルコード' }
 
           json = JSON.parse(response.body)

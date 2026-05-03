@@ -136,12 +136,12 @@ class BooksController < ApplicationController
 
     items.map do |item|
       info = item["volumeInfo"]
-      isbn = extract_isbn_from_identifiers(info["industryIdentifiers"])
+      thumbnail = info.dig("imageLinks", "thumbnail").to_s.sub("http://", "https://")
       {
         title: info["title"].to_s,
         author: Array(info["authors"]).join(", "),
         total_pages: info["pageCount"],
-        cover_image_url: isbn ? "https://cover.openbd.jp/#{isbn}.jpg" : ""
+        cover_image_url: thumbnail
       }
     end
   end
