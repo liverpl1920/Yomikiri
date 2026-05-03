@@ -1083,3 +1083,104 @@
     width: 7rem;
   }
 }
+
+/* ============================================================
+   書籍検索セクション
+   ============================================================ */
+
+.book-search {
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  padding: 1rem 1.25rem;
+  margin-bottom: 1.5rem;
+}
+
+.book-search__label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  margin: 0 0 0.5rem;
+}
+
+.book-search__input-group {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.book-search__input {
+  flex: 1;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  font-size: 0.9375rem;
+  color: var(--color-text-primary);
+  background-color: var(--color-bg);
+}
+
+.book-search__input:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+}
+
+.book-search__button {
+  padding: 0.5rem 1rem;
+  background-color: var(--color-primary);
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.book-search__button:hover {
+  background-color: var(--color-primary-hover, #2563eb);
+}
+
+.book-search__status {
+  font-size: 0.8125rem;
+  color: var(--color-text-secondary);
+  margin: 0.5rem 0 0;
+  min-height: 1.2em;
+}
+
+.book-search__results {
+  list-style: none;
+  padding: 0;
+  margin: 0.5rem 0 0;
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.book-search__results--hidden {
+  display: none;
+}
+
+.book-search__result-item {
+  border-bottom: 1px solid var(--color-border);
+}
+
+.book-search__result-item:last-child {
+  border-bottom: none;
+}
+
+.book-search__result-button {
+  width: 100%;
+  text-align: left;
+  padding: 0.625rem 0.875rem;
+  font-size: 0.875rem;
+  color: var(--color-text-primary);
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+}
+
+.book-search__result-button:hover,
+.book-search__result-button:focus-visible {
+  background-color: var(--color-surface-hover, #f1f5f9);
+  outline: none;
+}
