@@ -96,7 +96,8 @@ RSpec.describe 'タイトル入力からのISBN・書影自動取得', type: :sy
       fill_in 'タイトル', with: 'リーダブルコード'
       find('#book_author').click
 
-      expect(page).to have_css('[data-book-form-target="titleStatus"]', text: '書籍情報を自動入力しました。', wait: 5)
+      expect(page).to have_css('[data-book-form-target="titleStatus"]',
+                               text: 'タイトル・著者・ページ数・書影をすべて取得しました。', wait: 5)
     end
   end
 
@@ -112,7 +113,7 @@ RSpec.describe 'タイトル入力からのISBN・書影自動取得', type: :sy
       find('#book_author').click
 
       expect(page).to have_css('[data-book-form-target="titleStatus"]',
-                               text: 'タイトルから書籍情報を取得できませんでした。', wait: 5)
+                               text: 'タイトルから書籍情報を取得できませんでした。ISBNで検索してみてください。', wait: 5)
     end
   end
 
@@ -130,7 +131,7 @@ RSpec.describe 'タイトル入力からのISBN・書影自動取得', type: :sy
       fill_in 'タイトル', with: 'リーダブルコード'
       find('#book_author').click
       expect(page).to have_css('[data-book-form-target="titleStatus"]',
-                               text: '書籍情報を自動入力しました。', wait: 5)
+                               text: 'タイトル・著者・ページ数・書影をすべて取得しました。', wait: 5)
 
       fill_in '総ページ数', with: '260'
       fill_in '読了対象ページ数', with: '260'

@@ -2,7 +2,7 @@ import { Controller } from '@hotwired/stimulus'
 
 export default class extends Controller {
   static targets = ['totalPages', 'targetPages', 'deadline', 'quotaDisplay',
-    'title', 'titleStatus']
+    'title', 'titleStatus', 'coverPreview']
 
   connect () {
     this.calculateQuota()
@@ -67,13 +67,14 @@ export default class extends Controller {
 
       const books = data.books || []
       if (books.length === 0) {
-        this._setTitleStatus('タイトルから書籍情報を取得できませんでした。')
+        this._setTitleStatus('タイトルから書籍情報を取得できませんでした。ISBNで検索してみてください。')
         return false
       }
 
       const book = books[0]
-      this._fillFormFromSearch(book)
-      this._setTitleStatus('書籍情報を自動入力しました。')
+      const missing = this._fillFormFromSearch(book)
+      this._updateCoverPreview(book.cover_image_url)
+      this._setTitleStatus(this._buildFetchResultMessage(missing))
       return true
     } catch (_e) {
       this._setTitleStatus('取得中にエラーが発生しました。')
@@ -87,15 +88,51 @@ export default class extends Controller {
     const authorInput = document.getElementById('book_author')
     const totalPagesInput = document.getElementById('book_total_pages')
     const coverUrlInput = document.getElementById('book_cover_image_url')
+    const missing = []
 
-    if (authorInput && author) authorInput.value = author
+    if (authorInput && author) {
+      authorInput.value = author
+    } else {
+      missing.push('著者')
+    }
 
     if (totalPagesInput && totalPages) {
       totalPagesInput.value = totalPages
       totalPagesInput.dispatchEvent(new Event('input'))
+    } else {
+      missing.push('ページ数')
     }
 
-    if (coverUrlInput && coverUrl) coverUrlInput.value = coverUrl
+    if (coverUrlInput && coverUrl) {
+      coverUrlInput.value = coverUrl
+    } else {
+      missing.push('書影')
+    }
+
+    return missing
+  }
+
+  _buildFetchResultMessage (missing) {
+    if (missing.length === 0) {
+      return 'タイトル・著者・ページ数・書影をすべて取得しました。'
+    }
+    return `書籍情報を取得しましたが、${missing.join('・')}は取得できませんでした。`
+  }
+
+  _updateCoverPreview (coverUrl) {
+    if (!this.hasCoverPreviewTarget) return
+    const container = this.coverPreviewTarget
+    if (coverUrl) {
+      const img = document.createElement('img')
+      img.src = coverUrl
+      img.alt = '書影プレビュー'
+      img.className = 'book-cover-preview__image'
+      container.replaceChildren(img)
+      container.hidden = false
+    } else {
+      container.replaceChildren()
+      container.hidden = true
+    }
   }
 
   _setTitleStatus (message) {
