@@ -86,10 +86,13 @@ RSpec.describe 'タイトル入力からのISBN・書影自動取得', type: :sy
 
     it 'タイトルを入力してフォーカスを外すと書籍情報が自動入力される' do
       fill_in 'タイトル', with: 'リーダブルコード'
-      find('#book_title').send_keys(:tab)
+      page.execute_script("document.getElementById('book_title').blur()")
 
-      expect(page).to have_field('著者', with: 'Dustin Boswell', wait: 10)
-      expect(page).to have_field('総ページ数', with: '260', wait: 10)
+      # fetch完了をステータスメッセージで確認してからフィールド値を検証する
+      expect(page).to have_css('[data-book-form-target="titleStatus"]',
+                               text: 'タイトル・著者・ページ数・書影をすべて取得しました。', wait: 15)
+      expect(page).to have_field('著者', with: 'Dustin Boswell')
+      expect(page).to have_field('総ページ数', with: '260')
     end
 
     it '自動取得成功時は成功メッセージが表示される' do
