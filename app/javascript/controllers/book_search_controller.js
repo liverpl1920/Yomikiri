@@ -22,6 +22,10 @@ export default class extends Controller {
       if (!res.ok) throw new Error('Network error')
 
       const data = await res.json()
+      if (data.error) {
+        this._setStatus(data.error)
+        return
+      }
       this._handleResults(data.books || [])
     } catch (_e) {
       this._setStatus('検索中にエラーが発生しました')

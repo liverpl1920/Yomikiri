@@ -190,6 +190,63 @@ RSpec.describe 'Books Search', type: :request do
           expect(json['books'].length).to eq(2)
         end
       end
+
+      context 'Google Books APIが429を返した場合' do
+        before do
+          stub_request(:get, /www\.googleapis\.com\/books\/v1\/volumes/)
+            .to_return(status: 429, body: '', headers: {})
+        end
+
+        it '200 OK を返す' do
+          get search_books_path, params: { q: 'リーダブルコード' }
+
+          expect(response).to have_http_status(:ok)
+        end
+
+        it 'booksが空配列でerrorキーを含むJSONを返す' do
+          get search_books_path, params: { q: 'リーダブルコード' }
+
+          json = JSON.parse(response.body)
+          expect(json['books']).to eq([])
+          expect(json['error']).to be_present
+        end
+
+        it 'errorメッセージにレートリミットを示す文言が含まれる' do
+          get search_books_path, params: { q: 'リーダブルコード' }
+
+          json = JSON.parse(response.body)
+          expect(json['error']).to include('制限')
+        end
+      end
+
+      context 'Google Books APIが503を返した場合' do
+        before do
+          stub_request(:get, /www\.googleapis\.com\/books\/v1\/volumes/)
+            .to_return(status: 503, body: '', headers: {})
+        end
+
+        it 'booksが空配列でerrorキーを含むJSONを返す' do
+          get search_books_path, params: { q: 'リーダブルコード' }
+
+          json = JSON.parse(response.body)
+          expect(json['books']).to eq([])
+          expect(json['error']).to be_present
+        end
+      end
+
+      context 'Google Books APIがタイムアウトした場合' do
+        before do
+          stub_request(:get, /www\.googleapis\.com\/books\/v1\/volumes/).to_timeout
+        end
+
+        it 'booksが空配列でerrorキーを含むJSONを返す' do
+          get search_books_path, params: { q: 'リーダブルコード' }
+
+          json = JSON.parse(response.body)
+          expect(json['books']).to eq([])
+          expect(json['error']).to include('タイムアウト')
+        end
+      end
     end
   end
 end
