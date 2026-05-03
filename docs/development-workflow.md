@@ -319,10 +319,10 @@ services:
 
 1. AWS 側で S3 バケットを作成済みであること
 2. Render Dashboard の Environment に次を設定済みであること
-  - `AWS_ACCESS_KEY_ID`
-  - `AWS_SECRET_ACCESS_KEY`
-  - `AWS_REGION`（例: `ap-northeast-1`）
-  - `AWS_BUCKET`
+    - `AWS_ACCESS_KEY_ID`
+    - `AWS_SECRET_ACCESS_KEY`
+    - `AWS_REGION`（例: `ap-northeast-1`）
+    - `AWS_BUCKET`
 3. `render.yaml` の `sync: false` は「値は Git 管理せず、Render 側で手動設定する」意味であることを理解していること
 
 上記が未実施のまま `feature/#25-active-storage-setup` をマージすると、本番起動時に環境変数不足で起動不能になるリスクがあります。
