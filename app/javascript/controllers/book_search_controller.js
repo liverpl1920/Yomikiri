@@ -55,17 +55,20 @@ export default class extends Controller {
     const ul = this.resultsTarget
     ul.innerHTML = ''
 
-    books.forEach((book, index) => {
+    books.forEach((book) => {
       const li = document.createElement('li')
       li.className = 'book-search__result-item'
-      li.textContent = `${book.title}${book.author ? ' / ' + book.author : ''}`
-      li.dataset.index = index
-      li.addEventListener('click', () => {
+      const button = document.createElement('button')
+      button.type = 'button'
+      button.className = 'book-search__result-button'
+      button.textContent = `${book.title}${book.author ? ' / ' + book.author : ''}`
+      button.addEventListener('click', () => {
         this._fillForm(book)
         ul.innerHTML = ''
         ul.classList.add('book-search__results--hidden')
         this._setStatus('書籍情報を自動入力しました')
       })
+      li.appendChild(button)
       ul.appendChild(li)
     })
 
@@ -78,12 +81,12 @@ export default class extends Controller {
     const totalPagesInput = document.getElementById('book_total_pages')
     const coverUrlInput = document.getElementById('book_cover_image_url')
 
-    if (title && titleInput) titleInput.value = title
-    if (author && authorInput) authorInput.value = author
-    if (coverUrl !== undefined && coverUrlInput) coverUrlInput.value = coverUrl
+    if (titleInput) titleInput.value = title || ''
+    if (authorInput) authorInput.value = author || ''
+    if (coverUrlInput) coverUrlInput.value = coverUrl || ''
 
-    if (totalPages && totalPagesInput) {
-      totalPagesInput.value = totalPages
+    if (totalPagesInput) {
+      totalPagesInput.value = totalPages ?? ''
       totalPagesInput.dispatchEvent(new Event('input'))
     }
   }

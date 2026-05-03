@@ -101,11 +101,11 @@ class BooksController < ApplicationController
   end
 
   def isbn_query?(query)
-    sanitize_isbn(query).match?(/\A\d{10,13}\z/)
+    sanitize_isbn(query).match?(/\A(?:\d{13}|\d{9}[\dX])\z/)
   end
 
   def sanitize_isbn(query)
-    query.gsub(/[^0-9X]/, "")
+    query.upcase.gsub(/[^0-9X]/, "")
   end
 
   def search_by_isbn(isbn)
@@ -113,12 +113,14 @@ class BooksController < ApplicationController
     return [] if data.nil? || data.first.nil?
 
     book = data.first
+    summary_isbn = book.dig("summary", "isbn").to_s.gsub(/[^0-9]/, "")
+    cover_isbn = summary_isbn.match?(/\A\d{13}\z/) ? summary_isbn : ""
     total_pages = extract_pages_from_onix(book["onix"])
     [ {
       title: book.dig("summary", "title").to_s,
       author: book.dig("summary", "author").to_s,
       total_pages: total_pages,
-      cover_image_url: "https://cover.openbd.jp/#{isbn}.jpg"
+      cover_image_url: cover_isbn.present? ? "https://cover.openbd.jp/#{cover_isbn}.jpg" : ""
     } ]
   end
 

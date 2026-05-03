@@ -104,6 +104,17 @@ RSpec.describe 'Books Search', type: :request do
           json = JSON.parse(response.body)
           expect(json['books'].length).to eq(1)
         end
+
+        it 'ISBN-10で検索しても書影URLはAPIのISBN-13を使う' do
+          stub_request(:get, /api\.openbd\.jp\/v1\/get\?isbn=4873115655/)
+            .to_return(status: 200, body: openbd_found_response, headers: { 'Content-Type' => 'application/json' })
+
+          get search_books_path, params: { q: '4873115655' }
+
+          json = JSON.parse(response.body)
+          book = json['books'].first
+          expect(book['cover_image_url']).to eq('https://cover.openbd.jp/9784873115658.jpg')
+        end
       end
 
       context 'openBDに存在しないISBNの場合' do
@@ -170,6 +181,13 @@ RSpec.describe 'Books Search', type: :request do
           json = JSON.parse(response.body)
           second_book = json['books'][1]
           expect(second_book['cover_image_url']).to eq('')
+        end
+
+        it '11桁の数値クエリはISBN扱いせずタイトル検索される' do
+          get search_books_path, params: { q: '12345678901' }
+
+          json = JSON.parse(response.body)
+          expect(json['books'].length).to eq(2)
         end
       end
     end

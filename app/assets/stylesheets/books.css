@@ -1161,10 +1161,6 @@
 }
 
 .book-search__result-item {
-  padding: 0.625rem 0.875rem;
-  font-size: 0.875rem;
-  color: var(--color-text-primary);
-  cursor: pointer;
   border-bottom: 1px solid var(--color-border);
 }
 
@@ -1172,6 +1168,19 @@
   border-bottom: none;
 }
 
-.book-search__result-item:hover {
+.book-search__result-button {
+  width: 100%;
+  text-align: left;
+  padding: 0.625rem 0.875rem;
+  font-size: 0.875rem;
+  color: var(--color-text-primary);
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+}
+
+.book-search__result-button:hover,
+.book-search__result-button:focus-visible {
   background-color: var(--color-surface-hover, #f1f5f9);
+  outline: none;
 }
