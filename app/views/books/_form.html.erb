@@ -43,10 +43,31 @@
     <%= f.text_field :title,
           class: "form-field__input #{'form-field__input--error' if book.errors[:title].any?}",
           placeholder: '例: リーダブルコード',
-          autocomplete: 'off' %>
+          autocomplete: 'off',
+          data: {
+            'book-form-target': 'title',
+            action: 'blur->book-form#autoFetchByTitle'
+          } %>
     <% if book.errors[:title].any? %>
       <span class="form-field__error"><%= book.errors[:title].first %></span>
     <% end %>
+    <p class="book-form__title-status" data-book-form-target="titleStatus" aria-live="polite"></p>
+  </div>
+
+  <%# ISBNフォールバック（自動取得失敗時のみ表示） %>
+  <div class="book-form__isbn-section book-form__isbn-section--hidden" data-book-form-target="isbnSection">
+    <p class="book-form__isbn-hint">ISBNが分かる場合は入力すると書影を取得できます（任意）</p>
+    <div class="book-form__isbn-input-group">
+      <input type="text"
+             class="form-field__input"
+             placeholder="例: 9784873115658"
+             data-book-form-target="isbn"
+             autocomplete="off" />
+      <button type="button"
+              class="btn btn--secondary btn--sm"
+              data-action="click->book-form#fetchByIsbn">取得する</button>
+    </div>
+    <p class="book-form__isbn-status" data-book-form-target="isbnStatus" aria-live="polite"></p>
   </div>
 
   <%# 著者 %>

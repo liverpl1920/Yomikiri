@@ -1,10 +1,117 @@
 import { Controller } from '@hotwired/stimulus'
 
 export default class extends Controller {
-  static targets = ['totalPages', 'targetPages', 'deadline', 'quotaDisplay']
+  static targets = ['totalPages', 'targetPages', 'deadline', 'quotaDisplay',
+    'title', 'titleStatus', 'isbnSection', 'isbn', 'isbnStatus']
 
   connect () {
     this.calculateQuota()
+  }
+
+  async autoFetchByTitle () {
+    const title = this.hasTitleTarget ? this.titleTarget.value.trim() : ''
+    if (!title) return
+
+    this._setTitleStatus('書影を取得中...')
+
+    try {
+      const res = await fetch(`/books/search?q=${encodeURIComponent(title)}`, {
+        headers: { Accept: 'application/json' }
+      })
+      if (!res.ok) throw new Error('Network error')
+
+      const data = await res.json()
+      if (data.error) {
+        this._showIsbnFallback(data.error)
+        return
+      }
+
+      const books = data.books || []
+      if (books.length === 0) {
+        this._showIsbnFallback('タイトルから書影・ISBNを取得できませんでした。ISBNが分かる場合は下記に入力してください。')
+        return
+      }
+
+      const book = books[0]
+      if (!book.cover_image_url) {
+        this._fillFormFromSearch(book)
+        this._showIsbnFallback('書影を取得できませんでした。ISBNが分かる場合は下記に入力してください。')
+        return
+      }
+
+      this._fillFormFromSearch(book)
+      this._setTitleStatus('書影と書籍情報を自動入力しました。')
+      this._hideIsbnSection()
+    } catch (_e) {
+      this._showIsbnFallback('取得中にエラーが発生しました。ISBNが分かる場合は下記に入力してください。')
+    }
+  }
+
+  async fetchByIsbn () {
+    const isbn = this.hasIsbnTarget ? this.isbnTarget.value.trim() : ''
+    if (!isbn) return
+
+    this._setIsbnStatus('取得中...')
+
+    try {
+      const res = await fetch(`/books/search?q=${encodeURIComponent(isbn)}`, {
+        headers: { Accept: 'application/json' }
+      })
+      if (!res.ok) throw new Error('Network error')
+
+      const data = await res.json()
+      const books = data.books || []
+
+      if (books.length === 0 || !books[0].cover_image_url) {
+        this._setIsbnStatus('書影を取得できませんでした。')
+        return
+      }
+
+      const coverUrlInput = document.getElementById('book_cover_image_url')
+      if (coverUrlInput) coverUrlInput.value = books[0].cover_image_url
+      this._setIsbnStatus('書影を取得しました。')
+    } catch (_e) {
+      this._setIsbnStatus('取得中にエラーが発生しました。')
+    }
+  }
+
+  _showIsbnFallback (message) {
+    this._setTitleStatus(message)
+    if (this.hasIsbnSectionTarget) {
+      this.isbnSectionTarget.classList.remove('book-form__isbn-section--hidden')
+    }
+  }
+
+  _hideIsbnSection () {
+    if (this.hasIsbnSectionTarget) {
+      this.isbnSectionTarget.classList.add('book-form__isbn-section--hidden')
+    }
+  }
+
+  _fillFormFromSearch ({ author, total_pages: totalPages, cover_image_url: coverUrl }) {
+    const authorInput = document.getElementById('book_author')
+    const totalPagesInput = document.getElementById('book_total_pages')
+    const coverUrlInput = document.getElementById('book_cover_image_url')
+
+    if (authorInput && author) authorInput.value = author
+    if (coverUrlInput) coverUrlInput.value = coverUrl || ''
+
+    if (totalPagesInput && totalPages) {
+      totalPagesInput.value = totalPages
+      totalPagesInput.dispatchEvent(new Event('input'))
+    }
+  }
+
+  _setTitleStatus (message) {
+    if (this.hasTitleStatusTarget) {
+      this.titleStatusTarget.textContent = message
+    }
+  }
+
+  _setIsbnStatus (message) {
+    if (this.hasIsbnStatusTarget) {
+      this.isbnStatusTarget.textContent = message
+    }
   }
 
   syncTargetPages () {
