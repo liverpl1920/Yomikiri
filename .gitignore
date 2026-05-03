@@ -18,6 +18,9 @@
 !/storage/.keep
 /public/assets
 
+# Gemキャッシュ（bundle package で生成される大容量キャッシュ）
+/vendor/cache/
+
 # ノード
 /node_modules
 /yarn-error.log

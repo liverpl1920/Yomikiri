@@ -38,6 +38,51 @@ Figma：https://rinse-grasp-79348631.figma.site/
 
 ---
 
+## ローカル起動手順（開発環境）
+
+### 前提
+
+- Ruby 3.3.10
+- Bundler 2.7.x
+- Docker / Docker Compose
+
+### 1. 初回セットアップ
+
+```bash
+bundle install
+cp .env.example .env
+docker compose up -d db
+bundle exec rails db:prepare
+```
+
+### 2. アプリ起動
+
+```bash
+bundle exec rails server -p 3000 -b 127.0.0.1
+```
+
+ブラウザで `http://127.0.0.1:3000` を開いてください。
+
+### 3. 動作確認（ヘルスチェック）
+
+```bash
+curl -i http://127.0.0.1:3000/up
+```
+
+`HTTP/1.1 200 OK` が返れば起動できています。
+
+### 4. 停止
+
+```bash
+# Railsサーバー停止
+Ctrl + C
+
+# DBコンテナ停止
+docker compose stop db
+```
+
+---
+
 ## このサービスへの思い・作りたい理由
 
 ### 背景
