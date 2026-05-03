@@ -5,6 +5,7 @@ export default class extends Controller {
 
   connect () {
     this.resultsTarget.classList.add('book-search__results--hidden')
+    this.statusTarget.textContent = ''
   }
 
   async search () {
