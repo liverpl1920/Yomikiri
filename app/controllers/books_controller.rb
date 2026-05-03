@@ -3,6 +3,8 @@
 require "net/http"
 
 class BooksController < ApplicationController
+  GoogleBooksApiError = Class.new(StandardError)
+
   before_action :authenticate_user!
   before_action :set_book, only: [ :show, :destroy, :update_progress, :complete, :change_deadline ]
 
@@ -71,6 +73,8 @@ class BooksController < ApplicationController
 
     books = isbn_query?(query) ? search_by_isbn(sanitize_isbn(query)) : search_by_title(query)
     render json: { books: }
+  rescue GoogleBooksApiError => e
+    render json: { books: [], error: e.message }
   rescue StandardError
     render json: { books: [], error: "検索中にエラーが発生しました" }
   end
@@ -127,7 +131,7 @@ class BooksController < ApplicationController
   def search_by_title(title)
     uri = URI("https://www.googleapis.com/books/v1/volumes")
     uri.query = URI.encode_www_form(q: "intitle:#{title}", langRestrict: "ja", maxResults: 5)
-    data = fetch_json(uri.to_s)
+    data = fetch_title_json(uri.to_s)
     items = data&.dig("items") || []
 
     items.map do |item|
@@ -153,6 +157,30 @@ class BooksController < ApplicationController
     JSON.parse(response.body)
   rescue StandardError
     nil
+  end
+
+  def fetch_title_json(url)
+    uri = URI(url)
+    response = Net::HTTP.start(uri.host, uri.port, use_ssl: uri.scheme == "https",
+                                                   open_timeout: 5, read_timeout: 5) do |http|
+      http.get(uri.request_uri)
+    end
+    case response
+    when Net::HTTPSuccess
+      JSON.parse(response.body)
+    when Net::HTTPTooManyRequests
+      raise GoogleBooksApiError, "検索リクエストが制限されています。しばらく時間をおいてから再度お試しください。"
+    when Net::HTTPServerError
+      raise GoogleBooksApiError, "書影の取得中にサーバーエラーが発生しました。しばらく時間をおいてから再度お試しください。"
+    else
+      nil
+    end
+  rescue GoogleBooksApiError
+    raise
+  rescue Net::OpenTimeout, Net::ReadTimeout
+    raise GoogleBooksApiError, "検索がタイムアウトしました。接続を確認して再度お試しください。"
+  rescue StandardError
+    raise GoogleBooksApiError, "検索中に予期しないエラーが発生しました。しばらく時間をおいてから再度お試しください。"
   end
 
   def extract_pages_from_onix(onix)
