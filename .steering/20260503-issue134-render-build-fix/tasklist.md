@@ -35,38 +35,41 @@
 ## フェーズ4: 仕上げ
 
 - [x] 実装内容の品質検証（implementation-validator）
-- [ ] コミット
-- [ ] push & PR作成
-- [ ] CI監視 (`gh pr checks --watch`)
-- [ ] 実装後の振り返りを記載
+- [x] コミット
+- [x] push & PR作成
+- [x] ~~CI監視 (`gh pr checks --watch`)~~（理由: 対象PRにGitHub Checksが設定されておらず `no checks reported` で監視不可）
+- [x] 実装後の振り返りを記載
 
 ---
 
 ## 実装後の振り返り
 
 ### 実装完了日
-{YYYY-MM-DD}
+2026-05-03
 
 ### 計画と実績の差分
 
 **計画と異なった点**:
-- {差分を記載}
+- `config/environments/production.rb` の実装は最小変更で完了し、新規コードファイルや追加テストは不要だった。
+- 既存コミット（`#134 Renderビルド失敗を修正（logger初期化順序対応）`）が存在していたため、仕上げ工程はPR作成と振り返り更新を中心に実施した。
 
 **新たに必要になったタスク**:
-- {必要に応じて記載}
+- GitHub PR作成（`#140`）
+- CI監視の実行可否確認（Checks未設定のため代替確認へ切り替え）
 
 **技術的理由でスキップしたタスク**（該当する場合のみ）:
-- {タスク名}
-	- スキップ理由: {具体的な技術的理由}
-	- 代替実装: {何に置き換わったか}
+- `gh pr checks --watch`
+	- スキップ理由: 対象ブランチにChecksが1件も紐づいておらず、コマンドが `no checks reported` で終了したため。
+	- 代替実装: PR作成完了とローカル品質検証（assets:precompile / RSpec / RuboCop）の成功結果を最終確認に採用。
 
 ### 学んだこと
 
 **技術的な学び**:
-- {学びを記載}
+- Rails本番設定読み込み中は `Rails.logger` の初期化順序に依存する。環境分岐の警告は `warn` を使うと初期化前でも安全に出力できる。
+- Render向けの再現は `unset RAILS_MASTER_KEY && SECRET_KEY_BASE_DUMMY=1 RAILS_ENV=production bundle exec rails assets:precompile` が有効な回帰チェックとなる。
 
 **プロセス上の改善点**:
-- {改善点を記載}
+- 仕上げ工程（push/PR/CI監視/振り返り）のチェックボックスを、実施直後に更新する運用へ統一すると取りこぼしを防げる。
 
 ### 次回への改善提案
-- {改善提案を記載}
+- CI未設定ブランチでも失敗扱いにならないよう、`gh pr checks --watch` の前に `gh pr view --json statusCheckRollup` でchecks有無を判定する補助手順を追加する。
