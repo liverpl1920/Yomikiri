@@ -37,4 +37,19 @@
 
 ## 振り返り
 
-（実装完了後に記載）
+### 実装完了日
+2026-05-03
+
+### 計画と実績の差分
+- 計画通りに実装完了
+- CSS・JS・テンプレートへの変更は予定通り
+- システムスペック: テスト時のJavaScriptキャッシュ問題（`rails assets:clobber`が必要）が発生し、デバッグに時間を要した
+
+### 学んだこと
+1. **Railsシステムテスト×JSキャッシュ**: sprocketを使う環境では、JS変更後にテストを実行する際に`bundle exec rails assets:clobber`が必要な場合がある。headless Chromeがsprocketsのキャッシュを使い古いJSを読み込むことがある。
+2. **Capybara×Stimulus×blur**: `trigger(:blur)`は`headless_chrome`ドライバーでは`Capybara::NotSupportedByDriverError`となる。代わりに他要素への`.click`を使うかネイティブblurを発火させる必要がある。
+3. **`dispatchEvent(new Event('blur'))`の限界**: Stimulus actionの`blur`に対してdispatchEventは動作しない場合がある。別フィールドへのクリックで自然にblurを発火する方が信頼性が高い。
+
+### 次回への改善提案
+- システムスペックでJSを多用する場合、テスト前に`bundle exec rails assets:clobber`を実施するCIステップかMakefile targetを追加することを検討する
+- Stimulusアクションのテストにおけるblurイベントの取り扱いパターンをspec/supportに共通ヘルパーとして記述することを検討する
