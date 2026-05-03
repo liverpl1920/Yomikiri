@@ -32,7 +32,10 @@ RSpec.describe 'タイトル入力からのISBN・書影自動取得', type: :sy
             'pageCount' => 260,
             'industryIdentifiers' => [
               { 'type' => 'ISBN_13', 'identifier' => '9784873115658' }
-            ]
+            ],
+            'imageLinks' => {
+              'thumbnail' => 'http://books.google.com/books/content?id=test&zoom=1'
+            }
           }
         }
       ]
@@ -81,7 +84,7 @@ RSpec.describe 'タイトル入力からのISBN・書影自動取得', type: :sy
 
       expect(page).to have_field('著者', with: 'Dustin Boswell', wait: 5)
       expect(page).to have_field('総ページ数', with: '260', wait: 5)
-      expect(page).to have_field('書影URL', with: 'https://cover.openbd.jp/9784873115658.jpg', wait: 5)
+      expect(page).to have_field('書影URL', with: 'https://books.google.com/books/content?id=test&zoom=1', wait: 5)
     end
 
     it '自動取得成功時はISBNフォールバックセクションが非表示のまま' do
