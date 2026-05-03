@@ -1,6 +1,7 @@
 <%= form_with(model: book,
                data: {
-                 controller: 'book-form'
+                 controller: 'book-form',
+                 action: 'submit->book-form#submitWithAutoFetch'
                }) do |f| %>
 
   <%# バリデーションエラー一覧 %>
@@ -100,6 +101,9 @@
 
   <%# 現在ページ（hidden） %>
   <%= f.hidden_field :current_page, value: book.current_page.presence || 0 %>
+
+  <%# 書影URL（hidden）%>
+  <%= f.hidden_field :cover_image_url %>
 
   <%# ノルマプレビュー %>
   <div class="quota-preview" data-book-form-target="quotaDisplay">
