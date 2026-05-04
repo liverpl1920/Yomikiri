@@ -92,7 +92,12 @@ RSpec.describe 'タイトル入力からのISBN・書影自動取得', type: :sy
     end
 
     it 'タイトルを入力してフォーカスを外すと書籍情報が自動入力される' do
-      fill_in 'タイトル', with: 'リーダブルコード'
+      # JSで直接値を設定＋フォーカス（fill_inのSeniumキー送信はCIでIMEタイミング問題が起きるため）
+      page.execute_script(<<~JS)
+        var el = document.getElementById('book_title');
+        el.value = 'リーダブルコード';
+        el.focus();
+      JS
       find('#book_author').click
 
       # fetch完了をステータスメッセージで確認してからフィールド値を検証する
