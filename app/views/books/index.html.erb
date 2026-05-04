@@ -25,8 +25,9 @@
               <%# 書影 %>
               <div class="book-card__cover-wrapper">
                 <div class="book-card__cover <%= book.deadline_urgency_class %>">
-                  <% if book.cover_image_url.present? %>
-                    <img src="<%= book.cover_image_url %>"
+                  <% cover_src = book_cover_src(book.cover_image_url) %>
+                  <% if cover_src %>
+                    <img src="<%= cover_src %>"
                          alt="<%= book.title %>の書影"
                          class="book-card__cover-image"
                          loading="lazy">

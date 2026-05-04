@@ -67,6 +67,13 @@ RSpec.describe 'タイトル入力からのISBN・書影自動取得', type: :sy
     sign_in_via_form(user)
     visit new_book_path
     wait_for_stimulus
+    # book-form コントローラーの接続を確実に待つ（wait_for_stimulusは任意コントローラーが接続された時点で返るため）
+    start = Time.now
+    until Time.now - start > 10
+      break if page.evaluate_script("window.Stimulus && window.Stimulus.controllers.some(c => c.identifier === 'book-form')")
+
+      sleep 0.1
+    end
   end
 
   describe 'タイトル入力→自動取得成功' do
@@ -85,9 +92,17 @@ RSpec.describe 'タイトル入力からのISBN・書影自動取得', type: :sy
     end
 
     it 'タイトルを入力してフォーカスを外すと書籍情報が自動入力される' do
-      fill_in 'タイトル', with: 'リーダブルコード'
+      # JSで直接値を設定＋フォーカス（fill_inのSeniumキー送信はCIでIMEタイミング問題が起きるため）
+      page.execute_script(<<~JS)
+        var el = document.getElementById('book_title');
+        el.value = 'リーダブルコード';
+        el.focus();
+      JS
       find('#book_author').click
 
+      # fetch完了をステータスメッセージで確認してからフィールド値を検証する
+      expect(page).to have_css('[data-book-form-target="titleStatus"]',
+                               text: 'タイトル・著者・ページ数・書影をすべて取得しました。', wait: 20)
       expect(page).to have_field('著者', with: 'Dustin Boswell', wait: 5)
       expect(page).to have_field('総ページ数', with: '260', wait: 5)
     end
