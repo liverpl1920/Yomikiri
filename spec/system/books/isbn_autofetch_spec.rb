@@ -49,7 +49,8 @@ RSpec.describe 'タイトル入力からのISBN・書影自動取得', type: :sy
       'summary' => {
         'isbn' => '9784873115658',
         'title' => 'リーダブルコード',
-        'author' => 'Dustin Boswell'
+        'author' => 'Dustin Boswell',
+        'cover' => 'https://cover.openbd.jp/9784873115658.jpg'
       },
       'onix' => {
         'DescriptiveDetail' => {
