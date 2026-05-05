@@ -104,6 +104,69 @@ RSpec.describe 'Books Cover Proxy', type: :request do
           expect(response).to have_http_status(:not_found)
         end
       end
+
+      context '302 リダイレクトが発生する場合' do
+        let(:redirect_url) { 'https://lh3.googleusercontent.com/books/image.jpg' }
+        let(:image_body) { "\xFF\xD8\xFF\xE0fake_jpeg_data".b }
+
+        context 'Google 系ドメインへのリダイレクトの場合' do
+          before do
+            stub_request(:get, google_image_url)
+              .to_return(status: 302, headers: { 'Location' => redirect_url })
+            stub_request(:get, redirect_url)
+              .to_return(status: 200, body: image_body,
+                         headers: { 'Content-Type' => 'image/jpeg' })
+          end
+
+          it '200 OK を返す' do
+            get cover_proxy_books_path, params: { url: google_image_url }
+
+            expect(response).to have_http_status(:ok)
+          end
+
+          it 'リダイレクト先の画像データを返す' do
+            get cover_proxy_books_path, params: { url: google_image_url }
+
+            expect(response.body).to eq(image_body)
+          end
+        end
+
+        context '許可外ドメインへのリダイレクトの場合' do
+          before do
+            stub_request(:get, google_image_url)
+              .to_return(status: 302, headers: { 'Location' => 'https://evil.example.com/image.jpg' })
+          end
+
+          it '403 Forbidden を返す' do
+            get cover_proxy_books_path, params: { url: google_image_url }
+
+            expect(response).to have_http_status(:forbidden)
+          end
+        end
+
+        context '最大リダイレクト数を超える場合' do
+          let(:redirect_url2) { 'https://books.google.com/books/image2.jpg' }
+          let(:redirect_url3) { 'https://books.google.com/books/image3.jpg' }
+          let(:redirect_url4) { 'https://lh3.googleusercontent.com/final.jpg' }
+
+          before do
+            stub_request(:get, google_image_url)
+              .to_return(status: 302, headers: { 'Location' => redirect_url2 })
+            stub_request(:get, redirect_url2)
+              .to_return(status: 302, headers: { 'Location' => redirect_url3 })
+            stub_request(:get, redirect_url3)
+              .to_return(status: 302, headers: { 'Location' => redirect_url4 })
+            stub_request(:get, redirect_url4)
+              .to_return(status: 302, headers: { 'Location' => google_image_url })
+          end
+
+          it '404 Not Found を返す' do
+            get cover_proxy_books_path, params: { url: google_image_url }
+
+            expect(response).to have_http_status(:not_found)
+          end
+        end
+      end
     end
   end
 end

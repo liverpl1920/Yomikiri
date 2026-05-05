@@ -5,6 +5,8 @@ require "net/http"
 class BooksController < ApplicationController
   GoogleBooksApiError = Class.new(StandardError)
   ALLOWED_COVER_HOSTS = %w[books.google.com].freeze
+  ALLOWED_REDIRECT_HOSTS = %w[books.google.com lh3.googleusercontent.com].freeze
+  MAX_REDIRECTS = 3
 
   before_action :authenticate_user!
   before_action :set_book, only: [ :show, :destroy, :update_progress, :complete, :change_deadline ]
@@ -85,17 +87,16 @@ class BooksController < ApplicationController
     uri = URI.parse(url)
     return head :forbidden unless ALLOWED_COVER_HOSTS.include?(uri.host)
 
-    response = Net::HTTP.start(uri.host, uri.port, use_ssl: uri.scheme == "https",
-                                                    open_timeout: 5, read_timeout: 5) do |http|
-      http.get(uri.request_uri)
+    result = fetch_with_redirects(uri)
+    case result
+    when :forbidden
+      head :forbidden
+    when Net::HTTPResponse
+      content_type = result["content-type"] || "image/jpeg"
+      send_data result.body, type: content_type, disposition: "inline"
+    else
+      head :not_found
     end
-
-    unless response.is_a?(Net::HTTPSuccess)
-      return head :not_found
-    end
-
-    content_type = response["content-type"] || "image/jpeg"
-    send_data response.body, type: content_type, disposition: "inline"
   rescue URI::InvalidURIError
     head :bad_request
   rescue Net::OpenTimeout, Net::ReadTimeout
@@ -105,6 +106,25 @@ class BooksController < ApplicationController
   end
 
   private
+
+  def fetch_with_redirects(uri, redirect_count = 0)
+    return nil if redirect_count > MAX_REDIRECTS
+
+    response = Net::HTTP.start(uri.host, uri.port, use_ssl: uri.scheme == "https",
+                                open_timeout: 5, read_timeout: 5) do |http|
+      http.get(uri.request_uri)
+    end
+
+    if response.is_a?(Net::HTTPRedirection)
+      location = response["location"]
+      redirect_uri = URI.parse(location)
+      return :forbidden unless ALLOWED_REDIRECT_HOSTS.include?(redirect_uri.host)
+
+      fetch_with_redirects(redirect_uri, redirect_count + 1)
+    elsif response.is_a?(Net::HTTPSuccess)
+      response
+    end
+  end
 
   def set_book
     @book = current_user.books.find_by(id: params[:id])
