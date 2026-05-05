@@ -142,11 +142,9 @@ class BooksController < ApplicationController
     return [] if data.nil? || data.first.nil?
 
     book = data.first
-    summary_isbn = book.dig("summary", "isbn").to_s.gsub(/[^0-9]/, "")
-    cover_isbn = summary_isbn.match?(/\A\d{13}\z/) ? summary_isbn : ""
     total_pages = extract_pages_from_onix(book["onix"])
-    openbd_url = cover_isbn.present? ? "https://cover.openbd.jp/#{cover_isbn}.jpg" : ""
-    cover_image_url = resolve_cover_url(openbd_url, isbn, nil)
+    openbd_url = book.dig("summary", "cover").to_s.presence || ""
+    cover_image_url = resolve_cover_url(openbd_url, isbn, nil, isbn_search: true)
     [ {
       title: book.dig("summary", "title").to_s,
       author: book.dig("summary", "author").to_s,
@@ -226,10 +224,7 @@ class BooksController < ApplicationController
     data = fetch_json("https://api.openbd.jp/v1/get?isbn=#{isbn}")
     return "" if data.nil? || data.first.nil?
 
-    summary_isbn = data.first.dig("summary", "isbn").to_s.gsub(/[^0-9]/, "")
-    return "" unless summary_isbn.match?(/\A\d{13}\z/)
-
-    "https://cover.openbd.jp/#{summary_isbn}.jpg"
+    data.first.dig("summary", "cover").to_s.presence || ""
   end
 
   def lookup_rakuten_cover_url(isbn)
@@ -257,11 +252,13 @@ class BooksController < ApplicationController
     thumbnail.present? ? thumbnail.sub(/\Ahttp:/, "https:") : ""
   end
 
-  def resolve_cover_url(openbd_url, isbn, google_thumbnail)
+  def resolve_cover_url(openbd_url, isbn, google_thumbnail, isbn_search: false)
     return openbd_url if openbd_url.present?
 
     rakuten_url = lookup_rakuten_cover_url(isbn)
     return rakuten_url if rakuten_url.present?
+
+    return google_thumbnail.to_s.presence || "" unless isbn_search
 
     google_thumbnail.presence || lookup_google_books_cover_url(isbn)
   end
