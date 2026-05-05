@@ -98,7 +98,7 @@ Rails.application.configure do
     }
   else
     config.action_mailer.perform_deliveries = false
-    Rails.logger.warn "[ActionMailer] SENDGRID_API_KEY is not set. Email delivery is disabled."
+    warn "[ActionMailer] SENDGRID_API_KEY is not set. Email delivery is disabled."
   end
 
   # Enable locale fallbacks for I18n (makes lookups for any locale fall back to
