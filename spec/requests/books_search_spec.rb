@@ -319,6 +319,215 @@ RSpec.describe 'Books Search', type: :request do
           expect(book['cover_image_url']).not_to include('books.google.com')
         end
       end
+
+      context 'ISBNで検索してopenBDに書影がなく楽天に書影がある場合' do
+        let(:openbd_no_cover_response) do
+          [ {
+            'summary' => {
+              'isbn' => '',
+              'title' => '楽天書籍',
+              'author' => '著者'
+            },
+            'onix' => {}
+          } ].to_json
+        end
+
+        let(:rakuten_cover_response) do
+          {
+            'Items' => [
+              {
+                'Item' => {
+                  'largeImageUrl' => 'https://thumbnail.image.rakuten.co.jp/rakuten/large.jpg',
+                  'mediumImageUrl' => 'https://thumbnail.image.rakuten.co.jp/rakuten/medium.jpg'
+                }
+              }
+            ]
+          }.to_json
+        end
+
+        before do
+          stub_request(:get, /api\.openbd\.jp\/v1\/get\?isbn=9784873115658/)
+            .to_return(status: 200, body: openbd_no_cover_response,
+                       headers: { 'Content-Type' => 'application/json' })
+          stub_request(:get, /app\.rakuten\.co\.jp\/services\/api\/BooksBook/)
+            .to_return(status: 200, body: rakuten_cover_response,
+                       headers: { 'Content-Type' => 'application/json' })
+        end
+
+        it '楽天の書影URLを返す' do
+          stub_const('ENV', ENV.to_h.merge('RAKUTEN_APPLICATION_ID' => 'test_app_id'))
+
+          get search_books_path, params: { q: '9784873115658' }
+
+          json = JSON.parse(response.body)
+          book = json['books'].first
+          expect(book['cover_image_url']).to eq('https://thumbnail.image.rakuten.co.jp/rakuten/large.jpg')
+        end
+      end
+
+      context 'ISBNで検索してopenBD・楽天に書影がなくGoogle Booksに書影がある場合' do
+        let(:openbd_no_cover_response) do
+          [ {
+            'summary' => { 'isbn' => '', 'title' => 'Google書籍', 'author' => '著者' },
+            'onix' => {}
+          } ].to_json
+        end
+
+        let(:google_isbn_cover_response) do
+          {
+            'items' => [
+              {
+                'volumeInfo' => {
+                  'imageLinks' => {
+                    'thumbnail' => 'http://books.google.com/books/content?id=goog&img=1'
+                  }
+                }
+              }
+            ]
+          }.to_json
+        end
+
+        before do
+          stub_request(:get, /api\.openbd\.jp\/v1\/get\?isbn=9784873115658/)
+            .to_return(status: 200, body: openbd_no_cover_response,
+                       headers: { 'Content-Type' => 'application/json' })
+          stub_request(:get, /www\.googleapis\.com\/books\/v1\/volumes.*q=isbn/)
+            .to_return(status: 200, body: google_isbn_cover_response,
+                       headers: { 'Content-Type' => 'application/json' })
+        end
+
+        it 'Google Books thumbnail URL（https正規化済み）を返す' do
+          get search_books_path, params: { q: '9784873115658' }
+
+          json = JSON.parse(response.body)
+          book = json['books'].first
+          expect(book['cover_image_url']).to eq('https://books.google.com/books/content?id=goog&img=1')
+        end
+      end
+
+      context 'ISBNで検索して全ソースに書影がない場合' do
+        let(:openbd_no_cover_response) do
+          [ {
+            'summary' => { 'isbn' => '', 'title' => '書影なし書籍', 'author' => '著者' },
+            'onix' => {}
+          } ].to_json
+        end
+
+        before do
+          stub_request(:get, /api\.openbd\.jp\/v1\/get\?isbn=9784873115658/)
+            .to_return(status: 200, body: openbd_no_cover_response,
+                       headers: { 'Content-Type' => 'application/json' })
+          stub_request(:get, /www\.googleapis\.com\/books\/v1\/volumes.*q=isbn/)
+            .to_return(status: 200, body: { 'items' => [] }.to_json,
+                       headers: { 'Content-Type' => 'application/json' })
+        end
+
+        it '書影URLが空文字を返す' do
+          get search_books_path, params: { q: '9784873115658' }
+
+          json = JSON.parse(response.body)
+          book = json['books'].first
+          expect(book['cover_image_url']).to eq('')
+        end
+      end
+
+      context 'タイトル検索でopenBDに書影がなく楽天に書影がある場合' do
+        let(:google_books_no_openbd_response) do
+          {
+            'items' => [
+              {
+                'volumeInfo' => {
+                  'title' => '楽天書籍タイトル',
+                  'authors' => [ '著者名' ],
+                  'pageCount' => 200,
+                  'industryIdentifiers' => [
+                    { 'type' => 'ISBN_13', 'identifier' => '9784000000001' }
+                  ],
+                  'imageLinks' => {
+                    'thumbnail' => 'http://books.google.com/books/content?id=abc&img=1'
+                  }
+                }
+              }
+            ]
+          }.to_json
+        end
+
+        let(:rakuten_cover_response) do
+          {
+            'Items' => [
+              {
+                'Item' => {
+                  'largeImageUrl' => 'https://thumbnail.image.rakuten.co.jp/rakuten/title_large.jpg',
+                  'mediumImageUrl' => 'https://thumbnail.image.rakuten.co.jp/rakuten/title_medium.jpg'
+                }
+              }
+            ]
+          }.to_json
+        end
+
+        before do
+          stub_request(:get, /www\.googleapis\.com\/books\/v1\/volumes.*q=intitle/)
+            .to_return(status: 200, body: google_books_no_openbd_response,
+                       headers: { 'Content-Type' => 'application/json' })
+          stub_request(:get, /api\.openbd\.jp\/v1\/get\?isbn=9784000000001/)
+            .to_return(status: 200, body: [ nil ].to_json,
+                       headers: { 'Content-Type' => 'application/json' })
+          stub_request(:get, /app\.rakuten\.co\.jp\/services\/api\/BooksBook/)
+            .to_return(status: 200, body: rakuten_cover_response,
+                       headers: { 'Content-Type' => 'application/json' })
+        end
+
+        it '楽天の書影URLを返す' do
+          stub_const('ENV', ENV.to_h.merge('RAKUTEN_APPLICATION_ID' => 'test_app_id'))
+
+          get search_books_path, params: { q: '楽天書籍タイトル' }
+
+          json = JSON.parse(response.body)
+          book = json['books'].first
+          expect(book['cover_image_url']).to eq('https://thumbnail.image.rakuten.co.jp/rakuten/title_large.jpg')
+        end
+      end
+
+      context 'RAKUTEN_APPLICATION_ID が未設定の場合は楽天をスキップする' do
+        let(:openbd_no_cover_response) do
+          [ {
+            'summary' => { 'isbn' => '', 'title' => 'スキップ書籍', 'author' => '著者' },
+            'onix' => {}
+          } ].to_json
+        end
+
+        let(:google_isbn_cover_response) do
+          {
+            'items' => [
+              {
+                'volumeInfo' => {
+                  'imageLinks' => {
+                    'thumbnail' => 'http://books.google.com/books/content?id=skip&img=1'
+                  }
+                }
+              }
+            ]
+          }.to_json
+        end
+
+        before do
+          stub_request(:get, /api\.openbd\.jp\/v1\/get\?isbn=9784873115658/)
+            .to_return(status: 200, body: openbd_no_cover_response,
+                       headers: { 'Content-Type' => 'application/json' })
+          stub_request(:get, /www\.googleapis\.com\/books\/v1\/volumes.*q=isbn/)
+            .to_return(status: 200, body: google_isbn_cover_response,
+                       headers: { 'Content-Type' => 'application/json' })
+        end
+
+        it '楽天APIを呼ばずにGoogle Books URLを返す' do
+          get search_books_path, params: { q: '9784873115658' }
+
+          json = JSON.parse(response.body)
+          book = json['books'].first
+          expect(book['cover_image_url']).to eq('https://books.google.com/books/content?id=skip&img=1')
+          expect(WebMock).not_to have_requested(:get, /app\.rakuten\.co\.jp/)
+        end
+      end
     end
   end
 end

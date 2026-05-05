@@ -145,11 +145,13 @@ class BooksController < ApplicationController
     summary_isbn = book.dig("summary", "isbn").to_s.gsub(/[^0-9]/, "")
     cover_isbn = summary_isbn.match?(/\A\d{13}\z/) ? summary_isbn : ""
     total_pages = extract_pages_from_onix(book["onix"])
+    openbd_url = cover_isbn.present? ? "https://cover.openbd.jp/#{cover_isbn}.jpg" : ""
+    cover_image_url = resolve_cover_url(openbd_url, isbn, nil)
     [ {
       title: book.dig("summary", "title").to_s,
       author: book.dig("summary", "author").to_s,
       total_pages: total_pages,
-      cover_image_url: cover_isbn.present? ? "https://cover.openbd.jp/#{cover_isbn}.jpg" : ""
+      cover_image_url: cover_image_url
     } ]
   end
 
@@ -168,7 +170,7 @@ class BooksController < ApplicationController
         title: info["title"].to_s,
         author: Array(info["authors"]).join(", "),
         total_pages: info["pageCount"],
-        cover_image_url: openbd_url.present? ? openbd_url : google_thumbnail
+        cover_image_url: resolve_cover_url(openbd_url, isbn, google_thumbnail)
       }
     end
   end
@@ -228,6 +230,40 @@ class BooksController < ApplicationController
     return "" unless summary_isbn.match?(/\A\d{13}\z/)
 
     "https://cover.openbd.jp/#{summary_isbn}.jpg"
+  end
+
+  def lookup_rakuten_cover_url(isbn)
+    return "" if isbn.blank?
+
+    app_id = ENV["RAKUTEN_APPLICATION_ID"].to_s
+    return "" if app_id.blank?
+
+    uri = URI("https://app.rakuten.co.jp/services/api/BooksBook/Search/20170404")
+    uri.query = URI.encode_www_form(isbn: isbn, applicationId: app_id, format: "json")
+    data = fetch_json(uri.to_s)
+    item = data&.dig("Items", 0, "Item")
+    return "" if item.nil?
+
+    item["largeImageUrl"].presence || item["mediumImageUrl"].presence || ""
+  end
+
+  def lookup_google_books_cover_url(isbn)
+    return "" if isbn.blank?
+
+    uri = URI("https://www.googleapis.com/books/v1/volumes")
+    uri.query = URI.encode_www_form(q: "isbn:#{isbn}", maxResults: 1)
+    data = fetch_json(uri.to_s)
+    thumbnail = data&.dig("items", 0, "volumeInfo", "imageLinks", "thumbnail").to_s
+    thumbnail.present? ? thumbnail.sub(/\Ahttp:/, "https:") : ""
+  end
+
+  def resolve_cover_url(openbd_url, isbn, google_thumbnail)
+    return openbd_url if openbd_url.present?
+
+    rakuten_url = lookup_rakuten_cover_url(isbn)
+    return rakuten_url if rakuten_url.present?
+
+    google_thumbnail.presence || lookup_google_books_cover_url(isbn)
   end
 
   def extract_isbn_from_identifiers(identifiers)
