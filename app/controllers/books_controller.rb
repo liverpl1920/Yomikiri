@@ -175,10 +175,10 @@ class BooksController < ApplicationController
 
   def search_by_title(title)
     uri = URI("https://www.googleapis.com/books/v1/volumes")
-    params = { q: "intitle:#{title}", langRestrict: "ja", maxResults: 5 }
+    query_params = { q: "intitle:#{title}", langRestrict: "ja", maxResults: 5 }
     api_key = ENV["GOOGLE_BOOKS_API_KEY"].presence
-    params[:key] = api_key if api_key
-    uri.query = URI.encode_www_form(params)
+    query_params[:key] = api_key if api_key
+    uri.query = URI.encode_www_form(query_params)
     data = fetch_title_json(uri.to_s)
     items = data&.dig("items") || []
 

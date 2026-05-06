@@ -25,8 +25,8 @@
 2026-05-06
 
 ### 計画と実績の差分
-- 計画どおり3ファイル（`books_controller.rb`, `.env.example`, `render.yaml`）のみ変更で完了
-- テスト追加は不要（既存の WebMock スタブが正規表現マッチのため `key=` パラメータ追加後も全通過）
+- Copilotレビュー指摘を反映し、`spec/requests/books_search_spec.rb` に `key=` パラメータ付与の検証テストを追加
+- `render.yaml` のインデント不備と `search_by_title` の変数名（`params`）を修正
 
 ### 学んだこと
 - `ENV["KEY"].presence` を使うことで、未設定時にパラメータを付けないシンプルな条件分岐が書ける
