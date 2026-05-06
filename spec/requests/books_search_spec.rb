@@ -203,6 +203,15 @@ RSpec.describe 'Books Search', type: :request do
           json = JSON.parse(response.body)
           expect(json['books'].length).to eq(2)
         end
+
+        it 'GOOGLE_BOOKS_API_KEY が設定されている場合は key パラメータ付きで Google Books を呼ぶ' do
+          stub_const('ENV', ENV.to_h.merge('GOOGLE_BOOKS_API_KEY' => 'test_google_api_key'))
+
+          get search_books_path, params: { q: 'リーダブルコード' }
+
+          expect(WebMock).to have_requested(:get, /www\.googleapis\.com\/books\/v1\/volumes/)
+            .with { |request| request.uri.query.to_s.include?('key=test_google_api_key') }
+        end
       end
 
       context 'Google Books APIが429を返した場合' do
