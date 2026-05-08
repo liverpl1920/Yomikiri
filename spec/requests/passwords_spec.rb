@@ -44,6 +44,26 @@ RSpec.describe 'Passwords', type: :request do
         expect(response).to have_http_status(:see_other)
       end
     end
+
+    context 'メール送信でSMTPエラーが発生した場合' do
+      let!(:user) { create(:user) }
+
+      before do
+        allow(Rails.logger).to receive(:error)
+        allow(User).to receive(:send_reset_password_instructions).and_raise(Net::SMTPAuthenticationError.new('535 Authentication failed'))
+      end
+
+      it '500エラーにせず再設定画面へリダイレクトする' do
+        post user_password_path, params: {
+          user: { email: user.email }
+        }
+
+        expect(response).to have_http_status(:found).or have_http_status(:see_other)
+        expect(response).to redirect_to(new_user_password_path)
+        expect(flash[:alert]).to eq('現在メールを送信できません。時間をおいて再度お試しください。')
+        expect(Rails.logger).to have_received(:error).with(/Users::PasswordsController.*Net::SMTPAuthenticationError/)
+      end
+    end
   end
 
   describe 'PUT /users/password（W-14: パスワード変更）' do
@@ -89,7 +109,7 @@ RSpec.describe 'Passwords', type: :request do
           }
         }
 
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:unprocessable_content)
       end
     end
   end
