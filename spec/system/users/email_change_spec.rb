@@ -47,7 +47,7 @@ RSpec.describe 'メールアドレス変更', type: :system do
 
       expect(page).to have_current_path(email_change_path)
       expect(page).to have_css('.auth-card__errors')
-      expect(page).to have_text('現在のパスワード が違います')
+      expect(page).to have_text('現在のパスワードが違います')
     end
 
     it '同一メールアドレスはエラーになる' do
