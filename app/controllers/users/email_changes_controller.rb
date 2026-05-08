@@ -7,8 +7,8 @@ module Users
     def edit; end
 
     def update
-      current_password = params[:current_password]
-      new_email = params[:email]
+      current_password = email_change_params[:current_password]
+      new_email = email_change_params[:email]
 
       unless current_user.valid_password?(current_password)
         current_user.errors.add(:current_password, "が違います")
@@ -31,5 +31,11 @@ module Users
     end
 
     def complete; end
+
+    private
+
+    def email_change_params
+      params.permit(:current_password, :email)
+    end
   end
 end
