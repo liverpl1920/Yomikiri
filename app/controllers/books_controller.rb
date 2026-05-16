@@ -36,7 +36,7 @@ class BooksController < ApplicationController
     if new_page.nil?
       @book.errors.add(:base, "ページ数が無効です")
       render :show, status: :unprocessable_entity
-    elsif @book.update(current_page: new_page)
+    elsif persist_progress_with_log(new_page)
       redirect_to @book, notice: "進捗を更新しました。"
     else
       render :show, status: :unprocessable_entity
@@ -46,7 +46,7 @@ class BooksController < ApplicationController
   def change_deadline
     new_deadline = Date.parse(params[:deadline].to_s)
     if @book.extend_deadline!(new_deadline)
-      redirect_to @book, notice: "読了期限を延長しました。"
+      redirect_to @book, notice: "読了期限を延長しました。", status: :see_other
     else
       render :show, status: :unprocessable_entity
     end
@@ -143,6 +143,30 @@ class BooksController < ApplicationController
 
       @book.current_page + pages_read
     end
+  end
+
+  def persist_progress_with_log(new_page)
+    success = false
+
+    Book.transaction do
+      success = @book.update(current_page: new_page)
+      raise ActiveRecord::Rollback unless success
+
+      create_reading_log_for_progress!
+    end
+
+    success
+  rescue ActiveRecord::RecordInvalid
+    @book.errors.add(:base, "読書ログの記録に失敗しました")
+    false
+  end
+
+  def create_reading_log_for_progress!
+    previous_page, current_page = @book.saved_change_to_current_page
+    pages_read = current_page.to_i - previous_page.to_i
+    return if pages_read <= 0
+
+    @book.reading_logs.create!(pages_read: pages_read, read_at: Date.current)
   end
 
   def book_params
