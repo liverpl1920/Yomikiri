@@ -15,6 +15,7 @@ class Book < ApplicationRecord
 
   validate :target_pages_not_exceed_total_pages
   validate :current_page_not_exceed_target_pages
+  validate :current_page_not_exceed_total_pages
   validate :deadline_cannot_be_in_the_past, if: -> { new_record? || will_save_change_to_deadline? }
   validate :cover_image_url_must_be_valid_url, if: -> { cover_image_url.present? }
 
@@ -99,6 +100,12 @@ class Book < ApplicationRecord
     return if current_page.blank? || target_pages.blank?
 
     errors.add(:current_page, :less_than_or_equal_to, count: target_pages) if current_page > target_pages
+  end
+
+  def current_page_not_exceed_total_pages
+    return if current_page.blank? || total_pages.blank?
+
+    errors.add(:current_page, :less_than_or_equal_to_total_pages, count: total_pages) if current_page > total_pages
   end
 
   def deadline_cannot_be_in_the_past

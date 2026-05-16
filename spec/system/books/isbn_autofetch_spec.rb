@@ -115,6 +115,16 @@ RSpec.describe 'タイトル入力からのISBN・書影自動取得', type: :sy
       expect(page).to have_css('[data-book-form-target="titleStatus"]',
                                text: 'タイトル・著者・ページ数・書影をすべて取得しました。', wait: 5)
     end
+
+    it '既に読んだページ数は自動取得後も保持される' do
+      fill_in '既に読んだページ数', with: '42'
+      fill_in 'タイトル', with: 'リーダブルコード'
+      find('#book_author').click
+
+      expect(page).to have_css('[data-book-form-target="titleStatus"]',
+                               text: 'タイトル・著者・ページ数・書影をすべて取得しました。', wait: 5)
+      expect(page).to have_field('既に読んだページ数', with: '42')
+    end
   end
 
   describe 'タイトル入力→自動取得失敗' do

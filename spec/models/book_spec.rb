@@ -78,6 +78,22 @@ RSpec.describe Book, type: :model do
       it '現在ページが負の値の場合は無効' do
         expect(build(:book, current_page: -1)).not_to be_valid
       end
+
+      it '現在ページが総ページ数以下であれば有効' do
+        expect(build(:book, total_pages: 300, target_pages: 300, current_page: 300)).to be_valid
+      end
+
+      it '現在ページが総ページ数を超える場合は無効' do
+        expect(build(:book, total_pages: 300, target_pages: 300, current_page: 301)).not_to be_valid
+      end
+
+      it '現在ページが総ページ数を超える場合に専用エラーキーが付与される' do
+        book = build(:book, total_pages: 200, target_pages: 200, current_page: 201)
+
+        book.validate
+
+        expect(book.errors.details[:current_page]).to include(include(error: :less_than_or_equal_to_total_pages, count: 200))
+      end
     end
 
     describe 'deadline' do

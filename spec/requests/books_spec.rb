@@ -201,6 +201,26 @@ RSpec.describe 'Books', type: :request do
           post books_path, params: valid_params
           expect(Book.last.user).to eq(user)
         end
+
+        it '既に読んだページ数を指定した場合は進捗に反映される' do
+          params_with_current_page = valid_params.deep_dup
+          params_with_current_page[:book][:current_page] = 80
+
+          post books_path, params: params_with_current_page
+
+          created_book = Book.last
+          expect(created_book.current_page).to eq(80)
+          expect(created_book.progress_percentage).to eq(31)
+        end
+
+        it '既に読んだページ数が未入力の場合は0として保存される' do
+          params_without_current_page = valid_params.deep_dup
+          params_without_current_page[:book].delete(:current_page)
+
+          post books_path, params: params_without_current_page
+
+          expect(Book.last.current_page).to eq(0)
+        end
       end
 
       context 'cover_image_urlを含む有効なパラメータの場合' do
@@ -296,6 +316,92 @@ RSpec.describe 'Books', type: :request do
         it 'フォームを再表示する（422）' do
           post books_path, params: past_deadline_params
           expect(response).to have_http_status(:unprocessable_entity)
+        end
+      end
+
+      context '無効なパラメータ（現在ページが負数）の場合' do
+        let(:invalid_current_page_params) do
+          {
+            book: {
+              title: 'テスト本',
+              total_pages: 300,
+              target_pages: 250,
+              current_page: -1,
+              deadline: Date.current + 14
+            }
+          }
+        end
+
+        it '書籍が作成されない' do
+          expect {
+            post books_path, params: invalid_current_page_params
+          }.not_to change(Book, :count)
+        end
+
+        it 'フォームを再表示する（422）' do
+          post books_path, params: invalid_current_page_params
+          expect(response).to have_http_status(:unprocessable_entity)
+        end
+
+        it 'フォームに0以上エラーが表示される' do
+          post books_path, params: invalid_current_page_params
+
+          expect(response).to have_http_status(:unprocessable_entity)
+          expect(response.body).to include('現在ページは0以上の値にしてください')
+        end
+      end
+
+      context '無効なパラメータ（現在ページが読了対象ページ数を超過）の場合' do
+        let(:over_target_params) do
+          {
+            book: {
+              title: 'テスト本',
+              total_pages: 300,
+              target_pages: 250,
+              current_page: 251,
+              deadline: Date.current + 14
+            }
+          }
+        end
+
+        it '書籍が作成されない' do
+          expect {
+            post books_path, params: over_target_params
+          }.not_to change(Book, :count)
+        end
+
+        it 'フォームに読了対象ページ数超過エラーが表示される' do
+          post books_path, params: over_target_params
+
+          expect(response).to have_http_status(:unprocessable_entity)
+          expect(response.body).to include('現在ページは読了対象ページ数（250ページ）以下にしてください')
+        end
+      end
+
+      context '無効なパラメータ（現在ページが総ページ数を超過）の場合' do
+        let(:over_total_params) do
+          {
+            book: {
+              title: 'テスト本',
+              total_pages: 250,
+              target_pages: 250,
+              current_page: 251,
+              deadline: Date.current + 14
+            }
+          }
+        end
+
+        it '書籍が作成されない' do
+          expect {
+            post books_path, params: over_total_params
+          }.not_to change(Book, :count)
+        end
+
+        it 'フォームに総ページ数超過エラーが表示される' do
+          post books_path, params: over_total_params
+
+          expect(response).to have_http_status(:unprocessable_entity)
+          expect(response.body).to include('現在ページは総ページ数（250ページ）以下にしてください')
         end
       end
     end
