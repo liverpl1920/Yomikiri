@@ -501,6 +501,19 @@ RSpec.describe 'Books', type: :request do
           expect(book.reload.current_page).to eq(30)
         end
 
+        it '読書ログが記録される' do
+          book = create(:book, user: user, current_page: 10, target_pages: 100)
+
+          expect do
+            patch update_progress_book_path(book), params: { pages_read: 20 }
+          end.to change(ReadingLog, :count).by(1)
+
+          log = ReadingLog.last
+          expect(log.book).to eq(book)
+          expect(log.pages_read).to eq(20)
+          expect(log.read_at).to eq(Date.current)
+        end
+
         it '更新後、書籍詳細画面へリダイレクトされる' do
           book = create(:book, user: user, current_page: 0, target_pages: 100)
           patch update_progress_book_path(book), params: { pages_read: 10 }
@@ -548,6 +561,24 @@ RSpec.describe 'Books', type: :request do
           book = create(:book, user: user, current_page: 10, target_pages: 200)
           patch update_progress_book_path(book), params: { direct_page: 50 }
           expect(book.reload.current_page).to eq(50)
+        end
+
+        it '増分がある場合は読書ログが記録される' do
+          book = create(:book, user: user, current_page: 10, target_pages: 200)
+
+          expect do
+            patch update_progress_book_path(book), params: { direct_page: 50 }
+          end.to change(ReadingLog, :count).by(1)
+
+          expect(ReadingLog.last.pages_read).to eq(40)
+        end
+
+        it '増分がない場合は読書ログを記録しない' do
+          book = create(:book, user: user, current_page: 10, target_pages: 200)
+
+          expect do
+            patch update_progress_book_path(book), params: { direct_page: 10 }
+          end.not_to change(ReadingLog, :count)
         end
 
         it 'direct_page が target_pages を超える場合はバリデーションエラーになる' do

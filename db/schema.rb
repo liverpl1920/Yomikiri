@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2026_04_12_114726) do
+ActiveRecord::Schema[7.2].define(version: 2026_05_17_000000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -29,6 +29,16 @@ ActiveRecord::Schema[7.2].define(version: 2026_04_12_114726) do
     t.datetime "updated_at", null: false
     t.string "cover_image_url"
     t.index ["user_id"], name: "index_books_on_user_id"
+  end
+
+  create_table "reading_logs", force: :cascade do |t|
+    t.bigint "book_id", null: false
+    t.integer "pages_read", null: false
+    t.date "read_at", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["book_id", "read_at"], name: "index_reading_logs_on_book_id_and_read_at"
+    t.index ["book_id"], name: "index_reading_logs_on_book_id"
   end
 
   create_table "users", force: :cascade do |t|
@@ -50,4 +60,5 @@ ActiveRecord::Schema[7.2].define(version: 2026_04_12_114726) do
   end
 
   add_foreign_key "books", "users"
+  add_foreign_key "reading_logs", "books"
 end
