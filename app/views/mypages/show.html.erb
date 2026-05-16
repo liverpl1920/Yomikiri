@@ -76,13 +76,14 @@
     <%# 日別読書ログ %>
     <div class="mypage__card">
       <h2 class="mypage__card-title">日別読書ログ</h2>
-      <% if @reading_logs_by_date.empty? %>
-        <p class="mypage__empty-message">読書ログはまだありません。</p>
-      <% else %>
-        <ul class="mypage__daily-log-list">
-          <% @reading_logs_by_date.each do |read_at, logs| %>
-            <li class="mypage__daily-log-item">
-              <h3 class="mypage__daily-log-date"><%= l(read_at, format: :long) %></h3>
+      <p class="mypage__daily-log-caption">直近7日間の読書記録を表示しています。</p>
+      <ul class="mypage__daily-log-list">
+        <% @daily_reading_logs.each do |read_at, logs| %>
+          <li class="mypage__daily-log-item">
+            <h3 class="mypage__daily-log-date"><%= l(read_at, format: :long) %></h3>
+            <% if logs.empty? %>
+              <p class="mypage__daily-log-empty">記録なし</p>
+            <% else %>
               <ul class="mypage__daily-log-book-list">
                 <% logs.each do |log| %>
                   <li class="mypage__daily-log-book-item">
@@ -91,10 +92,10 @@
                   </li>
                 <% end %>
               </ul>
-            </li>
-          <% end %>
-        </ul>
-      <% end %>
+            <% end %>
+          </li>
+        <% end %>
+      </ul>
     </div>
 
     <%# 読了履歴 %>

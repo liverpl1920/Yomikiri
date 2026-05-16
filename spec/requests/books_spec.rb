@@ -573,6 +573,15 @@ RSpec.describe 'Books', type: :request do
           expect(ReadingLog.last.pages_read).to eq(40)
         end
 
+        it 'direct_page と pages_read が同時に送信されても増分で読書ログを記録する' do
+          book = create(:book, user: user, current_page: 10, target_pages: 200)
+
+          patch update_progress_book_path(book), params: { direct_page: 50, pages_read: 5 }
+
+          expect(book.reload.current_page).to eq(50)
+          expect(ReadingLog.last.pages_read).to eq(40)
+        end
+
         it '増分がない場合は読書ログを記録しない' do
           book = create(:book, user: user, current_page: 10, target_pages: 200)
 

@@ -163,11 +163,7 @@ class BooksController < ApplicationController
 
   def create_reading_log_for_progress!
     previous_page, current_page = @book.saved_change_to_current_page
-    pages_read = if params[:pages_read].present?
-      Integer(params[:pages_read], exception: false).to_i
-    else
-      current_page.to_i - previous_page.to_i
-    end
+    pages_read = current_page.to_i - previous_page.to_i
     return if pages_read <= 0
 
     @book.reading_logs.create!(pages_read: pages_read, read_at: Date.current)

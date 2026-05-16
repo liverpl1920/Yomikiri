@@ -228,6 +228,12 @@
   gap: var(--spacing-md);
 }
 
+.mypage__daily-log-caption {
+  margin-bottom: var(--spacing-md);
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+}
+
 .mypage__daily-log-item {
   border: 1px solid var(--color-border);
   border-radius: var(--border-radius);
@@ -268,6 +274,11 @@
   color: var(--color-primary);
   font-weight: 600;
   white-space: nowrap;
+}
+
+.mypage__daily-log-empty {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
 }
 
 /* ---- アカウント設定 ---- */

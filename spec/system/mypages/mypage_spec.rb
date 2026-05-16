@@ -47,8 +47,20 @@ RSpec.describe 'マイページ', type: :system do
       visit mypage_path
 
       expect(page).to have_text('日別読書ログ')
+      expect(page).to have_text(I18n.l(Date.current, format: :long))
       expect(page).to have_text('ログ表示本')
       expect(page).to have_text('+12ページ')
+    end
+
+    it '読書ログがない日も記録なしとして表示される' do
+      book = create(:book, user: user, title: 'ログ表示本')
+      create(:reading_log, book: book, read_at: Date.current, pages_read: 12)
+      login_as(user, scope: :user)
+
+      visit mypage_path
+
+      expect(page).to have_text(I18n.l(Date.current - 1.day, format: :long))
+      expect(page).to have_text('記録なし')
     end
   end
 
