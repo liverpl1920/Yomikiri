@@ -1,0 +1,29 @@
+name: reading-report-mail
+
+on:
+  schedule:
+    - cron: "5 15 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  dispatch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      RAILS_ENV: production
+      RAILS_MASTER_KEY: ${{ secrets.RAILS_MASTER_KEY }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: .ruby-version
+          bundler-cache: true
+
+      - name: Run reading report task
+        run: bundle exec rake reading_reports:dispatch
