@@ -1,0 +1,17 @@
+<%= @user.nickname.presence || @user.email %> さん
+
+今週の読書レポートをお届けします。
+対象期間: <%= @summary[:start_date] %> 〜 <%= @summary[:end_date] %>
+
+合計読了ページ数: <%= @summary[:total_pages] %> ページ
+
+読んだ本一覧:
+<% if @summary[:books].empty? %>
+- 該当なし
+<% else %>
+<% @summary[:books].each do |book| %>
+- <%= book[:title] %>: <%= book[:pages_read] %> ページ
+<% end %>
+<% end %>
+
+次の1週間も積読消化を進めていきましょう。
