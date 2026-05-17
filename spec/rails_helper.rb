@@ -64,6 +64,14 @@ RSpec.configure do |config|
   config.include Devise::Test::IntegrationHelpers, type: :request
   config.include ActiveSupport::Testing::TimeHelpers
 
+  config.around(:each) do |example|
+    original_rakuten_app_id = ENV['RAKUTEN_APPLICATION_ID']
+    ENV['RAKUTEN_APPLICATION_ID'] = ''
+    example.run
+  ensure
+    ENV['RAKUTEN_APPLICATION_ID'] = original_rakuten_app_id
+  end
+
   # Filter lines from Rails gems in backtraces.
   config.filter_rails_from_backtrace!
   # arbitrary gems may also be filtered via:

@@ -115,8 +115,6 @@ export default class extends Controller {
 
     if (genreInput && genre) {
       genreInput.value = genre
-    } else {
-      missing.push('ジャンル')
     }
 
     if (totalPagesInput && totalPages) {
@@ -179,9 +177,7 @@ export default class extends Controller {
 
   calculateQuota () {
     const targetPages = parseInt(this.targetPagesTarget.value, 10)
-    const currentPageInput = this.hasCurrentPageTarget
-      ? this.currentPageTarget
-      : document.getElementById('book_current_page')
+    const currentPageInput = document.getElementById('book_current_page')
     const currentPage = parseInt(currentPageInput?.value, 10)
     const deadlineValue = this.deadlineTarget.value
     const display = this.quotaDisplayTarget

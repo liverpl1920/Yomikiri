@@ -276,8 +276,11 @@ class BooksController < ApplicationController
     summary_genre = book.dig("summary", "genre").to_s.strip
     return summary_genre if summary_genre.present?
 
-    subjects = Array(book.dig("onix", "DescriptiveDetail", "Subject"))
+    subjects = book.dig("onix", "DescriptiveDetail", "Subject")
+    subjects = subjects.is_a?(Array) ? subjects : [ subjects ].compact
     subjects.each do |subject|
+      next unless subject.is_a?(Hash)
+
       heading = subject["SubjectHeadingText"]
       values = heading.is_a?(Array) ? heading : [ heading ]
       candidate = values.map { |value| value.to_s.strip }.find(&:present?)
@@ -336,11 +339,6 @@ class BooksController < ApplicationController
     page_extent&.dig("ExtentValue")&.to_i
   end
 
-  def lookup_openbd_cover_url(isbn)
-    book = lookup_openbd_book(isbn)
-    book&.dig("summary", "cover").to_s.presence || ""
-  end
-
   def lookup_openbd_book(isbn)
     return nil if isbn.blank?
 
@@ -354,8 +352,6 @@ class BooksController < ApplicationController
     return "" if isbn.blank?
 
     app_id = ENV["RAKUTEN_APPLICATION_ID"].to_s
-    # In test we only allow the explicitly stubbed fixture key to avoid accidental external calls.
-    return "" if Rails.env.test? && app_id != "test_app_id"
     return "" if app_id.blank?
 
     uri = URI("https://app.rakuten.co.jp/services/api/BooksBook/Search/20170404")

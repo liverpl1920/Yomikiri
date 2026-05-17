@@ -134,6 +134,7 @@ RSpec.describe 'タイトル入力からのISBN・書影自動取得', type: :sy
       deadline = (Date.current + 9.days).strftime('%Y-%m-%d')
       page.execute_script("document.getElementById('book_deadline').value = '#{deadline}'")
       page.execute_script("document.getElementById('book_deadline').dispatchEvent(new Event('change'))")
+      page.execute_script("window.Stimulus.controllers.find(c => c.identifier === 'book-form').calculateQuota()")
 
       expect(page).to have_css('.quota-preview__number', text: '26')
       expect(page).to have_css('.quota-preview__note', text: '残り 10 日で読み切るには、1日 26 ページ必要です')
