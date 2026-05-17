@@ -2,6 +2,8 @@ class Book < ApplicationRecord
   belongs_to :user
   has_many :reading_logs, dependent: :destroy
 
+  attr_accessor :is_past_reading, :completed_at_input
+
   enum :status, { unread: 0, reading: 1, completed: 2 }
 
   validates :title, presence: true, length: { maximum: 255 }
@@ -18,8 +20,11 @@ class Book < ApplicationRecord
   validate :current_page_not_exceed_total_pages
   validate :deadline_cannot_be_in_the_past, if: -> { new_record? || will_save_change_to_deadline? }
   validate :cover_image_url_must_be_valid_url, if: -> { cover_image_url.present? }
+  validate :completed_at_must_be_valid_date, if: -> { past_reading_checked? && completed_at_input.present? }
+  validate :completed_at_must_not_be_in_future, if: -> { past_reading_checked? && completed_at_input.present? }
 
   before_save :auto_set_reading_status
+  before_save :apply_past_reading_settings
 
   def extend_deadline!(new_deadline)
     return false if new_deadline.blank?
@@ -103,6 +108,44 @@ class Book < ApplicationRecord
   end
 
   private
+
+  def completed_at_must_be_valid_date
+    return if completed_at_input.blank?
+
+    begin
+      Date.parse(completed_at_input)
+    rescue Date::Error, TypeError
+      errors.add(:completed_at_input, :invalid)
+    end
+  end
+
+  def completed_at_must_not_be_in_future
+    return if completed_at_input.blank?
+
+    begin
+      date = Date.parse(completed_at_input)
+      errors.add(:completed_at_input, :future_date) if date > Date.current
+    rescue Date::Error, TypeError
+      # This error is handled by completed_at_must_be_valid_date
+    end
+  end
+
+  def apply_past_reading_settings
+    return unless past_reading_checked?
+
+    self.status = :completed
+    self.current_page = target_pages
+
+    if completed_at_input.present?
+      self.completed_at = Time.zone.parse(completed_at_input.to_s)
+    else
+      self.completed_at = Time.current
+    end
+  end
+
+  def past_reading_checked?
+    ActiveModel::Type::Boolean.new.cast(is_past_reading)
+  end
 
   def target_pages_not_exceed_total_pages
     return if target_pages.blank? || total_pages.blank?

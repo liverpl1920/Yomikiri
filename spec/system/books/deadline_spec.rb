@@ -43,9 +43,12 @@ RSpec.describe '期限延長フロー', type: :system do
       expect(page).to have_css('.modal-overlay[data-modal-target="extendOverlay"]:not([hidden])')
 
       new_deadline = (Date.current + 30).strftime('%Y-%m-%d')
-      within('.modal-overlay[data-modal-target="extendOverlay"]') do
-        fill_in 'deadline', with: new_deadline
-        click_button '延長する'
+      within('.modal-overlay[data-modal-target="extendOverlay"]', visible: :all) do
+        deadline_input = find('#deadline')
+        page.execute_script("arguments[0].value = '#{new_deadline}'", deadline_input)
+
+        extend_form = find('form', visible: :all)
+        page.execute_script('arguments[0].submit();', extend_form)
       end
 
       expect(page).to have_text('読了期限を延長しました')

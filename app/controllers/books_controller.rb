@@ -172,9 +172,9 @@ class BooksController < ApplicationController
   end
 
   def book_params
-    permitted = params.require(:book).permit(:title, :author, :total_pages, :target_pages, :current_page, :deadline, :status, :cover_image_url)
+    permitted = params.require(:book).permit(:title, :author, :total_pages, :target_pages, :current_page, :deadline, :status, :cover_image_url, :is_past_reading, :completed_at_input)
     permitted[:current_page] = 0 if permitted[:current_page].blank?
-    permitted
+      permitted
   end
 
   def normalized_index_search_params

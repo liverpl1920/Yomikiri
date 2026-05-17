@@ -9,6 +9,12 @@ export default class extends Controller {
     this.fetchingTitle = null
     this.fetchPromise = null
     this.lastAutoFetchedTitle = ''
+    this.syncCompletedAtFieldVisibility()
+  }
+
+  syncCompletedAtFieldVisibility () {
+    const checkbox = document.getElementById('book_is_past_reading')
+    this._setCompletedAtFieldVisibility(checkbox ? checkbox.checked : false)
   }
 
   markTitleFetched (title) {
@@ -224,5 +230,27 @@ export default class extends Controller {
     const note = display.querySelector('.quota-preview__note')
     note.textContent = `残り ${remainingDays} 日で読み切るには、1日 ${quota} ページ必要です`
     note.classList.remove('quota-preview__note--error')
+  }
+ 
+  toggleCompletedAtField (event) {
+    const field = document.getElementById('completed_at_field')
+    if (!field) return
+
+    if (event.target.checked) {
+      this._setCompletedAtFieldVisibility(true)
+    } else {
+      this._setCompletedAtFieldVisibility(false)
+      // チェックを外した場合は読了日フィールドをクリア
+      const completedAtInput = document.getElementById('book_completed_at_input')
+      if (completedAtInput) {
+        completedAtInput.value = ''
+      }
+    }
+  }
+
+  _setCompletedAtFieldVisibility (visible) {
+    const field = document.getElementById('completed_at_field')
+    if (!field) return
+    field.hidden = !visible
   }
 }
