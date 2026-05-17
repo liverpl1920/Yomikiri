@@ -11,6 +11,16 @@ export default class extends Controller {
     this.lastAutoFetchedTitle = ''
   }
 
+  markTitleFetched (title) {
+    this.lastAutoFetchedTitle = title || ''
+  }
+
+  applyAutocompleteSelection (book) {
+    this.markTitleFetched(book.title)
+    this._updateCoverPreview(book.cover_image_url)
+    this._setTitleStatus('書籍情報を自動入力しました')
+  }
+
   async autoFetchByTitle () {
     const title = this.hasTitleTarget ? this.titleTarget.value.trim() : ''
     if (!title) return false
@@ -80,7 +90,7 @@ export default class extends Controller {
       this._setTitleStatus('取得中にエラーが発生しました。')
       return false
     } finally {
-      this.lastAutoFetchedTitle = title
+      this.markTitleFetched(title)
     }
   }
 

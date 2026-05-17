@@ -907,6 +907,7 @@
 /* ---- フォームフィールド ---- */
 .form-field {
   display: block;
+  position: relative;
 }
 
 .form-field > * + * {
@@ -1112,3 +1113,78 @@
   border-radius: 4px;
   display: block;
 }
+
+  /* ---- タイトルオートコンプリート ---- */
+  .title-autocomplete__list {
+    position: absolute;
+    z-index: 100;
+    background-color: var(--color-bg, #fff);
+    border: 1px solid var(--color-border, #e2e8f0);
+    border-radius: var(--border-radius-md, 6px);
+    box-shadow: var(--shadow-md, 0 4px 12px rgba(0,0,0,0.1));
+    list-style: none;
+    margin: 2px 0 0;
+    padding: 4px 0;
+    width: 100%;
+    max-height: 260px;
+    overflow-y: auto;
+  }
+
+  .title-autocomplete__list--hidden {
+    display: none;
+  }
+
+  .title-autocomplete__item {
+    display: block;
+  }
+
+  .title-autocomplete__item--active .title-autocomplete__button,
+  .title-autocomplete__button:hover {
+    background-color: var(--color-bg-surface, #f8fafc);
+  }
+
+  .title-autocomplete__button {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    padding: 8px 12px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    text-align: left;
+    font-size: 0.875rem;
+    color: var(--color-text, #1a202c);
+    transition: background-color 0.15s;
+  }
+
+  .title-autocomplete__cover {
+    width: 36px;
+    height: 48px;
+    object-fit: cover;
+    border-radius: 2px;
+    flex-shrink: 0;
+    border: 1px solid var(--color-border, #e2e8f0);
+  }
+
+  .title-autocomplete__info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+  }
+
+  .title-autocomplete__title {
+    font-weight: 500;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .title-autocomplete__author {
+    font-size: 0.8125rem;
+    color: var(--color-text-secondary, #718096);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
