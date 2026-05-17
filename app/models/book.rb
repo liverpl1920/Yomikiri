@@ -6,6 +6,7 @@ class Book < ApplicationRecord
 
   validates :title, presence: true, length: { maximum: 255 }
   validates :author, length: { maximum: 255 }, allow_blank: true
+  validates :genre, length: { maximum: 100 }, allow_blank: true
   validates :cover_image_url, length: { maximum: 2048 }, allow_blank: true
   validates :total_pages, presence: true, numericality: { only_integer: true, greater_than: 0 }
   validates :target_pages, presence: true, numericality: { only_integer: true, greater_than: 0 }
@@ -44,6 +45,7 @@ class Book < ApplicationRecord
 
   scope :title_like, ->(query) { where("title ILIKE ?", "%#{sanitize_sql_like(query)}%") }
   scope :author_like, ->(query) { where("author ILIKE ?", "%#{sanitize_sql_like(query)}%") }
+  scope :genre_like, ->(query) { where("genre ILIKE ?", "%#{sanitize_sql_like(query)}%") }
   scope :completed_from, ->(from_date) { where("completed_at >= ?", from_date.beginning_of_day) }
   scope :completed_to, ->(to_date) { where("completed_at <= ?", to_date.end_of_day) }
 
@@ -51,6 +53,7 @@ class Book < ApplicationRecord
     relation = for_index_list
     relation = relation.title_like(params[:title]) if params[:title].present?
     relation = relation.author_like(params[:author]) if params[:author].present?
+    relation = relation.genre_like(params[:genre]) if params[:genre].present?
     relation = relation.completed_from(params[:completed_from]) if params[:completed_from].present?
     relation = relation.completed_to(params[:completed_to]) if params[:completed_to].present?
     relation

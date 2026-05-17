@@ -94,8 +94,9 @@ export default class extends Controller {
     }
   }
 
-  _fillFormFromSearch ({ author, total_pages: totalPages, cover_image_url: coverUrl }) {
+  _fillFormFromSearch ({ author, genre, total_pages: totalPages, cover_image_url: coverUrl }) {
     const authorInput = document.getElementById('book_author')
+    const genreInput = document.getElementById('book_genre')
     const totalPagesInput = document.getElementById('book_total_pages')
     const coverUrlInput = document.getElementById('book_cover_image_url')
     const missing = []
@@ -104,6 +105,12 @@ export default class extends Controller {
       authorInput.value = author
     } else {
       missing.push('著者')
+    }
+
+    if (genreInput && genre) {
+      genreInput.value = genre
+    } else {
+      missing.push('ジャンル')
     }
 
     if (totalPagesInput && totalPages) {
@@ -166,9 +173,10 @@ export default class extends Controller {
 
   calculateQuota () {
     const targetPages = parseInt(this.targetPagesTarget.value, 10)
-    const currentPage = this.hasCurrentPageTarget
-      ? parseInt(this.currentPageTarget.value, 10)
-      : 0
+    const currentPageInput = this.hasCurrentPageTarget
+      ? this.currentPageTarget
+      : document.getElementById('book_current_page')
+    const currentPage = parseInt(currentPageInput?.value, 10)
     const deadlineValue = this.deadlineTarget.value
     const display = this.quotaDisplayTarget
 

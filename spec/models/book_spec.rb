@@ -131,6 +131,20 @@ RSpec.describe Book, type: :model do
       end
     end
 
+    describe 'genre' do
+      it 'ジャンルがなくても有効' do
+        expect(build(:book, genre: nil)).to be_valid
+      end
+
+      it 'ジャンルが100文字以内なら有効' do
+        expect(build(:book, genre: 'a' * 100)).to be_valid
+      end
+
+      it 'ジャンルが101文字以上なら無効' do
+        expect(build(:book, genre: 'a' * 101)).not_to be_valid
+      end
+    end
+
     describe 'cover_image_url' do
       it 'nilでも有効' do
         expect(build(:book, cover_image_url: nil)).to be_valid
@@ -385,6 +399,26 @@ RSpec.describe Book, type: :model do
       expect(result.first.id).to eq(book_unread.id)
       expect(result.second.id).to eq(book_completed_near.id)
       expect(result.last.id).to eq(book_completed_far.id)
+    end
+  end
+
+  describe '.filtered_for_index' do
+    let(:user) { create(:user) }
+    let!(:programming) { create(:book, user: user, title: 'Ruby本', genre: 'プログラミング', status: :unread) }
+    let!(:business) { create(:book, user: user, title: '戦略本', genre: 'ビジネス', status: :unread) }
+
+    it 'ジャンルで部分一致検索できる' do
+      result = user.books.filtered_for_index(genre: 'プログラ', title: nil, author: nil, completed_from: nil, completed_to: nil)
+
+      expect(result).to include(programming)
+      expect(result).not_to include(business)
+    end
+
+    it 'ジャンルとタイトルの複合条件で検索できる' do
+      result = user.books.filtered_for_index(genre: 'プログラ', title: 'Ruby', author: nil, completed_from: nil, completed_to: nil)
+
+      expect(result).to include(programming)
+      expect(result).not_to include(business)
     end
   end
 

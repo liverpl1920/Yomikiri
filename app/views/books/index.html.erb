@@ -20,6 +20,11 @@
         </div>
 
         <div class="books-index__search-field">
+          <%= label_tag :genre, "ジャンル", class: "books-index__search-label" %>
+          <%= text_field_tag :genre, @search_params[:genre], class: "books-index__search-input", placeholder: "例: プログラミング" %>
+        </div>
+
+        <div class="books-index__search-field">
           <%= label_tag :completed_from, "読了日(開始)", class: "books-index__search-label" %>
           <%= date_field_tag :completed_from, @search_params[:completed_from], class: "books-index__search-input" %>
         </div>

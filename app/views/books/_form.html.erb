@@ -52,6 +52,19 @@
           autocomplete: 'off' %>
   </div>
 
+  <%# ジャンル %>
+  <div class="form-field">
+    <%= f.label :genre, 'ジャンル', class: 'form-field__label' %>
+    <span class="form-field__optional">任意</span>
+    <%= f.text_field :genre,
+          class: "form-field__input #{'form-field__input--error' if book.errors[:genre].any?}",
+          placeholder: '例: プログラミング',
+          autocomplete: 'off' %>
+    <% if book.errors[:genre].any? %>
+      <span class="form-field__error"><%= book.errors[:genre].first %></span>
+    <% end %>
+  </div>
+
   <%# 総ページ数 %>
   <div class="form-field">
     <%= f.label :total_pages, '総ページ数', class: 'form-field__label' %>
