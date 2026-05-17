@@ -50,12 +50,11 @@ RSpec.describe 'ログイン・ログアウト', type: :system do
       sign_in_via_form(user, password: password)
       visit root_path
 
-wait_for_stimulus
-    # ドロップダウントリガーをクリック
-    execute_script(%q{document.querySelector('[data-action="dropdown#toggle"]').click()})
+      wait_for_stimulus
+      expect(page).to have_css('.dropdown__trigger')
 
-      # ログアウトボタンをクリック
-      click_button 'ログアウト'
+      # ドロップダウン内のログアウトフォームを確実に送信する
+      execute_script(%q{document.querySelector('.dropdown__logout-form').requestSubmit()})
 
       expect(page).to have_current_path(root_path)
       expect(page).to have_link('ログイン')

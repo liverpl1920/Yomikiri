@@ -115,6 +115,27 @@ RSpec.describe 'タイトル入力からのISBN・書影自動取得', type: :sy
       expect(page).to have_css('[data-book-form-target="titleStatus"]',
                                text: 'タイトル・著者・ページ数・書影をすべて取得しました。', wait: 5)
     end
+
+    it '既に読んだページ数は自動取得後も保持される' do
+      fill_in '既に読んだページ数', with: '42'
+      fill_in 'タイトル', with: 'リーダブルコード'
+      find('#book_author').click
+
+      expect(page).to have_css('[data-book-form-target="titleStatus"]',
+                               text: 'タイトル・著者・ページ数・書影をすべて取得しました。', wait: 5)
+      expect(page).to have_field('既に読んだページ数', with: '42')
+    end
+
+    it '既に読んだページ数を考慮してノルマプレビューを表示する' do
+      fill_in '読了対象ページ数', with: '260'
+      fill_in '既に読んだページ数', with: '80'
+      deadline = (Date.current + 9.days).strftime('%Y-%m-%d')
+      page.execute_script("document.getElementById('book_deadline').value = '#{deadline}'")
+      page.execute_script("document.getElementById('book_deadline').dispatchEvent(new Event('change'))")
+
+      expect(page).to have_css('.quota-preview__number', text: '18')
+      expect(page).to have_css('.quota-preview__note', text: '残り 10 日で読み切るには、1日 18 ページ必要です')
+    end
   end
 
   describe 'タイトル入力→自動取得失敗' do

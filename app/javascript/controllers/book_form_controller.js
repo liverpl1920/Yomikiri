@@ -2,7 +2,7 @@ import { Controller } from '@hotwired/stimulus'
 
 export default class extends Controller {
   static targets = ['totalPages', 'targetPages', 'deadline', 'quotaDisplay',
-    'title', 'titleStatus', 'coverPreview']
+    'title', 'titleStatus', 'coverPreview', 'currentPage']
 
   connect () {
     this.calculateQuota()
@@ -156,11 +156,24 @@ export default class extends Controller {
 
   calculateQuota () {
     const targetPages = parseInt(this.targetPagesTarget.value, 10)
+    const currentPage = this.hasCurrentPageTarget
+      ? parseInt(this.currentPageTarget.value, 10)
+      : 0
     const deadlineValue = this.deadlineTarget.value
     const display = this.quotaDisplayTarget
 
     if (isNaN(targetPages) || targetPages <= 0 || !deadlineValue) {
       this._showPlaceholder(display)
+      return
+    }
+
+    if (!isNaN(currentPage) && currentPage < 0) {
+      this._showError(display, '既に読んだページ数は0以上を入力してください')
+      return
+    }
+
+    if (!isNaN(currentPage) && currentPage > targetPages) {
+      this._showError(display, '既に読んだページ数は読了対象ページ数以下を入力してください')
       return
     }
 
@@ -174,8 +187,10 @@ export default class extends Controller {
       return
     }
 
+    const normalizedCurrentPage = isNaN(currentPage) ? 0 : currentPage
+    const remainingPages = Math.max(targetPages - normalizedCurrentPage, 0)
     const remainingDays = Math.floor((deadline - today) / (1000 * 60 * 60 * 24)) + 1
-    const quota = Math.ceil(targetPages / remainingDays)
+    const quota = Math.ceil(remainingPages / remainingDays)
 
     this._showQuota(display, quota, remainingDays)
   }

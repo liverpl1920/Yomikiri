@@ -170,7 +170,9 @@ class BooksController < ApplicationController
   end
 
   def book_params
-    params.require(:book).permit(:title, :author, :total_pages, :target_pages, :current_page, :deadline, :status, :cover_image_url)
+    permitted = params.require(:book).permit(:title, :author, :total_pages, :target_pages, :current_page, :deadline, :status, :cover_image_url)
+    permitted[:current_page] = 0 if permitted[:current_page].blank?
+    permitted
   end
 
   def isbn_query?(query)
