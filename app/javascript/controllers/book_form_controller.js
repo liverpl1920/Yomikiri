@@ -226,3 +226,17 @@ export default class extends Controller {
     note.classList.remove('quota-preview__note--error')
   }
 }
+
+  toggleCompletedAtField (event) {
+    const field = document.getElementById('completed_at_field')
+    if (event.target.checked) {
+      field.hidden = false
+    } else {
+      field.hidden = true
+      // チェックを外した場合は読了日フィールドをクリア
+      const completedAtInput = document.getElementById('book_completed_at_input')
+      if (completedAtInput) {
+        completedAtInput.value = ''
+      }
+    }
+  }

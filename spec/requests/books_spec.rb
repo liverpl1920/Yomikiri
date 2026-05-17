@@ -404,6 +404,148 @@ RSpec.describe 'Books', type: :request do
           expect(response.body).to include('現在ページは総ページ数（250ページ）以下にしてください')
         end
       end
+
+      context '過去に読んだ本として登録（読了日あり）の場合' do
+        let(:past_reading_with_date_params) do
+          {
+            book: {
+              title: '過去に読んだ本',
+              total_pages: 300,
+              target_pages: 300,
+              current_page: 0,
+              deadline: Date.current + 14,
+              is_past_reading: 'true',
+              completed_at_input: (Date.current - 5).to_s
+            }
+          }
+        end
+
+        it '書籍が作成される' do
+          expect {
+            post books_path, params: past_reading_with_date_params
+          }.to change(Book, :count).by(1)
+        end
+
+        it '書籍が completed ステータスで作成される' do
+          post books_path, params: past_reading_with_date_params
+          book = Book.last
+          expect(book.status).to eq('completed')
+        end
+
+        it '現在ページが target_pages で設定される' do
+          post books_path, params: past_reading_with_date_params
+          book = Book.last
+          expect(book.current_page).to eq(300)
+        end
+
+        it 'completed_at が入力された日付で設定される' do
+          post books_path, params: past_reading_with_date_params
+          book = Book.last
+          expected_date = Date.current - 5
+          expect(book.completed_at.to_date).to eq(expected_date)
+        end
+
+        it '書籍詳細画面にリダイレクトされる' do
+          post books_path, params: past_reading_with_date_params
+          expect(response).to redirect_to(book_path(Book.last))
+        end
+      end
+
+      context '過去に読んだ本として登録（読了日なし）の場合' do
+        let(:past_reading_without_date_params) do
+          {
+            book: {
+              title: '過去に読んだ本（日付なし）',
+              total_pages: 200,
+              target_pages: 200,
+              current_page: 0,
+              deadline: Date.current + 14,
+              is_past_reading: 'true',
+              completed_at_input: ''
+            }
+          }
+        end
+
+        it '書籍が作成される' do
+          expect {
+            post books_path, params: past_reading_without_date_params
+          }.to change(Book, :count).by(1)
+        end
+
+        it '書籍が completed ステータスで作成される' do
+          post books_path, params: past_reading_without_date_params
+          book = Book.last
+          expect(book.status).to eq('completed')
+        end
+
+        it '現在ページが target_pages で設定される' do
+          post books_path, params: past_reading_without_date_params
+          book = Book.last
+          expect(book.current_page).to eq(200)
+        end
+
+        it 'completed_at が現在時刻で設定される' do
+          post books_path, params: past_reading_without_date_params
+          book = Book.last
+          # completed_at が Time.current で設定されているかを確認
+          # 時刻が異なる可能性があるため、日付で確認
+          expect(book.completed_at.to_date).to eq(Date.current)
+        end
+      end
+
+      context '過去に読んだ本として登録（不正な日付フォーマット）の場合' do
+        let(:invalid_date_format_params) do
+          {
+            book: {
+              title: '不正な日付の本',
+              total_pages: 250,
+              target_pages: 250,
+              current_page: 0,
+              deadline: Date.current + 14,
+              is_past_reading: 'true',
+              completed_at_input: 'invalid-date'
+            }
+          }
+        end
+
+        it '書籍が作成されない' do
+          expect {
+            post books_path, params: invalid_date_format_params
+          }.not_to change(Book, :count)
+        end
+
+        it 'フォームを再表示する（422）' do
+          post books_path, params: invalid_date_format_params
+          expect(response).to have_http_status(:unprocessable_entity)
+        end
+      end
+
+      context '過去に読んだ本として登録（未来日）の場合' do
+        let(:future_date_params) do
+          {
+            book: {
+              title: '未来日の本',
+              total_pages: 250,
+              target_pages: 250,
+              current_page: 0,
+              deadline: Date.current + 14,
+              is_past_reading: 'true',
+              completed_at_input: (Date.current + 5).to_s
+            }
+          }
+        end
+
+        it '書籍が作成されない' do
+          expect {
+            post books_path, params: future_date_params
+          }.not_to change(Book, :count)
+        end
+
+        it 'フォームを再表示する（422）' do
+          post books_path, params: future_date_params
+          expect(response).to have_http_status(:unprocessable_entity)
+        end
+      end
     end
 
     context '未認証ユーザーの場合' do
