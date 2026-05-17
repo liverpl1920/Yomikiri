@@ -861,4 +861,133 @@ RSpec.describe 'Books', type: :request do
       end
     end
   end
+
+  describe 'GET /books/search' do
+    context '未認証ユーザーの場合' do
+      it 'ログインページへリダイレクトされる' do
+        get search_books_path, params: { q: 'Ruby' }
+        expect(response).to redirect_to(new_user_session_path)
+      end
+    end
+
+    context '認証済みユーザーの場合' do
+      before { sign_in user }
+
+      context 'クエリが空の場合' do
+        it '空の書籍リストを返す' do
+          get search_books_path, params: { q: '' }
+          expect(response).to have_http_status(:ok)
+          json = JSON.parse(response.body)
+          expect(json['books']).to eq([])
+        end
+      end
+
+      context 'タイトル検索の場合' do
+        let(:google_books_data) do
+          {
+            'items' => [
+              {
+                'volumeInfo' => {
+                  'title' => 'Rubyプログラミング入門',
+                  'authors' => [ '著者名' ],
+                  'pageCount' => 300,
+                  'industryIdentifiers' => [
+                    { 'type' => 'ISBN_13', 'identifier' => '9784000000001' }
+                  ],
+                  'imageLinks' => {
+                    'thumbnail' => 'http://books.google.com/thumbnail.jpg',
+                    'small' => 'https://books.google.com/small.jpg',
+                    'medium' => 'https://books.google.com/medium.jpg',
+                    'large' => 'https://books.google.com/large.jpg'
+                  }
+                }
+              }
+            ]
+          }
+        end
+
+        before do
+          allow_any_instance_of(BooksController).to receive(:fetch_title_json).and_return(google_books_data)
+          allow_any_instance_of(BooksController).to receive(:lookup_openbd_cover_url).and_return('')
+          allow_any_instance_of(BooksController).to receive(:lookup_rakuten_cover_url).and_return('')
+        end
+
+        it '200 OK を返す' do
+          get search_books_path, params: { q: 'Ruby' }
+          expect(response).to have_http_status(:ok)
+        end
+
+        it '利用可能な最大サイズの書影URLを返す（large優先）' do
+          get search_books_path, params: { q: 'Ruby' }
+          json = JSON.parse(response.body)
+          expect(json['books'].first['cover_image_url']).to eq('https://books.google.com/large.jpg')
+        end
+      end
+
+      context 'タイトル検索でlargeがなくmediumがある場合' do
+        let(:google_books_data) do
+          {
+            'items' => [
+              {
+                'volumeInfo' => {
+                  'title' => 'Rubyプログラミング入門',
+                  'authors' => [ '著者名' ],
+                  'pageCount' => 300,
+                  'industryIdentifiers' => [],
+                  'imageLinks' => {
+                    'thumbnail' => 'http://books.google.com/thumbnail.jpg',
+                    'medium' => 'https://books.google.com/medium.jpg'
+                  }
+                }
+              }
+            ]
+          }
+        end
+
+        before do
+          allow_any_instance_of(BooksController).to receive(:fetch_title_json).and_return(google_books_data)
+          allow_any_instance_of(BooksController).to receive(:lookup_openbd_cover_url).and_return('')
+          allow_any_instance_of(BooksController).to receive(:lookup_rakuten_cover_url).and_return('')
+        end
+
+        it 'mediumサイズの書影URLを返す' do
+          get search_books_path, params: { q: 'Ruby' }
+          json = JSON.parse(response.body)
+          expect(json['books'].first['cover_image_url']).to eq('https://books.google.com/medium.jpg')
+        end
+      end
+
+      context 'タイトル検索でimageLinksにthumbnailのみある場合' do
+        let(:google_books_data) do
+          {
+            'items' => [
+              {
+                'volumeInfo' => {
+                  'title' => 'Rubyプログラミング入門',
+                  'authors' => [ '著者名' ],
+                  'pageCount' => 300,
+                  'industryIdentifiers' => [],
+                  'imageLinks' => {
+                    'thumbnail' => 'http://books.google.com/thumbnail.jpg'
+                  }
+                }
+              }
+            ]
+          }
+        end
+
+        before do
+          allow_any_instance_of(BooksController).to receive(:fetch_title_json).and_return(google_books_data)
+          allow_any_instance_of(BooksController).to receive(:lookup_openbd_cover_url).and_return('')
+          allow_any_instance_of(BooksController).to receive(:lookup_rakuten_cover_url).and_return('')
+        end
+
+        it 'thumbnailをhttpsに変換して返す' do
+          get search_books_path, params: { q: 'Ruby' }
+          json = JSON.parse(response.body)
+          expect(json['books'].first['cover_image_url']).to eq('https://books.google.com/thumbnail.jpg')
+        end
+      end
+    end
+  end
 end
