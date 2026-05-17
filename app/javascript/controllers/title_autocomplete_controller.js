@@ -8,6 +8,8 @@ export default class extends Controller {
 
   connect () {
     this._debounceTimer = null
+    this._abortController = null
+    this._latestQuery = ''
     this._activeIndex = -1
     this._candidates = []
     this._handleOutsideClick = this._onOutsideClick.bind(this)
@@ -16,14 +18,17 @@ export default class extends Controller {
 
   disconnect () {
     clearTimeout(this._debounceTimer)
+    if (this._abortController) this._abortController.abort()
     document.removeEventListener('click', this._handleOutsideClick)
   }
 
   onInput () {
     clearTimeout(this._debounceTimer)
     const query = this.inputTarget.value.trim()
+    this._latestQuery = query
 
     if (query.length < MIN_QUERY_LENGTH) {
+      if (this._abortController) this._abortController.abort()
       this._closeList()
       return
     }
@@ -58,13 +63,19 @@ export default class extends Controller {
   }
 
   async _fetchCandidates (query) {
+    if (this._abortController) this._abortController.abort()
+    this._abortController = new AbortController()
+
     try {
       const res = await fetch(`/books/search?q=${encodeURIComponent(query)}`, {
-        headers: { Accept: 'application/json' }
+        headers: { Accept: 'application/json' },
+        signal: this._abortController.signal
       })
       if (!res.ok) throw new Error('Network error')
 
       const data = await res.json()
+      if (query !== this._latestQuery || query !== this.inputTarget.value.trim()) return
+
       if (data.error) {
         this._closeList()
         return
@@ -72,7 +83,8 @@ export default class extends Controller {
 
       this._candidates = data.books || []
       this._renderList(this._candidates)
-    } catch (_e) {
+    } catch (error) {
+      if (error.name === 'AbortError') return
       this._closeList()
     }
   }
@@ -122,7 +134,10 @@ export default class extends Controller {
       }
 
       button.appendChild(info)
-      button.addEventListener('click', () => this._selectCandidate(book))
+      button.addEventListener('click', (event) => {
+        event.stopPropagation()
+        this._selectCandidate(book)
+      })
       li.appendChild(button)
       list.appendChild(li)
     })
@@ -135,12 +150,10 @@ export default class extends Controller {
     this._fillForm(book)
     this._closeList()
 
-    // blur時のautoFetchを抑止するためbook-formコントローラのlastAutoFetchedTitleを更新
+    // blur時のautoFetch抑止・ステータス表示はbook-formの公開メソッドに委譲する
     const formController = this._getBookFormController()
     if (formController) {
-      formController.lastAutoFetchedTitle = book.title || ''
-      formController._updateCoverPreview(book.cover_image_url)
-      formController._setTitleStatus('書籍情報を自動入力しました')
+      formController.applyAutocompleteSelection(book)
     }
   }
 
@@ -155,8 +168,13 @@ export default class extends Controller {
     if (coverUrlInput) coverUrlInput.value = book.cover_image_url || ''
 
     if (totalPagesInput) {
-      totalPagesInput.value = book.total_pages ?? ''
-      totalPagesInput.dispatchEvent(new Event('input'))
+      const parsedTotalPages = Number.parseInt(book.total_pages, 10)
+      if (Number.isNaN(parsedTotalPages) || parsedTotalPages <= 0) {
+        totalPagesInput.value = ''
+      } else {
+        totalPagesInput.value = String(parsedTotalPages)
+        totalPagesInput.dispatchEvent(new Event('input'))
+      }
     }
   }
 

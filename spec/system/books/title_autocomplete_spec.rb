@@ -167,7 +167,7 @@ RSpec.describe 'タイトル入力中オートコンプリート機能', type: :
       expect(page).to have_css('.title-autocomplete__item--active', wait: 3)
     end
 
-    it 'EnterキーでフォーカスされているCandidateを選択できる' do
+    it 'Enterキーでフォーカスされている候補を選択できる' do
       title_input = find('#book_title')
       title_input.send_keys('リーダブル')
 
@@ -206,7 +206,7 @@ RSpec.describe 'タイトル入力中オートコンプリート機能', type: :
       )
     end
 
-    it 'API通信エラー時はドロップダウンが表示されず入力を継続できる' do
+    it 'APIが500応答でもドロップダウンが表示されず入力を継続できる' do
       stub_request(:get, /www\.googleapis\.com\/books\/v1\/volumes/)
         .to_return(status: 500)
 
@@ -218,6 +218,29 @@ RSpec.describe 'タイトル入力中オートコンプリート機能', type: :
         '.title-autocomplete__list:not(.title-autocomplete__list--hidden)'
       )
       expect(page).to have_field('タイトル', with: 'エラーテスト')
+    end
+
+    it 'ネットワーク失敗時（fetch reject）でもドロップダウンが表示されず入力を継続できる' do
+      page.execute_script(<<~JS)
+        window.__originalFetchForAutocomplete = window.fetch;
+        window.fetch = () => Promise.reject(new Error('network-failure'));
+      JS
+
+      title_input = find('#book_title')
+      title_input.send_keys('ネットワークエラー')
+
+      sleep 1
+      expect(page).not_to have_css(
+        '.title-autocomplete__list:not(.title-autocomplete__list--hidden)'
+      )
+      expect(page).to have_field('タイトル', with: 'ネットワークエラー')
+    ensure
+      page.execute_script(<<~JS)
+        if (window.__originalFetchForAutocomplete) {
+          window.fetch = window.__originalFetchForAutocomplete;
+          delete window.__originalFetchForAutocomplete;
+        }
+      JS
     end
   end
 

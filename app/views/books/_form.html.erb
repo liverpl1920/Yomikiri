@@ -28,14 +28,14 @@
           autocomplete: 'off',
           data: {
             'book-form-target': 'title',
-           'title-autocomplete-target': 'input',
-           action: 'blur->book-form#autoFetchByTitle input->title-autocomplete#onInput keydown->title-autocomplete#onKeydown'
+            'title-autocomplete-target': 'input',
+            action: 'blur->book-form#autoFetchByTitle input->title-autocomplete#onInput keydown->title-autocomplete#onKeydown'
           } %>
-      <ul class="title-autocomplete__list title-autocomplete__list--hidden"
+        <ul class="title-autocomplete__list title-autocomplete__list--hidden"
           data-title-autocomplete-target="list"
           role="listbox"
           aria-label="書籍候補"></ul>
-      <% if book.errors[:title].any? %>
+        <% if book.errors[:title].any? %>
       <span class="form-field__error"><%= book.errors[:title].first %></span>
     <% end %>
     <p class="book-form__title-status" data-book-form-target="titleStatus" aria-live="polite"></p>

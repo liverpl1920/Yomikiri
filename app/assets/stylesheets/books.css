@@ -907,6 +907,7 @@
 /* ---- フォームフィールド ---- */
 .form-field {
   display: block;
+  position: relative;
 }
 
 .form-field > * + * {
@@ -1186,9 +1187,4 @@
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-  }
-
-  /* form-fieldをrelativeにしてdropdownを正しく配置 */
-  .form-field {
-    position: relative;
   }
