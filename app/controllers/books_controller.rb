@@ -12,7 +12,9 @@ class BooksController < ApplicationController
   before_action :set_book, only: [ :show, :destroy, :update_progress, :complete, :change_deadline ]
 
   def index
-    @books = current_user.books.for_index_list
+    @search_params = normalized_index_search_params
+    @search_active = @search_params.values.any?(&:present?)
+    @books = current_user.books.filtered_for_index(@search_params)
   end
 
   def new
@@ -173,6 +175,33 @@ class BooksController < ApplicationController
     permitted = params.require(:book).permit(:title, :author, :total_pages, :target_pages, :current_page, :deadline, :status, :cover_image_url)
     permitted[:current_page] = 0 if permitted[:current_page].blank?
     permitted
+  end
+
+  def normalized_index_search_params
+    permitted = params.permit(:title, :author, :completed_from, :completed_to)
+    title = permitted[:title].to_s.strip
+    author = permitted[:author].to_s.strip
+    completed_from = parse_iso_date(permitted[:completed_from])
+    completed_to = parse_iso_date(permitted[:completed_to])
+
+    if completed_from.present? && completed_to.present? && completed_from > completed_to
+      completed_from, completed_to = completed_to, completed_from
+    end
+
+    {
+      title: title.presence,
+      author: author.presence,
+      completed_from: completed_from,
+      completed_to: completed_to
+    }
+  end
+
+  def parse_iso_date(value)
+    return nil if value.blank?
+
+    Date.iso8601(value)
+  rescue ArgumentError
+    nil
   end
 
   def isbn_query?(query)

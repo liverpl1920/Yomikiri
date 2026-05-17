@@ -42,6 +42,20 @@ class Book < ApplicationRecord
     order(ordering, :deadline)
   }
 
+  scope :title_like, ->(query) { where("title ILIKE ?", "%#{sanitize_sql_like(query)}%") }
+  scope :author_like, ->(query) { where("author ILIKE ?", "%#{sanitize_sql_like(query)}%") }
+  scope :completed_from, ->(from_date) { where("completed_at >= ?", from_date.beginning_of_day) }
+  scope :completed_to, ->(to_date) { where("completed_at <= ?", to_date.end_of_day) }
+
+  def self.filtered_for_index(params)
+    relation = for_index_list
+    relation = relation.title_like(params[:title]) if params[:title].present?
+    relation = relation.author_like(params[:author]) if params[:author].present?
+    relation = relation.completed_from(params[:completed_from]) if params[:completed_from].present?
+    relation = relation.completed_to(params[:completed_to]) if params[:completed_to].present?
+    relation
+  end
+
   # 今日のノルマ（残ページ ÷ 残日数、切り上げ）
   # 期限超過時（D <= 0）は D=1 として計算する
   def daily_quota
