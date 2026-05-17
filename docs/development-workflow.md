@@ -346,7 +346,7 @@ services:
 
 ## ステップ 4: GitHub Project の自動化
 
-### PR 作成 → "In Review" へ自動移動
+### Issue 作成/再オープン時の自動追加 + PRマージ時のDone移動
 
 ```yaml
 # .github/workflows/project-automation.yml
@@ -354,18 +354,14 @@ services:
 name: Project Automation
 
 on:
+  issues:
+    types: [opened, reopened]
   pull_request:
-    types: [opened, reopened, closed]
-
-permissions:
-  contents: read
-  pull-requests: read
+    types: [closed]
 
 jobs:
-  # PR 作成時 → プロジェクトに追加（ステータスの "In Review" 移動は手動で行う）
-  # 注意: actions/add-to-project はプロジェクトへの追加のみ行い、カードのステータス変更は行いません。
-  # PR作成後は Projects ボード上で手動に "In Review" へ移動してください。
-  move-to-review:
+  # Issue 作成時/再オープン時 → プロジェクトに追加
+  add-to-project:
     if: github.event.action == 'opened' || github.event.action == 'reopened'
     runs-on: ubuntu-latest
     steps:
@@ -374,9 +370,20 @@ jobs:
           project-url: https://github.com/users/liverpl1920/projects/2
           github-token: ${{ secrets.PROJECT_TOKEN }}
 
-  # PR マージ → Issue 自動クローズ（PR 本文に "Closes #番号" を書く）
-  # GitHub がデフォルトで対応（branch protection 設定で有効化）
+  # PR close かつ merge=true のときに linked issue を Done に移動
+  move-to-done:
+    if: >
+      github.event_name == 'pull_request' &&
+      github.event.action == 'closed' &&
+      github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
 ```
+
+運用ルール:
+
+- PR 作成時（opened）には Project Automation は実行されません。
+- Issue の opened/reopened ではプロジェクトへ自動追加されます。
+- PR が merged されたときのみ linked issue の Done 移動処理が実行されます。
 
 ### PR テンプレートの設定
 
