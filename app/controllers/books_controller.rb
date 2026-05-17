@@ -212,12 +212,12 @@ class BooksController < ApplicationController
       info = item["volumeInfo"] || {}
       isbn = extract_isbn_from_identifiers(info["industryIdentifiers"])
       openbd_url = lookup_openbd_cover_url(isbn)
-      google_thumbnail = info.dig("imageLinks", "thumbnail").to_s.sub(/\Ahttp:/, "https:")
+      google_cover_url = best_google_image_url(info["imageLinks"])
       {
         title: info["title"].to_s,
         author: Array(info["authors"]).join(", "),
         total_pages: info["pageCount"],
-        cover_image_url: resolve_cover_url(openbd_url, isbn, google_thumbnail)
+        cover_image_url: resolve_cover_url(openbd_url, isbn, google_cover_url)
       }
     end
   end
@@ -297,8 +297,8 @@ class BooksController < ApplicationController
     uri = URI("https://www.googleapis.com/books/v1/volumes")
     uri.query = URI.encode_www_form(q: "isbn:#{isbn}", maxResults: 1)
     data = fetch_json(uri.to_s)
-    thumbnail = data&.dig("items", 0, "volumeInfo", "imageLinks", "thumbnail").to_s
-    thumbnail.present? ? thumbnail.sub(/\Ahttp:/, "https:") : ""
+    image_links = data&.dig("items", 0, "volumeInfo", "imageLinks")
+    best_google_image_url(image_links)
   end
 
   def resolve_cover_url(openbd_url, isbn, google_thumbnail, isbn_search: false)
@@ -317,5 +317,15 @@ class BooksController < ApplicationController
 
     isbn13 = identifiers.find { |id| id["type"] == "ISBN_13" }
     isbn13&.dig("identifier")&.gsub(/[^0-9]/, "")
+  end
+
+  def best_google_image_url(image_links)
+    return "" if image_links.blank?
+
+    %w[extraLarge large medium small thumbnail smallThumbnail].each do |size|
+      url = image_links[size].to_s.presence
+      return url.sub(/\Ahttp:/, "https:") if url
+    end
+    ""
   end
 end
