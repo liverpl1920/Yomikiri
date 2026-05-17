@@ -130,6 +130,7 @@
   </div>
 
   <%# 過去に読んだ本として登録 %>
+  <% show_completed_at_field = ActiveModel::Type::Boolean.new.cast(book.is_past_reading) || book.errors[:completed_at_input].any? %>
   <div class="form-field">
     <label class="form-field__label form-field__label--checkbox">
       <%= f.check_box :is_past_reading, { id: 'book_is_past_reading', data: { action: 'change->book-form#toggleCompletedAtField' } }, 'true', 'false' %>
@@ -139,7 +140,7 @@
   </div>
 
   <%# 読了日 %>
-  <div class="form-field" id="completed_at_field" hidden>
+  <div class="form-field" id="completed_at_field" <%= 'hidden' unless show_completed_at_field %>>
     <%= f.label :completed_at_input, '読了日', class: 'form-field__label' %>
     <span class="form-field__optional">任意</span>
     <%= f.date_field :completed_at_input,

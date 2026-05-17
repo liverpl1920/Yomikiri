@@ -20,8 +20,8 @@ class Book < ApplicationRecord
   validate :current_page_not_exceed_total_pages
   validate :deadline_cannot_be_in_the_past, if: -> { new_record? || will_save_change_to_deadline? }
   validate :cover_image_url_must_be_valid_url, if: -> { cover_image_url.present? }
-  validate :completed_at_must_be_valid_date, if: -> { is_past_reading.present? && completed_at_input.present? }
-  validate :completed_at_must_not_be_in_future, if: -> { is_past_reading.present? && completed_at_input.present? }
+  validate :completed_at_must_be_valid_date, if: -> { past_reading_checked? && completed_at_input.present? }
+  validate :completed_at_must_not_be_in_future, if: -> { past_reading_checked? && completed_at_input.present? }
 
   before_save :auto_set_reading_status
   before_save :apply_past_reading_settings
@@ -131,16 +131,20 @@ class Book < ApplicationRecord
   end
 
   def apply_past_reading_settings
-    return unless is_past_reading == true || is_past_reading == "true"
+    return unless past_reading_checked?
 
     self.status = :completed
     self.current_page = target_pages
 
     if completed_at_input.present?
-      self.completed_at = Date.parse(completed_at_input).to_time
+      self.completed_at = Time.zone.parse(completed_at_input.to_s)
     else
       self.completed_at = Time.current
     end
+  end
+
+  def past_reading_checked?
+    ActiveModel::Type::Boolean.new.cast(is_past_reading)
   end
 
   def target_pages_not_exceed_total_pages
