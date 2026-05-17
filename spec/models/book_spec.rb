@@ -131,17 +131,17 @@ RSpec.describe Book, type: :model do
       end
     end
 
-    describe 'genre' do
-      it 'ジャンルがなくても有効' do
-        expect(build(:book, genre: nil)).to be_valid
+    describe 'memo' do
+      it '空でも有効' do
+        expect(build(:book, memo: '')).to be_valid
       end
 
-      it 'ジャンルが100文字以内なら有効' do
-        expect(build(:book, genre: 'a' * 100)).to be_valid
+      it '2000文字以内であれば有効' do
+        expect(build(:book, memo: 'a' * 2000)).to be_valid
       end
 
-      it 'ジャンルが101文字以上なら無効' do
-        expect(build(:book, genre: 'a' * 101)).not_to be_valid
+      it '2001文字以上は無効' do
+        expect(build(:book, memo: 'a' * 2001)).not_to be_valid
       end
     end
 

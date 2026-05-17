@@ -142,6 +142,30 @@
     <% end %>
   </div>
 
+  <%# 過去に読んだ本として登録 %>
+  <% show_completed_at_field = ActiveModel::Type::Boolean.new.cast(book.is_past_reading) || book.errors[:completed_at_input].any? %>
+  <div class="form-field">
+    <label class="form-field__label form-field__label--checkbox">
+      <%= f.check_box :is_past_reading, { id: 'book_is_past_reading', data: { action: 'change->book-form#toggleCompletedAtField' } }, 'true', 'false' %>
+      <span>過去に読んだ本として登録</span>
+    </label>
+    <small class="form-field__hint">すでに読了済みの本を登録する場合はチェックしてください</small>
+  </div>
+
+  <%# 読了日 %>
+  <div class="form-field" id="completed_at_field" <%= 'hidden' unless show_completed_at_field %>>
+    <%= f.label :completed_at_input, '読了日', class: 'form-field__label' %>
+    <span class="form-field__optional">任意</span>
+    <%= f.date_field :completed_at_input,
+          class: "form-field__input form-field__input--date #{'form-field__input--error' if book.errors[:completed_at_input].any?}",
+          max: Date.current.to_s,
+          placeholder: '未入力の場合は本日が設定されます' %>
+    <small class="form-field__hint">本を読了した日付を入力してください（未来の日付は設定できません）</small>
+    <% if book.errors[:completed_at_input].any? %>
+      <span class="form-field__error"><%= book.errors[:completed_at_input].first %></span>
+    <% end %>
+  </div>
+
   <%# 書影URL（hidden）%>
   <%= f.hidden_field :cover_image_url %>
 
