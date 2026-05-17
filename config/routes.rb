@@ -18,6 +18,7 @@ Rails.application.routes.draw do
     end
     member do
       patch :update_progress
+      patch :update_memo
       patch :change_deadline
       patch :complete
     end

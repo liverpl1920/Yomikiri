@@ -191,6 +191,13 @@
   color: var(--color-text-muted);
 }
 
+.book-card__memo {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+  line-height: 1.6;
+  margin: 0;
+}
+
 /* ステータスバッジ */
 .book-card__status {
   display: inline-block;
@@ -533,6 +540,66 @@
 .book-show__actions {
   display: flex;
   gap: var(--spacing-md);
+}
+
+/* ---- コメント・メモ ---- */
+.book-show__memo {
+  background-color: var(--color-bg-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius-lg);
+  padding: var(--spacing-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.book-show__memo-title {
+  font-size: var(--font-size-base);
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+.book-show__memo-field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.book-show__memo-input {
+  width: 100%;
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius);
+  padding: var(--spacing-sm);
+  font-size: var(--font-size-base);
+  color: var(--color-text);
+  background-color: var(--color-bg);
+  resize: vertical;
+}
+
+.book-show__memo-help {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+}
+
+.book-show__memo-actions {
+  display: flex;
+}
+
+.book-show__memo-preview {
+  border-top: 1px solid var(--color-border);
+  padding-top: var(--spacing-md);
+}
+
+.book-show__memo-preview-label {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+  margin-bottom: var(--spacing-xs);
+}
+
+.book-show__memo-preview-body {
+  line-height: 1.7;
+  color: var(--color-text);
+  word-break: break-word;
 }
 
 /* ---- Googleカレンダー連携 ---- */

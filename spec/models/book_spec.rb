@@ -131,6 +131,20 @@ RSpec.describe Book, type: :model do
       end
     end
 
+    describe 'memo' do
+      it '空でも有効' do
+        expect(build(:book, memo: '')).to be_valid
+      end
+
+      it '2000文字以内であれば有効' do
+        expect(build(:book, memo: 'a' * 2000)).to be_valid
+      end
+
+      it '2001文字以上は無効' do
+        expect(build(:book, memo: 'a' * 2001)).not_to be_valid
+      end
+    end
+
     describe 'cover_image_url' do
       it 'nilでも有効' do
         expect(build(:book, cover_image_url: nil)).to be_valid

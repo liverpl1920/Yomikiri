@@ -20,6 +20,7 @@ ja:
       book:
         title: "タイトル"
         author: "著者"
+        memo: "コメント・メモ"
         cover_image_url: "書影URL"
         total_pages: "総ページ数"
         target_pages: "読了対象ページ数"

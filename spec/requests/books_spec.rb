@@ -1004,6 +1004,73 @@ RSpec.describe 'Books', type: :request do
     end
   end
 
+  describe 'PATCH /books/:id/update_memo' do
+    let!(:book) { create(:book, user: user, memo: '初期メモ') }
+
+    context '認証済みユーザーの場合' do
+      before { sign_in user }
+
+      it 'メモを更新できる' do
+        patch update_memo_book_path(book), params: { book: { memo: "気づきメモ\n次回の課題" } }
+
+        expect(response).to redirect_to(book_path(book))
+        expect(book.reload.memo).to eq("気づきメモ\n次回の課題")
+      end
+
+      it '空文字で保存するとメモをクリアできる' do
+        patch update_memo_book_path(book), params: { book: { memo: '' } }
+
+        expect(response).to redirect_to(book_path(book))
+        expect(book.reload.memo).to eq('')
+      end
+
+      it '2000文字超過は422になる' do
+        patch update_memo_book_path(book), params: { book: { memo: 'a' * 2001 } }
+
+        expect(response).to have_http_status(422)
+        expect(book.reload.memo).to eq('初期メモ')
+      end
+
+      it '表示時にHTMLタグがエスケープされる' do
+        patch update_memo_book_path(book), params: { book: { memo: '<script>alert(1)</script>' } }
+        follow_redirect!
+
+        expect(response.body).to include('&lt;script&gt;alert(1)&lt;/script&gt;')
+        expect(response.body).not_to include('<script>alert(1)</script>')
+      end
+
+      it '表示時に改行が保持される' do
+        patch update_memo_book_path(book), params: { book: { memo: "1行目\n2行目" } }
+        follow_redirect!
+
+        expect(response.body).to include('1行目')
+        expect(response.body).to include('2行目')
+        expect(response.body).to include('<br')
+      end
+    end
+
+    context '未認証ユーザーの場合' do
+      it 'ログインページへリダイレクトされる' do
+        patch update_memo_book_path(book), params: { book: { memo: 'メモ' } }
+
+        expect(response).to redirect_to(new_user_session_path)
+      end
+    end
+
+    context '他ユーザーの書籍を更新する場合' do
+      before { sign_in user }
+
+      it '404を返す' do
+        other_book = create(:book, user: other_user, memo: '他人のメモ')
+
+        patch update_memo_book_path(other_book), params: { book: { memo: '更新不可' } }
+
+        expect(response).to have_http_status(:not_found)
+        expect(other_book.reload.memo).to eq('他人のメモ')
+      end
+    end
+  end
+
   describe 'GET /books/search' do
     context '未認証ユーザーの場合' do
       it 'ログインページへリダイレクトされる' do

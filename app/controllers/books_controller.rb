@@ -9,7 +9,7 @@ class BooksController < ApplicationController
   MAX_REDIRECTS = 3
 
   before_action :authenticate_user!
-  before_action :set_book, only: [ :show, :destroy, :update_progress, :complete, :change_deadline ]
+  before_action :set_book, only: [ :show, :destroy, :update_progress, :update_memo, :complete, :change_deadline ]
 
   def index
     @search_params = normalized_index_search_params
@@ -40,6 +40,14 @@ class BooksController < ApplicationController
       render :show, status: :unprocessable_entity
     elsif persist_progress_with_log(new_page)
       redirect_to @book, notice: "進捗を更新しました。"
+    else
+      render :show, status: :unprocessable_entity
+    end
+  end
+
+  def update_memo
+    if @book.update(memo_params)
+      redirect_to @book, notice: "コメント・メモを更新しました。"
     else
       render :show, status: :unprocessable_entity
     end
@@ -172,9 +180,13 @@ class BooksController < ApplicationController
   end
 
   def book_params
-    permitted = params.require(:book).permit(:title, :author, :total_pages, :target_pages, :current_page, :deadline, :status, :cover_image_url, :is_past_reading, :completed_at_input)
+    permitted = params.require(:book).permit(:title, :author, :total_pages, :target_pages, :current_page, :deadline, :status, :cover_image_url, :memo, :is_past_reading, :completed_at_input)
     permitted[:current_page] = 0 if permitted[:current_page].blank?
       permitted
+  end
+
+  def memo_params
+    params.require(:book).permit(:memo)
   end
 
   def normalized_index_search_params
