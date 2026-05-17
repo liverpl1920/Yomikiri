@@ -56,6 +56,16 @@ RSpec.describe 'Header and Footer', type: :request do
       expect(response.body).to include('マイページ')
     end
 
+    it '読書統計リンクが表示される' do
+      get books_path
+
+      expect(response.body).to include('読書統計')
+
+      doc = Nokogiri::HTML(response.body)
+      stats_link = doc.css('a.dropdown__item').find { |link| link.text.strip == '読書統計' }
+      expect(stats_link['href']).to eq(stats_mypage_path)
+    end
+
     it '共通フッターが表示される' do
       get books_path
 

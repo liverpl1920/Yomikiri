@@ -301,3 +301,169 @@
 .mypage__settings-link:hover {
   text-decoration: underline;
 }
+
+/* ---- 読書統計ページ ---- */
+.mypage-stats {
+  padding: var(--spacing-xl) 0 var(--spacing-3xl);
+}
+
+.mypage-stats__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-lg);
+  flex-wrap: wrap;
+}
+
+.mypage-stats__title {
+  font-size: var(--font-size-2xl);
+  color: var(--color-text);
+}
+
+.mypage-stats__header-links {
+  display: flex;
+  gap: var(--spacing-sm);
+  flex-wrap: wrap;
+}
+
+.mypage-stats__period-tabs {
+  display: inline-flex;
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius);
+  overflow: hidden;
+  margin-bottom: var(--spacing-md);
+}
+
+.mypage-stats__period-tab {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 5.5rem;
+  padding: 0.5rem 1rem;
+  color: var(--color-text-muted);
+  background-color: var(--color-bg);
+  font-weight: 600;
+  text-decoration: none;
+  transition: background-color 0.2s, color 0.2s;
+}
+
+.mypage-stats__period-tab:hover {
+  background-color: var(--color-bg-surface);
+  text-decoration: none;
+}
+
+.mypage-stats__period-tab--active {
+  background-color: var(--color-primary);
+  color: #fff;
+}
+
+.mypage-stats__period-summary {
+  margin-bottom: var(--spacing-lg);
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+}
+
+.mypage-stats__cards {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-lg);
+}
+
+.mypage-stats__card {
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius-lg);
+  background-color: var(--color-bg);
+  box-shadow: var(--shadow-sm);
+  padding: var(--spacing-lg);
+}
+
+.mypage-stats__card-title {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+  margin-bottom: var(--spacing-sm);
+}
+
+.mypage-stats__card-value {
+  color: var(--color-primary);
+  font-size: var(--font-size-3xl);
+  font-weight: 700;
+  line-height: 1.1;
+}
+
+.mypage-stats__card-unit {
+  margin-top: var(--spacing-xs);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+}
+
+.mypage-stats__breakdown {
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius-lg);
+  background-color: var(--color-bg);
+  box-shadow: var(--shadow-sm);
+  padding: var(--spacing-lg);
+}
+
+.mypage-stats__breakdown-title {
+  font-size: var(--font-size-xl);
+  margin-bottom: var(--spacing-md);
+}
+
+.mypage-stats__empty {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+}
+
+.mypage-stats__list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.mypage-stats__item-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-xs);
+}
+
+.mypage-stats__book-title {
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.mypage-stats__book-pages {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+  white-space: nowrap;
+}
+
+.mypage-stats__bar {
+  width: 100%;
+  height: 0.75rem;
+  background-color: var(--color-bg-surface);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.mypage-stats__bar-fill {
+  display: block;
+  height: 100%;
+  background: linear-gradient(90deg, #2563eb 0%, #3b82f6 100%);
+  border-radius: inherit;
+}
+
+@media (max-width: 768px) {
+  .mypage-stats__cards {
+    grid-template-columns: 1fr;
+  }
+
+  .mypage-stats__item-head {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0;
+  }
+}
