@@ -235,7 +235,7 @@ export default class extends Controller {
     note.textContent = `残り ${remainingDays} 日で読み切るには、1日 ${quota} ページ必要です`
     note.classList.remove('quota-preview__note--error')
   }
- 
+
   toggleCompletedAtField (event) {
     const field = document.getElementById('completed_at_field')
     if (!field) return
