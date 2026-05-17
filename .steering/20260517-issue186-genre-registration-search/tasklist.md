@@ -61,9 +61,9 @@
 ## フェーズ5: 仕上げ
 
 - [x] tasklist.md に振り返りを記載
-- [ ] Issue番号付きでコミット
-- [ ] ブランチをpushしてPRを作成
-- [ ] `gh pr checks --watch` でCI完了を確認
+- [x] Issue番号付きでコミット
+- [x] ブランチをpushしてPRを作成
+- [x] `gh pr checks --watch` でCI完了を確認
 
 ## 申し送り事項
 
