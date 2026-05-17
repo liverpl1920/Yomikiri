@@ -104,11 +104,20 @@
   <div class="form-field">
     <%= f.label :current_page, '既に読んだページ数', class: 'form-field__label' %>
     <span class="form-field__optional">任意</span>
+    <% current_page_value = if book.new_record? && book.current_page.to_i.zero?
+                              nil
+                            else
+                              book.current_page
+                            end %>
     <%= f.number_field :current_page,
-          value: book.current_page.presence,
+          value: current_page_value,
           class: "form-field__input form-field__input--narrow #{'form-field__input--error' if book.errors[:current_page].any?}",
           min: 0,
-          placeholder: '未入力なら0として登録されます' %>
+          placeholder: '未入力なら0として登録されます',
+          data: {
+            'book-form-target': 'currentPage',
+            action: 'input->book-form#calculateQuota'
+          } %>
     <span class="form-field__unit">ページ</span>
     <% if book.errors[:current_page].any? %>
       <span class="form-field__error"><%= book.errors[:current_page].first %></span>

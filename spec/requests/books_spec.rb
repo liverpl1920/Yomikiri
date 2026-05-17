@@ -215,7 +215,7 @@ RSpec.describe 'Books', type: :request do
 
         it '既に読んだページ数が未入力の場合は0として保存される' do
           params_without_current_page = valid_params.deep_dup
-          params_without_current_page[:book].delete(:current_page)
+          params_without_current_page[:book][:current_page] = ''
 
           post books_path, params: params_without_current_page
 

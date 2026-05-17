@@ -98,6 +98,7 @@ class Book < ApplicationRecord
 
   def current_page_not_exceed_target_pages
     return if current_page.blank? || target_pages.blank?
+    return if total_pages.present? && current_page > total_pages
 
     errors.add(:current_page, :less_than_or_equal_to, count: target_pages) if current_page > target_pages
   end
