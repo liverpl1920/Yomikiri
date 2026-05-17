@@ -148,6 +148,15 @@ RSpec.describe 'Books index search', type: :request do
         expect(response.body).to include('条件に一致する本がありません')
         expect(response.body).to include('検索条件をクリア')
       end
+
+      it 'メモがある本は一覧に要約が表示される' do
+        memo_book = create(:book, user: user, title: 'メモ付き本', memo: "この本は重要ポイントが多い。\n次回は3章から読む")
+
+        get books_path
+
+        expect(response.body).to include(memo_book.title)
+        expect(response.body).to include('この本は重要ポイントが多い。 次回は3章から読む')
+      end
     end
   end
 end

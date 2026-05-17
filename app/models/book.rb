@@ -1,4 +1,6 @@
 class Book < ApplicationRecord
+  MEMO_MAX_LENGTH = 2000
+
   belongs_to :user
   has_many :reading_logs, dependent: :destroy
 
@@ -8,6 +10,7 @@ class Book < ApplicationRecord
 
   validates :title, presence: true, length: { maximum: 255 }
   validates :author, length: { maximum: 255 }, allow_blank: true
+  validates :memo, length: { maximum: MEMO_MAX_LENGTH }, allow_blank: true
   validates :cover_image_url, length: { maximum: 2048 }, allow_blank: true
   validates :total_pages, presence: true, numericality: { only_integer: true, greater_than: 0 }
   validates :target_pages, presence: true, numericality: { only_integer: true, greater_than: 0 }

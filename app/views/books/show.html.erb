@@ -209,6 +209,41 @@
       </div>
     </dl>
 
+    <section class="book-show__memo" aria-label="コメント・メモ">
+      <h2 class="book-show__memo-title">コメント・メモ</h2>
+
+      <% if @book.errors[:memo].any? %>
+        <div class="form-errors" role="alert">
+          <ul class="form-errors__list">
+            <% @book.errors[:memo].each do |message| %>
+              <li><%= I18n.t('activerecord.attributes.book.memo') + message %></li>
+            <% end %>
+          </ul>
+        </div>
+      <% end %>
+
+      <%= form_with model: @book, url: update_memo_book_path(@book), method: :patch, data: { turbo: false } do |f| %>
+        <div class="book-show__memo-field">
+          <%= f.text_area :memo,
+                class: 'book-show__memo-input',
+                rows: 5,
+                maxlength: Book::MEMO_MAX_LENGTH,
+                placeholder: '読書中の気づきや次回読むときのメモを入力できます' %>
+          <small class="book-show__memo-help">最大2000文字。空欄で保存するとメモをクリアできます。</small>
+        </div>
+        <div class="book-show__memo-actions">
+          <%= f.submit 'メモを保存する', class: 'btn btn--primary' %>
+        </div>
+      <% end %>
+
+      <% if @book.memo.present? %>
+        <div class="book-show__memo-preview">
+          <p class="book-show__memo-preview-label">保存済みメモ</p>
+          <div class="book-show__memo-preview-body"><%= simple_format(@book.memo) %></div>
+        </div>
+      <% end %>
+    </section>
+
     <div class="book-show__actions">
       <%= link_to '一覧に戻る', books_path, class: 'btn btn--outline' %>
       <% unless @book.completed? %>
