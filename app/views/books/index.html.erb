@@ -7,15 +7,52 @@
       <%= link_to "+ 本を追加する", new_book_path, class: "btn btn--primary books-index__add-btn" %>
     </div>
 
+    <%= form_with url: books_path, method: :get, local: true, class: "books-index__search" do %>
+      <div class="books-index__search-fields">
+        <div class="books-index__search-field">
+          <%= label_tag :title, "書籍名", class: "books-index__search-label" %>
+          <%= text_field_tag :title, @search_params[:title], class: "books-index__search-input", placeholder: "例: リーダブルコード" %>
+        </div>
+
+        <div class="books-index__search-field">
+          <%= label_tag :author, "著者名", class: "books-index__search-label" %>
+          <%= text_field_tag :author, @search_params[:author], class: "books-index__search-input", placeholder: "例: Dustin" %>
+        </div>
+
+        <div class="books-index__search-field">
+          <%= label_tag :completed_from, "読了日(開始)", class: "books-index__search-label" %>
+          <%= date_field_tag :completed_from, @search_params[:completed_from], class: "books-index__search-input" %>
+        </div>
+
+        <div class="books-index__search-field">
+          <%= label_tag :completed_to, "読了日(終了)", class: "books-index__search-label" %>
+          <%= date_field_tag :completed_to, @search_params[:completed_to], class: "books-index__search-input" %>
+        </div>
+      </div>
+
+      <div class="books-index__search-actions">
+        <%= submit_tag "検索", class: "btn btn--primary" %>
+        <%= link_to "クリア", books_path, class: "btn btn--secondary" %>
+      </div>
+    <% end %>
+
     <% if @books.empty? %>
       <%# Empty State %>
       <div class="books-empty">
         <div class="books-empty__icon" aria-hidden="true">📚</div>
-        <h2 class="books-empty__title">積読本はまだありません</h2>
-        <p class="books-empty__description">
-          最初の本を登録して、読書管理を始めましょう。
-        </p>
-        <%= link_to "最初の本を登録して始める", new_book_path, class: "btn btn--primary btn--lg" %>
+        <% if @search_active %>
+          <h2 class="books-empty__title">条件に一致する本がありません</h2>
+          <p class="books-empty__description">
+            検索条件を変更するか、クリアして再度お試しください。
+          </p>
+          <%= link_to "検索条件をクリア", books_path, class: "btn btn--secondary btn--lg" %>
+        <% else %>
+          <h2 class="books-empty__title">積読本はまだありません</h2>
+          <p class="books-empty__description">
+            最初の本を登録して、読書管理を始めましょう。
+          </p>
+          <%= link_to "最初の本を登録して始める", new_book_path, class: "btn btn--primary btn--lg" %>
+        <% end %>
       </div>
     <% else %>
       <ul class="book-list" aria-label="積読一覧">
