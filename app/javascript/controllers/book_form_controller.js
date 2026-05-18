@@ -177,8 +177,7 @@ export default class extends Controller {
 
   calculateQuota () {
     const targetPages = parseInt(this.targetPagesTarget.value, 10)
-    const currentPageInput = document.getElementById('book_current_page')
-    const currentPage = parseInt(currentPageInput?.value, 10)
+    const currentPage = parseInt(this.currentPageTarget.value, 10)
     const deadlineValue = this.deadlineTarget.value
     const display = this.quotaDisplayTarget
 
