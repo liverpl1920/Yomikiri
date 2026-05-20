@@ -3,6 +3,7 @@ FactoryBot.define do
     association :user
     title { '実践的なRailsアプリケーション開発' }
     author { '山田太郎' }
+    genre { '技術書' }
     total_pages { 300 }
     target_pages { 300 }
     current_page { 0 }

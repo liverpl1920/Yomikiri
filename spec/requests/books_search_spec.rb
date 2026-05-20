@@ -310,6 +310,59 @@ RSpec.describe 'Books Search', type: :request do
         end
       end
 
+      context 'openBDのSubjectが単一Hashでもジャンルを抽出できる場合' do
+        let(:google_books_subject_hash_response) do
+          {
+            'items' => [
+              {
+                'volumeInfo' => {
+                  'title' => 'Subject Hash 本',
+                  'authors' => [ '著者名' ],
+                  'pageCount' => 100,
+                  'industryIdentifiers' => [
+                    { 'type' => 'ISBN_13', 'identifier' => '9780000000002' }
+                  ]
+                }
+              }
+            ]
+          }.to_json
+        end
+
+        let(:openbd_subject_hash_response) do
+          [ {
+            'summary' => {
+              'isbn' => '9780000000002',
+              'title' => 'Subject Hash 本',
+              'author' => '著者名'
+            },
+            'onix' => {
+              'DescriptiveDetail' => {
+                'Subject' => {
+                  'SubjectHeadingText' => '技術・工学'
+                }
+              }
+            }
+          } ].to_json
+        end
+
+        before do
+          stub_request(:get, /www\.googleapis\.com\/books\/v1\/volumes/)
+            .to_return(status: 200, body: google_books_subject_hash_response,
+                       headers: { 'Content-Type' => 'application/json' })
+          stub_request(:get, /api\.openbd\.jp\/v1\/get\?isbn=9780000000002/)
+            .to_return(status: 200, body: openbd_subject_hash_response,
+                       headers: { 'Content-Type' => 'application/json' })
+        end
+
+        it 'TypeErrorにならずジャンルを返す' do
+          get search_books_path, params: { q: 'Subject Hash 本' }
+
+          expect(response).to have_http_status(:ok)
+          json = JSON.parse(response.body)
+          expect(json['books'].first['genre']).to eq('技術・工学')
+        end
+      end
+
       context 'openBDに書影があればopenBD URLを優先する' do
         before do
           stub_request(:get, /www\.googleapis\.com\/books\/v1\/volumes/)

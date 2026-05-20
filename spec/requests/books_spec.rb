@@ -178,6 +178,7 @@ RSpec.describe 'Books', type: :request do
             book: {
               title: 'リーダブルコード',
               author: 'Dustin Boswell',
+              genre: 'プログラミング',
               total_pages: 260,
               target_pages: 260,
               current_page: 0,
@@ -200,6 +201,12 @@ RSpec.describe 'Books', type: :request do
         it '現在のユーザーに紐付いた書籍が作成される' do
           post books_path, params: valid_params
           expect(Book.last.user).to eq(user)
+        end
+
+        it 'ジャンルが保存される' do
+          post books_path, params: valid_params
+
+          expect(Book.last.genre).to eq('プログラミング')
         end
 
         it '既に読んだページ数を指定した場合は進捗に反映される' do
@@ -290,6 +297,33 @@ RSpec.describe 'Books', type: :request do
 
         it 'フォームを再表示する（422）' do
           post books_path, params: invalid_params
+          expect(response).to have_http_status(:unprocessable_entity)
+        end
+      end
+
+      context '無効なパラメータ（ジャンルが長すぎる）の場合' do
+        let(:invalid_genre_params) do
+          {
+            book: {
+              title: 'テスト本',
+              genre: 'あ' * 101,
+              total_pages: 260,
+              target_pages: 260,
+              current_page: 0,
+              deadline: Date.current + 14
+            }
+          }
+        end
+
+        it '書籍が作成されない' do
+          expect {
+            post books_path, params: invalid_genre_params
+          }.not_to change(Book, :count)
+        end
+
+        it 'フォームを再表示する（422）' do
+          post books_path, params: invalid_genre_params
+
           expect(response).to have_http_status(:unprocessable_entity)
         end
       end
@@ -1099,6 +1133,7 @@ RSpec.describe 'Books', type: :request do
                 'volumeInfo' => {
                   'title' => 'Rubyプログラミング入門',
                   'authors' => [ '著者名' ],
+                  'categories' => [ 'プログラミング' ],
                   'pageCount' => 300,
                   'industryIdentifiers' => [
                     { 'type' => 'ISBN_13', 'identifier' => '9784000000001' }
@@ -1117,7 +1152,7 @@ RSpec.describe 'Books', type: :request do
 
         before do
           allow_any_instance_of(BooksController).to receive(:fetch_title_json).and_return(google_books_data)
-          allow_any_instance_of(BooksController).to receive(:lookup_openbd_cover_url).and_return('')
+          allow_any_instance_of(BooksController).to receive(:lookup_openbd_book).and_return(nil)
           allow_any_instance_of(BooksController).to receive(:lookup_rakuten_cover_url).and_return('')
         end
 
@@ -1130,6 +1165,13 @@ RSpec.describe 'Books', type: :request do
           get search_books_path, params: { q: 'Ruby' }
           json = JSON.parse(response.body)
           expect(json['books'].first['cover_image_url']).to eq('https://books.google.com/large.jpg')
+        end
+
+        it 'カテゴリがある場合はジャンルを返す' do
+          get search_books_path, params: { q: 'Ruby' }
+          json = JSON.parse(response.body)
+
+          expect(json['books'].first['genre']).to eq('プログラミング')
         end
       end
 
@@ -1155,7 +1197,7 @@ RSpec.describe 'Books', type: :request do
 
         before do
           allow_any_instance_of(BooksController).to receive(:fetch_title_json).and_return(google_books_data)
-          allow_any_instance_of(BooksController).to receive(:lookup_openbd_cover_url).and_return('')
+          allow_any_instance_of(BooksController).to receive(:lookup_openbd_book).and_return(nil)
           allow_any_instance_of(BooksController).to receive(:lookup_rakuten_cover_url).and_return('')
         end
 
@@ -1187,7 +1229,7 @@ RSpec.describe 'Books', type: :request do
 
         before do
           allow_any_instance_of(BooksController).to receive(:fetch_title_json).and_return(google_books_data)
-          allow_any_instance_of(BooksController).to receive(:lookup_openbd_cover_url).and_return('')
+          allow_any_instance_of(BooksController).to receive(:lookup_openbd_book).and_return(nil)
           allow_any_instance_of(BooksController).to receive(:lookup_rakuten_cover_url).and_return('')
         end
 
@@ -1195,6 +1237,50 @@ RSpec.describe 'Books', type: :request do
           get search_books_path, params: { q: 'Ruby' }
           json = JSON.parse(response.body)
           expect(json['books'].first['cover_image_url']).to eq('https://books.google.com/thumbnail.jpg')
+        end
+      end
+
+      context 'Google BooksにカテゴリがなくopenBDにジャンルがある場合' do
+        let(:google_books_data) do
+          {
+            'items' => [
+              {
+                'volumeInfo' => {
+                  'title' => 'Rubyプログラミング入門',
+                  'authors' => [ '著者名' ],
+                  'pageCount' => 300,
+                  'industryIdentifiers' => [
+                    { 'type' => 'ISBN_13', 'identifier' => '9784000000001' }
+                  ],
+                  'imageLinks' => {
+                    'thumbnail' => 'http://books.google.com/thumbnail.jpg'
+                  }
+                }
+              }
+            ]
+          }
+        end
+
+        let(:openbd_book) do
+          {
+            'summary' => {
+              'genre' => 'プログラミング',
+              'cover' => 'https://cover.openbd.jp/9784000000001.jpg'
+            }
+          }
+        end
+
+        before do
+          allow_any_instance_of(BooksController).to receive(:fetch_title_json).and_return(google_books_data)
+          allow_any_instance_of(BooksController).to receive(:lookup_openbd_book).and_return(openbd_book)
+          allow_any_instance_of(BooksController).to receive(:lookup_rakuten_cover_url).and_return('')
+        end
+
+        it 'openBDジャンルを返す' do
+          get search_books_path, params: { q: 'Ruby' }
+          json = JSON.parse(response.body)
+
+          expect(json['books'].first['genre']).to eq('プログラミング')
         end
       end
     end

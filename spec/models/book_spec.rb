@@ -402,6 +402,26 @@ RSpec.describe Book, type: :model do
     end
   end
 
+  describe '.filtered_for_index' do
+    let(:user) { create(:user) }
+    let!(:programming) { create(:book, user: user, title: 'Ruby本', genre: 'プログラミング', status: :unread) }
+    let!(:business) { create(:book, user: user, title: '戦略本', genre: 'ビジネス', status: :unread) }
+
+    it 'ジャンルで部分一致検索できる' do
+      result = user.books.filtered_for_index(genre: 'プログラ', title: nil, author: nil, completed_from: nil, completed_to: nil)
+
+      expect(result).to include(programming)
+      expect(result).not_to include(business)
+    end
+
+    it 'ジャンルとタイトルの複合条件で検索できる' do
+      result = user.books.filtered_for_index(genre: 'プログラ', title: 'Ruby', author: nil, completed_from: nil, completed_to: nil)
+
+      expect(result).to include(programming)
+      expect(result).not_to include(business)
+    end
+  end
+
   describe 'コールバック' do
     describe '#auto_set_reading_status (before_save)' do
       context 'ステータスが unread の場合' do

@@ -180,7 +180,7 @@ class BooksController < ApplicationController
   end
 
   def book_params
-    permitted = params.require(:book).permit(:title, :author, :total_pages, :target_pages, :current_page, :deadline, :status, :cover_image_url, :memo, :is_past_reading, :completed_at_input)
+    permitted = params.require(:book).permit(:title, :author, :genre, :total_pages, :target_pages, :current_page, :deadline, :status, :cover_image_url, :memo, :is_past_reading, :completed_at_input)
     permitted[:current_page] = 0 if permitted[:current_page].blank?
       permitted
   end
@@ -190,9 +190,10 @@ class BooksController < ApplicationController
   end
 
   def normalized_index_search_params
-    permitted = params.permit(:title, :author, :completed_from, :completed_to)
+    permitted = params.permit(:title, :author, :genre, :completed_from, :completed_to)
     title = permitted[:title].to_s.strip
     author = permitted[:author].to_s.strip
+    genre = permitted[:genre].to_s.strip
     completed_from = parse_iso_date(permitted[:completed_from])
     completed_to = parse_iso_date(permitted[:completed_to])
 
@@ -203,6 +204,7 @@ class BooksController < ApplicationController
     {
       title: title.presence,
       author: author.presence,
+      genre: genre.presence,
       completed_from: completed_from,
       completed_to: completed_to
     }
@@ -235,6 +237,7 @@ class BooksController < ApplicationController
     [ {
       title: book.dig("summary", "title").to_s,
       author: book.dig("summary", "author").to_s,
+      genre: extract_openbd_genre(book),
       total_pages: total_pages,
       cover_image_url: cover_image_url
     } ]
@@ -252,15 +255,43 @@ class BooksController < ApplicationController
     items.map do |item|
       info = item["volumeInfo"] || {}
       isbn = extract_isbn_from_identifiers(info["industryIdentifiers"])
-      openbd_url = lookup_openbd_cover_url(isbn)
+      openbd_book = lookup_openbd_book(isbn)
+      openbd_url = openbd_book&.dig("summary", "cover").to_s.presence || ""
       google_cover_url = best_google_image_url(info["imageLinks"])
+      genre = extract_google_books_genre(info)
+      genre = extract_openbd_genre(openbd_book) if genre.blank?
       {
         title: info["title"].to_s,
         author: Array(info["authors"]).join(", "),
+        genre: genre,
         total_pages: info["pageCount"],
         cover_image_url: resolve_cover_url(openbd_url, isbn, google_cover_url)
       }
     end
+  end
+
+  def extract_openbd_genre(book)
+    return "" if book.blank?
+
+    summary_genre = book.dig("summary", "genre").to_s.strip
+    return summary_genre if summary_genre.present?
+
+    subjects = book.dig("onix", "DescriptiveDetail", "Subject")
+    subjects = subjects.is_a?(Array) ? subjects : [ subjects ].compact
+    subjects.each do |subject|
+      next unless subject.is_a?(Hash)
+
+      heading = subject["SubjectHeadingText"]
+      values = heading.is_a?(Array) ? heading : [ heading ]
+      candidate = values.map { |value| value.to_s.strip }.find(&:present?)
+      return candidate if candidate
+    end
+
+    ""
+  end
+
+  def extract_google_books_genre(info)
+    Array(info["categories"]).map { |category| category.to_s.strip }.find(&:present?).to_s
   end
 
   def fetch_json(url)
@@ -308,13 +339,13 @@ class BooksController < ApplicationController
     page_extent&.dig("ExtentValue")&.to_i
   end
 
-  def lookup_openbd_cover_url(isbn)
-    return "" if isbn.blank?
+  def lookup_openbd_book(isbn)
+    return nil if isbn.blank?
 
     data = fetch_json("https://api.openbd.jp/v1/get?isbn=#{isbn}")
-    return "" if data.nil? || data.first.nil?
+    return nil if data.nil? || data.first.nil?
 
-    data.first.dig("summary", "cover").to_s.presence || ""
+    data.first
   end
 
   def lookup_rakuten_cover_url(isbn)
