@@ -24,20 +24,20 @@ RSpec.describe 'Books index search', type: :request do
       before { sign_in user }
 
       let!(:title_hit) do
-        create(:book, user: user, title: 'リーダブルコード', author: 'Dustin Boswell',
+        create(:book, user: user, title: 'リーダブルコード', author: 'Dustin Boswell', genre: 'プログラミング',
                       status: :reading, deadline: Date.current + 2)
       end
       let!(:author_hit) do
-        create(:book, user: user, title: '現場Rails', author: 'Yamada Taro',
+        create(:book, user: user, title: '現場Rails', author: 'Yamada Taro', genre: 'プログラミング',
                       status: :unread, deadline: Date.current + 5)
       end
       let!(:completed_old) do
-        create(:book, user: user, title: '読了済みA', author: 'Alice',
+        create(:book, user: user, title: '読了済みA', author: 'Alice', genre: '自己啓発',
                       status: :completed, deadline: Date.current + 1,
                       completed_at: Time.zone.local(2026, 5, 1, 10, 0, 0))
       end
       let!(:completed_recent) do
-        create(:book, user: user, title: '読了済みB', author: 'Bob',
+        create(:book, user: user, title: '読了済みB', author: 'Bob', genre: 'ビジネス',
                       status: :completed, deadline: Date.current + 3,
                       completed_at: Time.zone.local(2026, 5, 10, 10, 0, 0))
       end
@@ -59,6 +59,14 @@ RSpec.describe 'Books index search', type: :request do
         expect(response).to have_http_status(:ok)
         expect(rendered_titles).to include(author_hit.title)
         expect(rendered_titles).not_to include(title_hit.title)
+      end
+
+      it 'ジャンルで部分一致検索できる' do
+        get books_path, params: { genre: '自己' }
+
+        expect(response).to have_http_status(:ok)
+        expect(rendered_titles).to include(completed_old.title)
+        expect(rendered_titles).not_to include(completed_recent.title)
       end
 
       it '読了期間の開始日だけ指定して検索できる' do
@@ -86,6 +94,7 @@ RSpec.describe 'Books index search', type: :request do
         get books_path, params: {
           title: '読了済み',
           author: 'Bob',
+          genre: 'ビジネス',
           completed_from: '2026-05-08',
           completed_to: '2026-05-12'
         }
@@ -114,12 +123,14 @@ RSpec.describe 'Books index search', type: :request do
         get books_path, params: {
           title: 'リーダブル',
           author: 'Dustin',
+          genre: 'プログラ',
           completed_from: '2026-05-01',
           completed_to: '2026-05-15'
         }
 
         expect(response.body).to include('value="リーダブル"')
         expect(response.body).to include('value="Dustin"')
+        expect(response.body).to include('value="プログラ"')
         expect(response.body).to include('value="2026-05-01"')
         expect(response.body).to include('value="2026-05-15"')
       end

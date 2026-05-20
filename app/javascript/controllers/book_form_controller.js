@@ -100,8 +100,9 @@ export default class extends Controller {
     }
   }
 
-  _fillFormFromSearch ({ author, total_pages: totalPages, cover_image_url: coverUrl }) {
+  _fillFormFromSearch ({ author, genre, total_pages: totalPages, cover_image_url: coverUrl }) {
     const authorInput = document.getElementById('book_author')
+    const genreInput = document.getElementById('book_genre')
     const totalPagesInput = document.getElementById('book_total_pages')
     const coverUrlInput = document.getElementById('book_cover_image_url')
     const missing = []
@@ -110,6 +111,10 @@ export default class extends Controller {
       authorInput.value = author
     } else {
       missing.push('著者')
+    }
+
+    if (genreInput && genre) {
+      genreInput.value = genre
     }
 
     if (totalPagesInput && totalPages) {
@@ -172,9 +177,7 @@ export default class extends Controller {
 
   calculateQuota () {
     const targetPages = parseInt(this.targetPagesTarget.value, 10)
-    const currentPage = this.hasCurrentPageTarget
-      ? parseInt(this.currentPageTarget.value, 10)
-      : 0
+    const currentPage = parseInt(this.currentPageTarget.value, 10)
     const deadlineValue = this.deadlineTarget.value
     const display = this.quotaDisplayTarget
 
@@ -231,7 +234,7 @@ export default class extends Controller {
     note.textContent = `残り ${remainingDays} 日で読み切るには、1日 ${quota} ページ必要です`
     note.classList.remove('quota-preview__note--error')
   }
- 
+
   toggleCompletedAtField (event) {
     const field = document.getElementById('completed_at_field')
     if (!field) return
