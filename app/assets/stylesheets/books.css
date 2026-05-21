@@ -73,7 +73,7 @@
 /* ---- 書籍カードリスト ---- */
 .book-list {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
   gap: var(--spacing-lg);
   list-style: none;
   padding: 0;
@@ -125,7 +125,7 @@
 }
 
 .book-card__cover-placeholder {
-  font-size: 4rem;
+  font-size: 3rem;
   line-height: 1;
   display: flex;
   align-items: center;
