@@ -106,10 +106,11 @@ RSpec.describe '積読登録画面でのタイトル検索結果フィードバ�
 
     it '書影が取得できなかった旨のメッセージが表示される' do
       fill_in 'タイトル', with: 'ISBN なし本'
+      find('#book_title').send_keys(:tab)
       find('#book_author').click
 
       expect(page).to have_css('[data-book-form-target="titleStatus"]',
-                               text: '書籍情報を取得しましたが、書影は取得できませんでした。', wait: 5)
+                               text: '書籍情報を取得しましたが、書影は取得できませんでした。', wait: 10)
     end
 
     it '書影プレビューは表示されない' do

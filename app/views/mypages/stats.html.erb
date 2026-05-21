@@ -1,0 +1,77 @@
+<% content_for :title, "読書統計 | Yomikiri" %>
+
+<section class="mypage-stats">
+  <div class="container">
+    <div class="mypage-stats__header">
+      <h1 class="mypage-stats__title">読書統計</h1>
+      <div class="mypage-stats__header-links">
+        <%= link_to '← マイページへ戻る', mypage_path, class: 'btn btn--outline' %>
+        <%= link_to '一覧に戻る', books_path, class: 'btn btn--outline' %>
+      </div>
+    </div>
+
+    <div class="mypage-stats__period-tabs" role="tablist" aria-label="集計期間">
+      <%= link_to '週次',
+            stats_mypage_path(period: 'weekly'),
+            class: ["mypage-stats__period-tab", (@period == 'weekly' ? 'mypage-stats__period-tab--active' : nil)].compact.join(' '),
+            role: 'tab',
+            aria: { selected: (@period == 'weekly').to_s } %>
+      <%= link_to '月次',
+            stats_mypage_path(period: 'monthly'),
+            class: ["mypage-stats__period-tab", (@period == 'monthly' ? 'mypage-stats__period-tab--active' : nil)].compact.join(' '),
+            role: 'tab',
+            aria: { selected: (@period == 'monthly').to_s } %>
+    </div>
+
+    <div class="mypage-stats__period-summary">
+      <p class="mypage-stats__period-label">
+        <strong><%= @summary[:period_label] %>集計:</strong>
+        <%= l(@summary[:start_date], format: :default) %> 〜 <%= l(@summary[:end_date], format: :default) %>
+      </p>
+    </div>
+
+    <div class="mypage-stats__cards">
+      <article class="mypage-stats__card">
+        <h2 class="mypage-stats__card-title">読了ページ数</h2>
+        <p class="mypage-stats__card-value"><%= @summary[:total_pages] %></p>
+        <p class="mypage-stats__card-unit">ページ</p>
+      </article>
+
+      <article class="mypage-stats__card">
+        <h2 class="mypage-stats__card-title">読了冊数</h2>
+        <p class="mypage-stats__card-value"><%= @completed_books_count %></p>
+        <p class="mypage-stats__card-unit">冊</p>
+      </article>
+
+      <article class="mypage-stats__card">
+        <h2 class="mypage-stats__card-title">平均ページ/日</h2>
+        <p class="mypage-stats__card-value"><%= number_with_precision(@average_pages_per_day, precision: 1, strip_insignificant_zeros: true) %></p>
+        <p class="mypage-stats__card-unit">ページ/日</p>
+      </article>
+    </div>
+
+    <section class="mypage-stats__breakdown">
+      <h2 class="mypage-stats__breakdown-title">書籍別の読了ページ内訳</h2>
+
+      <% if @summary[:books].empty? %>
+        <p class="mypage-stats__empty">この期間の読書記録はありません。</p>
+      <% else %>
+        <ul class="mypage-stats__list">
+          <% @summary[:books].each do |book_summary| %>
+            <% pages_read = book_summary[:pages_read] %>
+            <% ratio = @max_pages_read.positive? ? ((pages_read.to_f / @max_pages_read) * 100).round(1) : 0 %>
+            <li class="mypage-stats__item">
+              <div class="mypage-stats__item-head">
+                <span class="mypage-stats__book-title"><%= book_summary[:title] %></span>
+                <span class="mypage-stats__book-pages"><%= pages_read %> ページ</span>
+              </div>
+              <div class="mypage-stats__bar" role="img" aria-label="<%= book_summary[:title] %> の読了ページ割合">
+                <span class="mypage-stats__bar-fill" style="width: <%= ratio %>%"></span>
+              </div>
+            </li>
+          <% end %>
+        </ul>
+      <% end %>
+    </section>
+  </div>
+</section>

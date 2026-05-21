@@ -35,8 +35,11 @@ jobs:
       - name: Brakeman を実行
         run: bundle exec brakeman --no-pager --format github
 
+      - name: bundler-audit advisory DB を更新
+        run: bundle exec bundler-audit update || echo "Advisory DB update failed, using cached version"
+
       - name: bundler-audit を実行（gem 脆弱性スキャン）
-        run: bundle exec bundler-audit check --update
+        run: bundle exec bundler-audit check
 
   # ─────────────────────────────────────────
   # ② 自動テスト (RSpec)

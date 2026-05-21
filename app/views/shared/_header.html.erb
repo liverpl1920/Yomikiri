@@ -28,6 +28,9 @@
               <%= link_to 'マイページ', mypage_path, class: 'dropdown__item', role: 'menuitem' %>
             </li>
             <li role="none">
+              <%= link_to '読書統計', stats_mypage_path, class: 'dropdown__item', role: 'menuitem' %>
+            </li>
+            <li role="none">
               <%= button_to 'ログアウト', destroy_user_session_path,
                     method: :delete,
                     class: 'dropdown__item dropdown__item--logout',

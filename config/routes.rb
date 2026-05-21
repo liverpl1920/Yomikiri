@@ -7,7 +7,9 @@ Rails.application.routes.draw do
   }
   root "top#index"
 
-  resource :mypage, only: [ :show, :update ]
+  resource :mypage, only: [ :show, :update ] do
+    get :stats
+  end
   resource :email_change, only: [ :edit, :update ], controller: "users/email_changes"
   get "email_change/complete", to: "users/email_changes#complete", as: :email_change_complete
 
