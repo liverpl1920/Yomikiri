@@ -129,7 +129,7 @@ RSpec.describe 'タイトル入力からのISBN・書影自動取得', type: :sy
 
     it '既に読んだページ数を考慮してノルマプレビューを表示する' do
       fill_in '読了対象ページ数', with: '260'
-      deadline = (Date.current + 9.days).strftime('%Y-%m-%d')
+      deadline = (Date.today + 9.days).strftime('%Y-%m-%d')
       page.execute_script("document.getElementById('book_deadline').value = '#{deadline}'")
       page.execute_script("document.getElementById('book_deadline').dispatchEvent(new Event('change'))")
       fill_in '既に読んだページ数', with: '80'
