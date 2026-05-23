@@ -246,12 +246,9 @@
     align-items: center;
   }
 
-  .top-header__nav {
-    gap: var(--spacing-sm);
-  }
-
-  .top-header__nav .btn--lg {
-    padding: 0.6rem 1.2rem;
-    font-size: var(--font-size-sm);
+  .top-hero__cta .btn--lg,
+  .top-cta__actions .btn--lg {
+    width: 100%;
+    max-width: 320px;
   }
 }

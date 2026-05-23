@@ -199,3 +199,31 @@
     text-align: center;
   }
 }
+
+/* モバイル（430px以下）: ゲストヘッダーボタンのサイズ・余白調整 */
+@media (max-width: 430px) {
+  .site-header__nav .btn {
+    padding: 0.45rem 0.75rem;
+    font-size: var(--font-size-sm);
+  }
+
+  .site-header__logo {
+    font-size: var(--font-size-xl);
+  }
+}
+
+/* 極小モバイル（360px以下）: ヘッダーをさらにコンパクトに */
+@media (max-width: 360px) {
+  .site-header__nav {
+    gap: var(--spacing-xs);
+  }
+
+  .site-header__nav .btn {
+    padding: 0.4rem 0.6rem;
+    font-size: 0.8125rem;
+  }
+
+  .site-header__logo {
+    font-size: var(--font-size-lg);
+  }
+}
