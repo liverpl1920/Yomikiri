@@ -110,7 +110,11 @@ RSpec.describe 'タイトル入力からのISBN・書影自動取得', type: :sy
     end
 
     it '自動取得成功時は成功メッセージが表示される' do
-      fill_in 'タイトル', with: 'リーダブルコード'
+      page.execute_script(<<~JS)
+        var el = document.getElementById('book_title');
+        el.value = 'リーダブルコード';
+        el.focus();
+      JS
       find('#book_author').click
 
       expect(page).to have_css('[data-book-form-target="titleStatus"]',
