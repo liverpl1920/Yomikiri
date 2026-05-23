@@ -22,7 +22,25 @@
 
 - [x] 6. `spec/requests/books_spec.rb` にsuggestionsエンドポイントのテスト追加
 
-## フェーズ4: 検証
+## 振り返り
 
-- [x] 7. `bundle exec rspec` 実行・全テストパス確認（288 examples, 0 failures）
-- [x] 8. `bundle exec rubocop` 実行・エラーなし確認
+### 実装完了日
+2026年5月23日
+
+### 計画と実績の差分
+- 計画通りに全タスクを完了した
+- `sanitize_sql_like` は `Book.` を通じて呼び出すことで public メソッドとして利用できた
+- Stimulusコントローラーの `static values` 機能で `field` をコントローラーに渡す設計が綺麗に実現できた
+
+### 学んだこと
+- 既存の `title_autocomplete_controller.js` パターンを参考にすることで、一貫したコード品質を維持できた
+- `SUGGESTION_FIELDS` 定数でホワイトリスト検証を行うことで、フィールド名インジェクションを防止できた
+- `autocomplete: "off"` をフィールドに設定することでブラウザ標準のオートコンプリートと競合しないようにした
+
+### 次回への改善提案
+- Systemスペックでオートコンプリートの動作を E2E テストとして追加することも検討できる
+- ユーザーの書籍数が多い場合にパフォーマンスが問題になる可能性があれば、インデックス追加を検討する
+
+### PR
+https://github.com/liverpl1920/Yomikiri/pull/220 (CI: SUCCESS)
+
