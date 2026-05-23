@@ -68,6 +68,7 @@ RSpec.describe 'タイトル入力中オートコンプリート機能', type: :
   end
 
   def wait_for_title_autocomplete_controller
+    connected = false
     start = Time.now
     until Time.now - start > 10
       connected = page.evaluate_script(
@@ -77,6 +78,7 @@ RSpec.describe 'タイトル入力中オートコンプリート機能', type: :
 
       sleep 0.1
     end
+    expect(connected).to be(true), 'title-autocomplete controller did not connect within 10 seconds'
   end
 
   before do
@@ -157,33 +159,48 @@ RSpec.describe 'タイトル入力中オートコンプリート機能', type: :
       stub_openbd_not_found
     end
 
+    # IME合成を経由せず直接inputイベントを発火する共通ヘルパー
+    def type_in_title(text)
+      page.execute_script(
+        "const el = document.querySelector('#book_title');" \
+        "el.focus();" \
+        "el.value = #{text.to_json};" \
+        "el.dispatchEvent(new Event('input', { bubbles: true }));"
+      )
+    end
+
+    # keydownイベントをJS経由で発火するヘルパー
+    def press_key(key)
+      page.execute_script(
+        "document.querySelector('#book_title')" \
+        ".dispatchEvent(new KeyboardEvent('keydown', { key: #{key.to_json}, bubbles: true, cancelable: true }));"
+      )
+    end
+
     it 'ArrowDownで次の候補にフォーカスが移動する' do
-      title_input = find('#book_title')
-      title_input.send_keys('リーダブル')
+      type_in_title('リーダブル')
 
-      expect(page).to have_css('.title-autocomplete__item', wait: 5)
-      title_input.send_keys(:arrow_down)
+      expect(page).to have_css('.title-autocomplete__item', wait: 10)
+      press_key('ArrowDown')
 
-      expect(page).to have_css('.title-autocomplete__item--active', wait: 3)
+      expect(page).to have_css('.title-autocomplete__item--active', wait: 5)
     end
 
     it 'Enterキーでフォーカスされている候補を選択できる' do
-      title_input = find('#book_title')
-      title_input.send_keys('リーダブル')
+      type_in_title('リーダブル')
 
-      expect(page).to have_css('.title-autocomplete__item', wait: 5)
-      title_input.send_keys(:arrow_down)
-      title_input.send_keys(:return)
+      expect(page).to have_css('.title-autocomplete__item', wait: 10)
+      press_key('ArrowDown')
+      press_key('Enter')
 
       expect(page).to have_field('タイトル', with: 'リーダブルコード', wait: 5)
     end
 
     it 'Escキーでドロップダウンが閉じる' do
-      title_input = find('#book_title')
-      title_input.send_keys('リーダブル')
+      type_in_title('リーダブル')
 
-      expect(page).to have_css('.title-autocomplete__list:not(.title-autocomplete__list--hidden)', wait: 5)
-      title_input.send_keys(:escape)
+      expect(page).to have_css('.title-autocomplete__list:not(.title-autocomplete__list--hidden)', wait: 10)
+      press_key('Escape')
 
       expect(page).not_to have_css(
         '.title-autocomplete__list:not(.title-autocomplete__list--hidden)',

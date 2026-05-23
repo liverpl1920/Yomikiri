@@ -46,7 +46,8 @@ class BooksController < ApplicationController
   end
 
   def update_memo
-    if @book.update(memo_params)
+    if @book.update(memo_params.merge(memo_updated_at: Time.current))
+      flash[:memo_saved] = true
       redirect_to @book, notice: "コメント・メモを更新しました。"
     else
       render :show, status: :unprocessable_entity

@@ -225,6 +225,7 @@
       <%= form_with model: @book, url: update_memo_book_path(@book), method: :patch, data: { turbo: false } do |f| %>
         <div class="book-show__memo-field">
           <%= f.text_area :memo,
+                value: flash[:memo_saved] ? '' : @book.memo,
                 class: 'book-show__memo-input',
                 rows: 5,
                 maxlength: Book::MEMO_MAX_LENGTH,
@@ -239,6 +240,9 @@
       <% if @book.memo.present? %>
         <div class="book-show__memo-preview">
           <p class="book-show__memo-preview-label">保存済みメモ</p>
+          <% if @book.memo_updated_at.present? %>
+            <p class="book-show__memo-preview-date"><%= l(@book.memo_updated_at, format: :default) %> 記録</p>
+          <% end %>
           <div class="book-show__memo-preview-body"><%= simple_format(@book.memo) %></div>
         </div>
       <% end %>
