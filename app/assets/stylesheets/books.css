@@ -193,6 +193,18 @@
   color: var(--color-text-muted);
 }
 
+.book-card__genre {
+  display: inline-block;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--color-text-muted);
+  background-color: #f3f4f6;
+  border: 1px solid #e5e7eb;
+  border-radius: 99px;
+  padding: 0.1rem 0.5rem;
+  width: fit-content;
+}
+
 .book-card__memo {
   font-size: var(--font-size-sm);
   color: var(--color-text-muted);
