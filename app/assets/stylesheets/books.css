@@ -103,10 +103,12 @@
 .book-card__cover-wrapper {
   position: relative;
   flex-shrink: 0;
+  width: 100px;
+  margin: var(--spacing-md) auto 0;
 }
 
 .book-card__cover {
-  width: 100%;
+  width: 100px;
   aspect-ratio: 3 / 4;
   background-color: var(--color-bg-surface);
   display: flex;
