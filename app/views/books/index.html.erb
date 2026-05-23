@@ -102,10 +102,6 @@
                   <span class="book-card__genre"><%= book.genre %></span>
                 <% end %>
 
-                <% if book.memo.present? %>
-                  <p class="book-card__memo"><%= truncate(book.memo.to_s.gsub(/\s+/, ' '), length: 60) %></p>
-                <% end %>
-
                 <%# ステータスバッジ %>
                 <span class="book-card__status book-card__status--<%= book.status %>">
                   <%= t("book.status.#{book.status}") %>
