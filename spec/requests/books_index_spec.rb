@@ -165,8 +165,9 @@ RSpec.describe 'Books index search', type: :request do
 
         get books_path
 
+        doc = Nokogiri::HTML.parse(response.body)
         expect(response.body).to include(memo_book.title)
-        expect(response.body).not_to include('この本は重要ポイントが多い。 次回は3章から読む')
+        expect(doc.css('.book-card__memo')).to be_empty
       end
     end
   end
