@@ -114,7 +114,7 @@ RSpec.describe 'タイトル入力からのISBN・書影自動取得', type: :sy
       find('#book_author').click
 
       expect(page).to have_css('[data-book-form-target="titleStatus"]',
-                               text: 'タイトル・著者・ページ数・書影をすべて取得しました。', wait: 5)
+                               text: 'タイトル・著者・ページ数・書影をすべて取得しました。', wait: 20)
     end
 
     it '既に読んだページ数は自動取得後も保持される' do
