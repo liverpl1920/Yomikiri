@@ -1082,11 +1082,11 @@ RSpec.describe 'Books', type: :request do
       end
 
       it 'メモを更新するとmemo_updated_atが更新される' do
-        expect {
+        freeze_time do
           patch update_memo_book_path(book), params: { book: { memo: '新しいメモ' } }
-        }.to change { book.reload.memo_updated_at }.from(nil)
 
-        expect(book.reload.memo_updated_at).to be_within(5.seconds).of(Time.current)
+          expect(book.reload.memo_updated_at).to eq(Time.current)
+        end
       end
 
       it 'メモ保存後のリダイレクト先でテキストエリアが空になっている' do
@@ -1098,10 +1098,14 @@ RSpec.describe 'Books', type: :request do
       end
 
       it 'メモ保存後のリダイレクト先で記録日時が表示される' do
-        patch update_memo_book_path(book), params: { book: { memo: '日時確認メモ' } }
-        follow_redirect!
+        freeze_time do
+          patch update_memo_book_path(book), params: { book: { memo: '日時確認メモ' } }
+          follow_redirect!
 
-        expect(response.body).to include('記録')
+          expected_datetime = I18n.l(book.reload.memo_updated_at, format: :default)
+          expect(response.body).to include(expected_datetime)
+          expect(response.body).to include('book-show__memo-preview-date')
+        end
       end
     end
 
