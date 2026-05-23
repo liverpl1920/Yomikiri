@@ -122,10 +122,10 @@ class BooksController < ApplicationController
     results = current_user.books
                           .where.not(field => [ nil, "" ])
                           .where("#{field} ILIKE ?", "%#{Book.sanitize_sql_like(query)}%")
+                          .order(field)
                           .distinct
                           .limit(5)
                           .pluck(field)
-                          .sort
     render json: { suggestions: results }
   end
 

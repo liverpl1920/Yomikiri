@@ -1,6 +1,6 @@
 # 実装設計: 検索著者名・ジャンルオートコンプリート
 
-## 実装方针
+## 実装方針
 
 ### 1. 新規 APIエンドポイント
 `BooksController` に `suggestions` アクションを追加する。
@@ -15,7 +15,7 @@
 ### 2. 新規 Stimulusコントローラー
 `search_filter_autocomplete_controller.js` を新規作成する。
 
-- `title_autocomplete_controller.js` のパターンを参考したシンプルな実装
+- `title_autocomplete_controller.js` のパターンを参考にしたシンプルな実装
 - 入力テキストをそのまま維持（候補選択後も編集可能）
 - `/books/suggestions` エンドポイントにフェッチ
 - デバウンス300ms、最低1文字以上で起動
