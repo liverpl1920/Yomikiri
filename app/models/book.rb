@@ -11,6 +11,8 @@ class Book < ApplicationRecord
   validates :title, presence: true, length: { maximum: 255 }
   validates :author, length: { maximum: 255 }, allow_blank: true
   validates :memo, length: { maximum: MEMO_MAX_LENGTH }, allow_blank: true
+  validates :rating, numericality: { in: 1..5, only_integer: true }, allow_nil: true
+  validates :review, length: { maximum: 1000 }, allow_blank: true
   validates :cover_image_url, length: { maximum: 2048 }, allow_blank: true
   validates :genre, length: { maximum: 100 }, allow_blank: true
   validates :total_pages, presence: true, numericality: { only_integer: true, greater_than: 0 }

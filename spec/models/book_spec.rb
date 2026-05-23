@@ -145,6 +145,44 @@ RSpec.describe Book, type: :model do
       end
     end
 
+    describe 'rating' do
+      it 'nilでも有効' do
+        expect(build(:book, rating: nil)).to be_valid
+      end
+
+      it '1〜5の整数は有効' do
+        (1..5).each do |r|
+          expect(build(:book, rating: r)).to be_valid
+        end
+      end
+
+      it '0は無効' do
+        expect(build(:book, rating: 0)).not_to be_valid
+      end
+
+      it '6は無効' do
+        expect(build(:book, rating: 6)).not_to be_valid
+      end
+
+      it '小数は無効' do
+        expect(build(:book, rating: 3.5)).not_to be_valid
+      end
+    end
+
+    describe 'review' do
+      it '空でも有効' do
+        expect(build(:book, review: '')).to be_valid
+      end
+
+      it '1000文字以内であれば有効' do
+        expect(build(:book, review: 'a' * 1000)).to be_valid
+      end
+
+      it '1001文字以上は無効' do
+        expect(build(:book, review: 'a' * 1001)).not_to be_valid
+      end
+    end
+
     describe 'cover_image_url' do
       it 'nilでも有効' do
         expect(build(:book, cover_image_url: nil)).to be_valid

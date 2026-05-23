@@ -1105,6 +1105,84 @@ RSpec.describe 'Books', type: :request do
     end
   end
 
+  describe 'PATCH /books/:id/update_review' do
+    let!(:book) { create(:book, user: user, status: :completed, current_page: 100, target_pages: 100) }
+
+    context '認証済みユーザーの場合' do
+      before { sign_in user }
+
+      it '評価と感想を保存できる' do
+        patch update_review_book_path(book), params: { book: { rating: 4, review: '面白かった' } }
+
+        expect(response).to redirect_to(book_path(book))
+        expect(book.reload.rating).to eq(4)
+        expect(book.reload.review).to eq('面白かった')
+      end
+
+      it '評価のみ保存できる' do
+        patch update_review_book_path(book), params: { book: { rating: 5 } }
+
+        expect(response).to redirect_to(book_path(book))
+        expect(book.reload.rating).to eq(5)
+      end
+
+      it '感想のみ保存できる' do
+        patch update_review_book_path(book), params: { book: { review: '良い本でした' } }
+
+        expect(response).to redirect_to(book_path(book))
+        expect(book.reload.review).to eq('良い本でした')
+      end
+
+      it 'ratingが6の場合は422になる' do
+        patch update_review_book_path(book), params: { book: { rating: 6 } }
+
+        expect(response).to have_http_status(422)
+      end
+
+      it '感想が1001文字以上の場合は422になる' do
+        patch update_review_book_path(book), params: { book: { review: 'a' * 1001 } }
+
+        expect(response).to have_http_status(422)
+      end
+
+      it '感想表示時にHTMLタグがエスケープされる' do
+        patch update_review_book_path(book), params: { book: { review: '<script>alert(1)</script>' } }
+        follow_redirect!
+
+        expect(response.body).to include('&lt;script&gt;alert(1)&lt;/script&gt;')
+        expect(response.body).not_to include('<script>alert(1)</script>')
+      end
+
+      it 'フラッシュメッセージが表示される' do
+        patch update_review_book_path(book), params: { book: { rating: 4, review: '良い本' } }
+        follow_redirect!
+
+        expect(response.body).to include('評価・感想を保存しました。')
+      end
+    end
+
+    context '未認証ユーザーの場合' do
+      it 'ログインページへリダイレクトされる' do
+        patch update_review_book_path(book), params: { book: { rating: 3 } }
+
+        expect(response).to redirect_to(new_user_session_path)
+      end
+    end
+
+    context '他ユーザーの書籍を更新する場合' do
+      before { sign_in user }
+
+      it '404を返す' do
+        other_book = create(:book, user: other_user, status: :completed, current_page: 100, target_pages: 100)
+
+        patch update_review_book_path(other_book), params: { book: { rating: 5 } }
+
+        expect(response).to have_http_status(:not_found)
+        expect(other_book.reload.rating).to be_nil
+      end
+    end
+  end
+
   describe 'GET /books/search' do
     context '未認証ユーザーの場合' do
       it 'ログインページへリダイレクトされる' do

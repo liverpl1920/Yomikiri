@@ -244,6 +244,65 @@
       <% end %>
     </section>
 
+    <%# 評価・感想セクション（読了済み時のみ表示）(ISSUE#197) %>
+    <% if @book.completed? %>
+      <section class="book-show__review" aria-label="評価・感想">
+        <h2 class="book-show__review-title">評価・感想</h2>
+
+        <% if @book.errors[:rating].any? || @book.errors[:review].any? %>
+          <div class="form-errors" role="alert">
+            <ul class="form-errors__list">
+              <% (@book.errors[:rating] + @book.errors[:review]).each do |message| %>
+                <li><%= message %></li>
+              <% end %>
+            </ul>
+          </div>
+        <% end %>
+
+        <%= form_with model: @book, url: update_review_book_path(@book), method: :patch, data: { turbo: false } do |f| %>
+          <div class="book-show__review-rating">
+            <label class="book-show__review-label">評価</label>
+            <div class="book-show__stars" role="group" aria-label="評価を選択（1〜5）">
+              <% (1..5).each do |star| %>
+                <label class="book-show__star-label">
+                  <%= f.radio_button :rating, star,
+                        class: 'book-show__star-input',
+                        checked: @book.rating == star %>
+                  <span class="book-show__star-icon" aria-hidden="true">★</span>
+                  <span class="sr-only"><%= star %>点</span>
+                </label>
+              <% end %>
+            </div>
+            <% if @book.rating.present? %>
+              <div class="book-show__stars-display" aria-label="現在の評価: <%= @book.rating %>点">
+                <% @book.rating.times do %>
+                  <span class="book-show__star-filled" aria-hidden="true">★</span>
+                <% end %>
+                <% (5 - @book.rating).times do %>
+                  <span class="book-show__star-empty" aria-hidden="true">☆</span>
+                <% end %>
+              </div>
+            <% end %>
+          </div>
+
+          <div class="book-show__review-field">
+            <label class="book-show__review-label" for="book_review">感想</label>
+            <%= f.text_area :review,
+                  id: 'book_review',
+                  class: 'book-show__review-input',
+                  rows: 4,
+                  maxlength: 1000,
+                  placeholder: 'この本の感想を書いてみましょう（任意）' %>
+            <small class="book-show__review-help">最大1000文字</small>
+          </div>
+
+          <div class="book-show__review-actions">
+            <%= f.submit '評価・感想を保存する', class: 'btn btn--primary' %>
+          </div>
+        <% end %>
+      </section>
+    <% end %>
+
     <div class="book-show__actions">
       <%= link_to '一覧に戻る', books_path, class: 'btn btn--outline' %>
       <% unless @book.completed? %>
