@@ -113,9 +113,8 @@ RSpec.describe 'タイトル入力からのISBN・書影自動取得', type: :sy
       page.execute_script(<<~JS)
         var el = document.getElementById('book_title');
         el.value = 'リーダブルコード';
-        el.focus();
+        el.dispatchEvent(new Event('blur', { bubbles: true }));
       JS
-      find('#book_author').click
 
       expect(page).to have_css('[data-book-form-target="titleStatus"]',
                                text: 'タイトル・著者・ページ数・書影をすべて取得しました。', wait: 20)
