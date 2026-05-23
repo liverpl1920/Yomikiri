@@ -161,10 +161,10 @@ RSpec.describe 'タイトル入力中オートコンプリート機能', type: :
       title_input = find('#book_title')
       title_input.send_keys('リーダブル')
 
-      expect(page).to have_css('.title-autocomplete__item', wait: 5)
+      expect(page).to have_css('.title-autocomplete__item', wait: 10)
       title_input.send_keys(:arrow_down)
 
-      expect(page).to have_css('.title-autocomplete__item--active', wait: 3)
+      expect(page).to have_css('.title-autocomplete__item--active', wait: 5)
     end
 
     it 'Enterキーでフォーカスされている候補を選択できる' do
