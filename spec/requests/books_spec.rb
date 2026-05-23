@@ -265,7 +265,9 @@ RSpec.describe 'Books', type: :request do
         end
 
         it '書籍がisbnつきで作成される' do
-          post books_path, params: params_with_isbn
+          expect {
+            post books_path, params: params_with_isbn
+          }.to change(Book, :count).by(1)
           expect(Book.last.isbn).to eq('9784873115658')
         end
       end

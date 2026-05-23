@@ -131,8 +131,8 @@ export default class extends Controller {
       missing.push('書影')
     }
 
-    if (isbnInput && isbn) {
-      isbnInput.value = isbn
+    if (isbnInput) {
+      isbnInput.value = isbn || ''
     }
 
     return missing
