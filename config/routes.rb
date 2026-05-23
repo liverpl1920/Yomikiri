@@ -23,6 +23,7 @@ Rails.application.routes.draw do
       patch :update_memo
       patch :change_deadline
       patch :complete
+      patch :update_review
     end
   end
 

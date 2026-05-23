@@ -1304,3 +1304,116 @@
     text-overflow: ellipsis;
     white-space: nowrap;
   }
+
+/* =============================================
+   評価・感想セクション (ISSUE#197)
+   ============================================= */
+
+.book-show__review {
+  margin-top: 1.5rem;
+  padding: 1.25rem;
+  background: var(--color-surface, #fff);
+  border: 1px solid var(--color-border, #e2e8f0);
+  border-radius: 8px;
+}
+
+.book-show__review-title {
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  color: var(--color-text-primary, #2d3748);
+}
+
+.book-show__review-label {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--color-text-secondary, #718096);
+  margin-bottom: 0.5rem;
+}
+
+.book-show__review-rating {
+  margin-bottom: 1rem;
+}
+
+.book-show__stars {
+  display: flex;
+  flex-direction: row-reverse;
+  gap: 4px;
+  width: fit-content;
+}
+
+.book-show__star-input {
+  display: none;
+}
+
+.book-show__star-label {
+  cursor: pointer;
+  font-size: 1.75rem;
+  color: #cbd5e0;
+  transition: color 0.15s;
+}
+
+.book-show__star-label:has(.book-show__star-input:checked) ~ .book-show__star-label .book-show__star-icon,
+.book-show__star-label:has(.book-show__star-input:checked) .book-show__star-icon,
+.book-show__stars:has(.book-show__star-label:hover) .book-show__star-label:hover ~ .book-show__star-label .book-show__star-icon,
+.book-show__stars:has(.book-show__star-label:hover) .book-show__star-label:hover .book-show__star-icon {
+  color: #f6ad55;
+}
+
+.book-show__stars-display {
+  margin-top: 0.5rem;
+  font-size: 1.25rem;
+}
+
+.book-show__star-filled {
+  color: #f6ad55;
+}
+
+.book-show__star-empty {
+  color: #cbd5e0;
+}
+
+.book-show__review-field {
+  margin-bottom: 1rem;
+}
+
+.book-show__review-input {
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--color-border, #e2e8f0);
+  border-radius: 6px;
+  font-size: 0.9375rem;
+  resize: vertical;
+  font-family: inherit;
+}
+
+.book-show__review-input:focus {
+  outline: none;
+  border-color: var(--color-primary, #667eea);
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.15);
+}
+
+.book-show__review-help {
+  display: block;
+  margin-top: 0.25rem;
+  font-size: 0.75rem;
+  color: var(--color-text-secondary, #718096);
+}
+
+.book-show__review-actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}

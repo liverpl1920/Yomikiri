@@ -9,7 +9,7 @@ class BooksController < ApplicationController
   MAX_REDIRECTS = 3
 
   before_action :authenticate_user!
-  before_action :set_book, only: [ :show, :destroy, :update_progress, :update_memo, :complete, :change_deadline ]
+  before_action :set_book, only: [ :show, :destroy, :update_progress, :update_memo, :complete, :change_deadline, :update_review ]
 
   def index
     @search_params = normalized_index_search_params
@@ -78,6 +78,14 @@ class BooksController < ApplicationController
   def destroy
     @book.destroy
     redirect_to books_path, notice: "#{@book.title}を削除しました。", status: :see_other
+  end
+
+  def update_review
+    if @book.update(review_params)
+      redirect_to @book, notice: "評価・感想を保存しました。"
+    else
+      render :show, status: :unprocessable_entity
+    end
   end
 
   def search
@@ -187,6 +195,10 @@ class BooksController < ApplicationController
 
   def memo_params
     params.require(:book).permit(:memo)
+  end
+
+  def review_params
+    params.require(:book).permit(:rating, :review)
   end
 
   def normalized_index_search_params

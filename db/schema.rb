@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2026_05_17_104748) do
+ActiveRecord::Schema[7.2].define(version: 2026_05_23_011211) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -30,6 +30,8 @@ ActiveRecord::Schema[7.2].define(version: 2026_05_17_104748) do
     t.string "cover_image_url"
     t.string "genre"
     t.text "memo"
+    t.integer "rating"
+    t.text "review"
     t.index ["user_id"], name: "index_books_on_user_id"
   end
 
