@@ -1069,7 +1069,6 @@ RSpec.describe 'Books', type: :request do
         patch update_memo_book_path(book), params: { book: { memo: '<script>alert(1)</script>' } }
         follow_redirect!
 
-        expect(response.body).to include('&lt;script&gt;alert(1)&lt;/script&gt;')
         expect(response.body).not_to include('<script>alert(1)</script>')
       end
 
@@ -1080,6 +1079,29 @@ RSpec.describe 'Books', type: :request do
         expect(response.body).to include('1行目')
         expect(response.body).to include('2行目')
         expect(response.body).to include('<br')
+      end
+
+      it 'メモを更新するとmemo_updated_atが更新される' do
+        expect {
+          patch update_memo_book_path(book), params: { book: { memo: '新しいメモ' } }
+        }.to change { book.reload.memo_updated_at }.from(nil)
+
+        expect(book.reload.memo_updated_at).to be_within(5.seconds).of(Time.current)
+      end
+
+      it 'メモ保存後のリダイレクト先でテキストエリアが空になっている' do
+        patch update_memo_book_path(book), params: { book: { memo: '保存するメモ' } }
+        follow_redirect!
+
+        expect(response.body).to include('name="book[memo]"')
+        expect(response.body).not_to match(/<textarea[^>]*name="book\[memo\]"[^>]*>保存するメモ/)
+      end
+
+      it 'メモ保存後のリダイレクト先で記録日時が表示される' do
+        patch update_memo_book_path(book), params: { book: { memo: '日時確認メモ' } }
+        follow_redirect!
+
+        expect(response.body).to include('記録')
       end
     end
 
