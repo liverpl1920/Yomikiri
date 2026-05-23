@@ -161,11 +161,19 @@ RSpec.describe 'タイトル入力中オートコンプリート機能', type: :
 
     # IME合成を経由せず直接inputイベントを発火する共通ヘルパー
     def type_in_title(text)
-      find('#book_title').click
       page.execute_script(
         "const el = document.querySelector('#book_title');" \
+        "el.focus();" \
         "el.value = #{text.to_json};" \
         "el.dispatchEvent(new Event('input', { bubbles: true }));"
+      )
+    end
+
+    # keydownイベントをJS経由で発火するヘルパー
+    def press_key(key)
+      page.execute_script(
+        "document.querySelector('#book_title')" \
+        ".dispatchEvent(new KeyboardEvent('keydown', { key: #{key.to_json}, bubbles: true, cancelable: true }));"
       )
     end
 
@@ -173,7 +181,7 @@ RSpec.describe 'タイトル入力中オートコンプリート機能', type: :
       type_in_title('リーダブル')
 
       expect(page).to have_css('.title-autocomplete__item', wait: 10)
-      find('#book_title').send_keys(:arrow_down)
+      press_key('ArrowDown')
 
       expect(page).to have_css('.title-autocomplete__item--active', wait: 5)
     end
@@ -182,8 +190,8 @@ RSpec.describe 'タイトル入力中オートコンプリート機能', type: :
       type_in_title('リーダブル')
 
       expect(page).to have_css('.title-autocomplete__item', wait: 10)
-      find('#book_title').send_keys(:arrow_down)
-      find('#book_title').send_keys(:return)
+      press_key('ArrowDown')
+      press_key('Enter')
 
       expect(page).to have_field('タイトル', with: 'リーダブルコード', wait: 5)
     end
@@ -192,7 +200,7 @@ RSpec.describe 'タイトル入力中オートコンプリート機能', type: :
       type_in_title('リーダブル')
 
       expect(page).to have_css('.title-autocomplete__list:not(.title-autocomplete__list--hidden)', wait: 10)
-      find('#book_title').send_keys(:escape)
+      press_key('Escape')
 
       expect(page).not_to have_css(
         '.title-autocomplete__list:not(.title-autocomplete__list--hidden)',
