@@ -16,12 +16,42 @@
 
         <div class="books-index__search-field">
           <%= label_tag :author, "著者名", class: "books-index__search-label" %>
-          <%= text_field_tag :author, @search_params[:author], class: "books-index__search-input", placeholder: "例: Dustin" %>
+          <div class="search-filter-autocomplete"
+               data-controller="search-filter-autocomplete"
+               data-search-filter-autocomplete-field-value="author">
+            <%= text_field_tag :author, @search_params[:author],
+                  class: "books-index__search-input",
+                  placeholder: "例: Dustin",
+                  autocomplete: "off",
+                  data: {
+                    "search-filter-autocomplete-target": "input",
+                    action: "input->search-filter-autocomplete#onInput keydown->search-filter-autocomplete#onKeydown"
+                  } %>
+            <ul class="search-filter-autocomplete__list search-filter-autocomplete__list--hidden"
+                role="listbox"
+                aria-expanded="false"
+                data-search-filter-autocomplete-target="list"></ul>
+          </div>
         </div>
 
         <div class="books-index__search-field">
           <%= label_tag :genre, "ジャンル", class: "books-index__search-label" %>
-          <%= text_field_tag :genre, @search_params[:genre], class: "books-index__search-input", placeholder: "例: プログラミング" %>
+          <div class="search-filter-autocomplete"
+               data-controller="search-filter-autocomplete"
+               data-search-filter-autocomplete-field-value="genre">
+            <%= text_field_tag :genre, @search_params[:genre],
+                  class: "books-index__search-input",
+                  placeholder: "例: プログラミング",
+                  autocomplete: "off",
+                  data: {
+                    "search-filter-autocomplete-target": "input",
+                    action: "input->search-filter-autocomplete#onInput keydown->search-filter-autocomplete#onKeydown"
+                  } %>
+            <ul class="search-filter-autocomplete__list search-filter-autocomplete__list--hidden"
+                role="listbox"
+                aria-expanded="false"
+                data-search-filter-autocomplete-target="list"></ul>
+          </div>
         </div>
 
         <div class="books-index__search-field">

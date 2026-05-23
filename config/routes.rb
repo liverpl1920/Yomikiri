@@ -17,6 +17,7 @@ Rails.application.routes.draw do
     collection do
       get :search
       get :cover_proxy
+      get :suggestions
     end
     member do
       patch :update_progress
