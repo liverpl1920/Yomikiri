@@ -309,6 +309,7 @@
 
     <div class="book-show__actions">
       <%= link_to '一覧に戻る', books_path, class: 'btn btn--outline' %>
+      <%= link_to '書籍情報を編集する', edit_book_path(@book), class: 'btn btn--secondary' %>
       <% unless @book.completed? %>
         <button type="button" class="btn btn--secondary"
                 data-action="click->modal#openExtend">

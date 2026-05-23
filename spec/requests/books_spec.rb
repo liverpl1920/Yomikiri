@@ -772,6 +772,88 @@ RSpec.describe 'Books', type: :request do
     end
   end
 
+  describe 'GET /books/:id/edit' do
+    context '認証済みユーザーの場合' do
+      before { sign_in user }
+
+      it '自分の書籍の編集画面を表示できる' do
+        book = create(:book, user: user)
+        get edit_book_path(book)
+        expect(response).to have_http_status(:ok)
+      end
+
+      it '他ユーザーの書籍の編集画面は404になる' do
+        other_book = create(:book, user: other_user)
+        get edit_book_path(other_book)
+        expect(response).to have_http_status(:not_found)
+      end
+    end
+
+    context '未認証ユーザーの場合' do
+      it 'ログインページへリダイレクトされる' do
+        book = create(:book, user: user)
+        get edit_book_path(book)
+        expect(response).to redirect_to(new_user_session_path)
+      end
+    end
+  end
+
+  describe 'PATCH /books/:id' do
+    context '認証済みユーザーの場合' do
+      before { sign_in user }
+
+      context '有効なパラメータの場合' do
+        it '書籍情報が更新される' do
+          book = create(:book, user: user, title: '旧タイトル', author: '旧著者')
+          patch book_path(book), params: { book: { title: '新タイトル', author: '新著者', genre: book.genre, total_pages: book.total_pages, target_pages: book.target_pages, deadline: book.deadline } }
+          expect(book.reload.title).to eq('新タイトル')
+          expect(book.reload.author).to eq('新著者')
+        end
+
+        it '更新後、書籍詳細画面へリダイレクトされる' do
+          book = create(:book, user: user)
+          patch book_path(book), params: { book: { title: book.title, author: book.author, genre: book.genre, total_pages: book.total_pages, target_pages: book.target_pages, deadline: book.deadline } }
+          expect(response).to redirect_to(book_path(book))
+        end
+
+        it 'フラッシュメッセージが表示される' do
+          book = create(:book, user: user)
+          patch book_path(book), params: { book: { title: book.title, author: book.author, genre: book.genre, total_pages: book.total_pages, target_pages: book.target_pages, deadline: book.deadline } }
+          follow_redirect!
+          expect(response.body).to include('情報を更新しました。')
+        end
+      end
+
+      context '無効なパラメータ（タイトルなし）の場合' do
+        it '422 Unprocessable Entity を返す' do
+          book = create(:book, user: user)
+          patch book_path(book), params: { book: { title: '', total_pages: book.total_pages, target_pages: book.target_pages, deadline: book.deadline } }
+          expect(response).to have_http_status(:unprocessable_entity)
+        end
+
+        it '書籍情報は更新されない' do
+          book = create(:book, user: user, title: '元のタイトル')
+          patch book_path(book), params: { book: { title: '', total_pages: book.total_pages, target_pages: book.target_pages, deadline: book.deadline } }
+          expect(book.reload.title).to eq('元のタイトル')
+        end
+      end
+
+      it '他ユーザーの書籍は更新できない（404）' do
+        other_book = create(:book, user: other_user)
+        patch book_path(other_book), params: { book: { title: '改ざん' } }
+        expect(response).to have_http_status(:not_found)
+      end
+    end
+
+    context '未認証ユーザーの場合' do
+      it 'ログインページへリダイレクトされる' do
+        book = create(:book, user: user)
+        patch book_path(book), params: { book: { title: book.title } }
+        expect(response).to redirect_to(new_user_session_path)
+      end
+    end
+  end
+
   describe 'PATCH /books/:id/update_progress' do
     context '認証済みユーザーの場合' do
       before { sign_in user }

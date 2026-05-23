@@ -143,6 +143,7 @@
   </div>
 
   <%# 過去に読んだ本として登録 %>
+  <% if book.new_record? %>
   <% show_completed_at_field = ActiveModel::Type::Boolean.new.cast(book.is_past_reading) || book.errors[:completed_at_input].any? %>
   <div class="form-field">
     <label class="form-field__label form-field__label--checkbox">
@@ -165,6 +166,7 @@
       <span class="form-field__error"><%= book.errors[:completed_at_input].first %></span>
     <% end %>
   </div>
+  <% end %>
 
   <%# 書影URL（hidden）%>
   <%= f.hidden_field :cover_image_url %>

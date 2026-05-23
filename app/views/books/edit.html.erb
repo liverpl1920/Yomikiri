@@ -1,0 +1,14 @@
+<% content_for :title, "書籍情報を編集する | Yomikiri" %>
+
+<div class="container">
+  <div class="page-header">
+    <h1 class="page-header__title">書籍情報を編集する</h1>
+    <p class="page-header__description">
+      登録済みの書籍情報を修正・更新できます。
+    </p>
+  </div>
+
+  <div class="book-form-wrapper">
+    <%= render 'form', book: @book %>
+  </div>
+</div>

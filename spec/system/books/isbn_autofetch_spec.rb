@@ -148,11 +148,15 @@ RSpec.describe 'タイトル入力からのISBN・書影自動取得', type: :sy
     end
 
     it 'タイトル検索で結果がない場合、失敗メッセージが表示される' do
-      fill_in 'タイトル', with: '存在しない本のタイトル'
-      find('#book_author').click
+      # JSで直接値を設定してblurイベントを発火（fill_inのSeleniumキー送信はCIでIMEタイミング問題が起きるため）
+      page.execute_script(<<~JS)
+        var el = document.getElementById('book_title');
+        el.value = '存在しない本のタイトル';
+        el.dispatchEvent(new Event('blur', { bubbles: true }));
+      JS
 
       expect(page).to have_css('[data-book-form-target="titleStatus"]',
-                               text: 'タイトルから書籍情報を取得できませんでした。ISBNで検索してみてください。', wait: 5)
+                               text: 'タイトルから書籍情報を取得できませんでした。ISBNで検索してみてください。', wait: 20)
     end
   end
 

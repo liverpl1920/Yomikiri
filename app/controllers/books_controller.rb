@@ -9,7 +9,7 @@ class BooksController < ApplicationController
   MAX_REDIRECTS = 3
 
   before_action :authenticate_user!
-  before_action :set_book, only: [ :show, :destroy, :update_progress, :update_memo, :complete, :change_deadline, :update_review ]
+  before_action :set_book, only: [ :show, :edit, :update, :destroy, :update_progress, :update_memo, :complete, :change_deadline, :update_review ]
 
   def index
     @search_params = normalized_index_search_params
@@ -31,6 +31,17 @@ class BooksController < ApplicationController
   end
 
   def show
+  end
+
+  def edit
+  end
+
+  def update
+    if @book.update(edit_book_params)
+      redirect_to @book, notice: "#{@book.title}の情報を更新しました。"
+    else
+      render :edit, status: :unprocessable_entity
+    end
   end
 
   def update_progress
@@ -192,6 +203,10 @@ class BooksController < ApplicationController
     permitted = params.require(:book).permit(:title, :author, :genre, :total_pages, :target_pages, :current_page, :deadline, :status, :cover_image_url, :memo, :is_past_reading, :completed_at_input)
     permitted[:current_page] = 0 if permitted[:current_page].blank?
       permitted
+  end
+
+  def edit_book_params
+    params.require(:book).permit(:title, :author, :genre, :total_pages, :target_pages, :deadline, :cover_image_url)
   end
 
   def memo_params
