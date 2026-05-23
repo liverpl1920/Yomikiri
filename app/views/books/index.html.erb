@@ -140,7 +140,13 @@
                 <%# 読了期限 %>
                 <div class="book-card__deadline">
                   <span class="book-card__deadline-label">読了期限</span>
-                  <span class="book-card__deadline-value"><%= l(book.deadline, format: :long) %></span>
+                  <span class="book-card__deadline-value">
+                    <% if book.deadline.present? %>
+                      <%= l(book.deadline, format: :long) %>
+                    <% else %>
+                      未設定
+                    <% end %>
+                  </span>
                 </div>
 
                 <%# 進捗バー %>

@@ -103,9 +103,14 @@
   </div>
 
   <%# 読了期限 %>
+  <% deadline_optional_for_form = book.new_record? || book.unread? || book.completed? %>
   <div class="form-field">
     <%= f.label :deadline, '読了期限', class: 'form-field__label' %>
-    <span class="form-field__required" aria-hidden="true">必須</span>
+    <% if deadline_optional_for_form %>
+      <span class="form-field__optional">任意</span>
+    <% else %>
+      <span class="form-field__required" aria-hidden="true">必須</span>
+    <% end %>
     <%= f.date_field :deadline,
           class: "form-field__input form-field__input--date #{'form-field__input--error' if book.errors[:deadline].any?}",
           min: (book.completed? ? nil : Date.current.to_s),

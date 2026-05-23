@@ -19,7 +19,7 @@ class Book < ApplicationRecord
   validates :total_pages, presence: true, numericality: { only_integer: true, greater_than: 0 }
   validates :target_pages, presence: true, numericality: { only_integer: true, greater_than: 0 }
   validates :current_page, presence: true, numericality: { only_integer: true, greater_than_or_equal_to: 0 }
-  validates :deadline, presence: true
+  validates :deadline, presence: true, unless: :deadline_optional?
   validates :status, presence: true
 
   validate :target_pages_not_exceed_total_pages
@@ -35,7 +35,7 @@ class Book < ApplicationRecord
 
   def extend_deadline!(new_deadline)
     return false if new_deadline.blank?
-    return errors.add(:deadline, :must_be_after_current_deadline) && false if new_deadline <= deadline
+    return errors.add(:deadline, :must_be_after_current_deadline) && false if deadline.present? && new_deadline <= deadline
 
     self.deadline = new_deadline
     self.extension_count += 1
@@ -73,7 +73,7 @@ class Book < ApplicationRecord
   # 今日のノルマ（残ページ ÷ 残日数、切り上げ）
   # 期限超過時（D <= 0）は D=1 として計算する
   def daily_quota
-    return 0 if completed?
+    return 0 if completed? || deadline.nil?
 
     remaining = target_pages - current_page
     return 0 if remaining <= 0
@@ -92,17 +92,21 @@ class Book < ApplicationRecord
 
   # 残り日数（今日を含む／期限当日は D=1）
   def days_remaining
+    return nil if deadline.nil?
+
     (deadline - Date.current).to_i + 1
   end
 
   # 期限超過判定（D <= 0、すなわち期限日翌日以降）
   def overdue?
+    return false if deadline.nil?
+
     days_remaining <= 0
   end
 
   # 賞味期限ビジュアライザー用CSSクラス
   def deadline_urgency_class
-    return "" if completed?
+    return "" if completed? || deadline.nil?
 
     days = days_remaining
     if days <= 1
@@ -173,6 +177,19 @@ class Book < ApplicationRecord
     return if current_page.blank? || total_pages.blank?
 
     errors.add(:current_page, :less_than_or_equal_to_total_pages, count: total_pages) if current_page > total_pages
+  end
+
+  def deadline_optional?
+    past_reading_checked? ||
+      (unread? && !will_transition_to_reading?) ||
+      completed?
+  end
+
+  def will_transition_to_reading?
+    unread? && persisted? &&
+      current_page_changed? &&
+      current_page_was.to_i.zero? &&
+      current_page.to_i > 0
   end
 
   def deadline_cannot_be_in_the_past

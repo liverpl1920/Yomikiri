@@ -97,8 +97,38 @@ RSpec.describe Book, type: :model do
     end
 
     describe 'deadline' do
-      it '読了期限がない場合は無効' do
-        expect(build(:book, deadline: nil)).not_to be_valid
+      it '積読書籍（unread）は読了期限なしで有効' do
+        expect(build(:book, deadline: nil, status: :unread)).to be_valid
+      end
+
+      it '読書中書籍（reading）は読了期限なしで無効' do
+        book = build(:book, deadline: nil, status: :reading)
+        expect(book).not_to be_valid
+        expect(book.errors[:deadline]).not_to be_empty
+      end
+
+      it '読了済み書籍（completed）は読了期限なしで有効' do
+        book = build(:book, deadline: nil, status: :completed)
+        expect(book).to be_valid
+      end
+
+      it '過去読書（is_past_reading: true）は読了期限なしで有効' do
+        book = build(:book, deadline: nil)
+        book.is_past_reading = 'true'
+        expect(book).to be_valid
+      end
+
+      it '積読書籍が初回進捗記録で読書中へ遷移する際は読了期限が必須' do
+        book = create(:book, deadline: nil, status: :unread, current_page: 0)
+        book.current_page = 1
+        expect(book).not_to be_valid
+        expect(book.errors[:deadline]).not_to be_empty
+      end
+
+      it '積読書籍が初回進捗記録で遷移する際、期限があれば有効' do
+        book = create(:book, deadline: Date.current + 7, status: :unread, current_page: 0)
+        book.current_page = 1
+        expect(book).to be_valid
       end
 
       it '今日の日付であれば有効（新規作成時）' do
