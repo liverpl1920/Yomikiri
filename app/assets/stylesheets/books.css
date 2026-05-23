@@ -1222,6 +1222,30 @@
   }
 }
 
+/* ---- ISBN自動取得エリア ---- */
+.isbn-fetch__row {
+  display: flex;
+  gap: var(--spacing-sm);
+  align-items: stretch;
+}
+
+.isbn-fetch__input {
+  flex: 1;
+  min-width: 0;
+}
+
+.isbn-fetch__btn {
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+.book-form__isbn-status {
+  font-size: 0.8125rem;
+  color: var(--color-text-secondary);
+  margin-top: 0.25rem;
+  min-height: 1.25rem;
+}
+
 .book-form__title-status {
   font-size: 0.8125rem;
   color: var(--color-text-secondary);

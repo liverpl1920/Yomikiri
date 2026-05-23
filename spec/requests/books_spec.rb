@@ -158,6 +158,12 @@ RSpec.describe 'Books', type: :request do
         get new_book_path
         expect(response.body).to include('積読を登録する')
       end
+
+      it 'ISBN入力フィールドが表示される' do
+        get new_book_path
+        expect(response.body).to include('isbn_input')
+        expect(response.body).to include('書籍情報を取得')
+      end
     end
 
     context '未認証ユーザーの場合' do
