@@ -13,7 +13,7 @@ Rails.application.routes.draw do
   resource :email_change, only: [ :edit, :update ], controller: "users/email_changes"
   get "email_change/complete", to: "users/email_changes#complete", as: :email_change_complete
 
-  resources :books, only: [ :index, :new, :create, :show, :destroy ] do
+  resources :books, only: [ :index, :new, :create, :show, :destroy, :edit, :update ] do
     collection do
       get :search
       get :cover_proxy
