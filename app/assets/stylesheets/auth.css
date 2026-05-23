@@ -156,4 +156,31 @@
   padding: 0.75rem;
 }
 
+/* ---- レスポンシブ ---- */
+@media (max-width: 430px) {
+  .auth-page {
+    padding: var(--spacing-lg) var(--spacing-sm);
+    align-items: flex-start;
+    padding-top: var(--spacing-xl);
+  }
+
+  .auth-card__header {
+    padding: var(--spacing-xl) var(--spacing-md) var(--spacing-md);
+  }
+
+  .auth-card__body {
+    padding: var(--spacing-md);
+  }
+
+  .auth-card__footer {
+    padding: var(--spacing-md);
+  }
+
+  .btn--full {
+    padding: 0.875rem;
+    font-size: var(--font-size-base);
+    min-height: 48px;
+  }
+}
+
 
