@@ -1471,4 +1471,68 @@ RSpec.describe 'Books', type: :request do
       end
     end
   end
+
+  describe 'GET /books/suggestions' do
+    context '未ログインの場合' do
+      it 'ログイン画面へリダイレクトされる' do
+        get suggestions_books_path, params: { field: 'author', q: 'Dustin' }
+
+        expect(response).to redirect_to(new_user_session_path)
+      end
+    end
+
+    context 'ログイン済みの場合' do
+      before { sign_in user }
+
+      let!(:book1) { create(:book, user: user, author: 'Dustin Boswell', genre: 'プログラミング') }
+      let!(:book2) { create(:book, user: user, author: 'Dustin Powers', genre: 'プログラミング') }
+      let!(:book3) { create(:book, user: user, author: 'Yamada Taro', genre: '自己啓発') }
+      let!(:other_book) { create(:book, user: other_user, author: 'Other User Author', genre: 'ビジネス') }
+
+      context 'field=author の場合' do
+        it '著者名の候補を返す' do
+          get suggestions_books_path, params: { field: 'author', q: 'Dustin' }
+
+          json = JSON.parse(response.body)
+          expect(response).to have_http_status(:ok)
+          expect(json['suggestions']).to include('Dustin Boswell', 'Dustin Powers')
+          expect(json['suggestions']).not_to include('Yamada Taro')
+        end
+
+        it '他ユーザーの著者名は返さない' do
+          get suggestions_books_path, params: { field: 'author', q: 'Other' }
+
+          json = JSON.parse(response.body)
+          expect(json['suggestions']).to be_empty
+        end
+
+        it 'q が空でも結果を返す' do
+          get suggestions_books_path, params: { field: 'author', q: '' }
+
+          json = JSON.parse(response.body)
+          expect(response).to have_http_status(:ok)
+          expect(json['suggestions']).to be_an(Array)
+        end
+      end
+
+      context 'field=genre の場合' do
+        it 'ジャンルの候補を返す' do
+          get suggestions_books_path, params: { field: 'genre', q: 'プログラミング' }
+
+          json = JSON.parse(response.body)
+          expect(response).to have_http_status(:ok)
+          expect(json['suggestions']).to include('プログラミング')
+          expect(json['suggestions']).not_to include('自己啓発')
+        end
+      end
+
+      context '不正な field が指定された場合' do
+        it '400 Bad Request を返す' do
+          get suggestions_books_path, params: { field: 'title', q: 'test' }
+
+          expect(response).to have_http_status(:bad_request)
+        end
+      end
+    end
+  end
 end

@@ -1318,6 +1318,58 @@
   }
 
 /* =============================================
+   検索フィルターオートコンプリート (ISSUE#216)
+   ============================================= */
+
+.search-filter-autocomplete {
+  position: relative;
+}
+
+.search-filter-autocomplete__list {
+  position: absolute;
+  z-index: 100;
+  background-color: var(--color-bg, #fff);
+  border: 1px solid var(--color-border, #e2e8f0);
+  border-radius: var(--border-radius-md, 6px);
+  box-shadow: var(--shadow-md, 0 4px 12px rgba(0,0,0,0.1));
+  list-style: none;
+  margin: 2px 0 0;
+  padding: 4px 0;
+  width: 100%;
+  max-height: 220px;
+  overflow-y: auto;
+}
+
+.search-filter-autocomplete__list--hidden {
+  display: none;
+}
+
+.search-filter-autocomplete__item {
+  display: block;
+}
+
+.search-filter-autocomplete__item--active .search-filter-autocomplete__button,
+.search-filter-autocomplete__button:hover {
+  background-color: var(--color-bg-surface, #f8fafc);
+}
+
+.search-filter-autocomplete__button {
+  display: block;
+  width: 100%;
+  padding: 8px 12px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  font-size: 0.875rem;
+  color: var(--color-text, #1a202c);
+  transition: background-color 0.15s;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* =============================================
    評価・感想セクション (ISSUE#197)
    ============================================= */
 

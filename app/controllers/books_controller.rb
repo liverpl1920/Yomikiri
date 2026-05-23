@@ -112,6 +112,23 @@ class BooksController < ApplicationController
     render json: { books: [], error: "検索中にエラーが発生しました" }
   end
 
+  SUGGESTION_FIELDS = %w[author genre].freeze
+
+  def suggestions
+    field = params[:field].to_s
+    return render json: { error: "Invalid field" }, status: :bad_request unless SUGGESTION_FIELDS.include?(field)
+
+    query = params[:q].to_s.strip
+    results = current_user.books
+                          .where.not(field => [ nil, "" ])
+                          .where("#{field} ILIKE ?", "%#{Book.sanitize_sql_like(query)}%")
+                          .distinct
+                          .limit(5)
+                          .pluck(field)
+                          .sort
+    render json: { suggestions: results }
+  end
+
   def cover_proxy
     url = params[:url].to_s
     uri = URI.parse(url)
