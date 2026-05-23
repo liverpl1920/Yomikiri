@@ -98,6 +98,10 @@
                   <p class="book-card__author"><%= book.author %></p>
                 <% end %>
 
+                <% if book.genre.present? %>
+                  <span class="book-card__genre"><%= book.genre %></span>
+                <% end %>
+
                 <% if book.memo.present? %>
                   <p class="book-card__memo"><%= truncate(book.memo.to_s.gsub(/\s+/, ' '), length: 60) %></p>
                 <% end %>
