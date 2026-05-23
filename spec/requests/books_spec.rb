@@ -838,6 +838,16 @@ RSpec.describe 'Books', type: :request do
         end
       end
 
+      context '読了済み書籍の場合' do
+        it '過去日の読了期限に更新できる' do
+          book = create(:book, user: user, status: :completed, deadline: Date.current + 1)
+          past_deadline = Date.current - 10
+          patch book_path(book), params: { book: { title: book.title, author: book.author, genre: book.genre, total_pages: book.total_pages, target_pages: book.target_pages, deadline: past_deadline } }
+          expect(response).to redirect_to(book_path(book))
+          expect(book.reload.deadline).to eq(past_deadline)
+        end
+      end
+
       it '他ユーザーの書籍は更新できない（404）' do
         other_book = create(:book, user: other_user)
         patch book_path(other_book), params: { book: { title: '改ざん' } }

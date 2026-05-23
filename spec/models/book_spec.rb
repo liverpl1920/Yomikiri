@@ -111,6 +111,12 @@ RSpec.describe Book, type: :model do
         expect(book.errors[:deadline]).not_to be_empty
       end
 
+      it '新規作成時は status が completed でも過去日の期限は無効' do
+        book = build(:book, deadline: Date.current - 1, status: :completed)
+        expect(book).not_to be_valid
+        expect(book.errors[:deadline]).not_to be_empty
+      end
+
       it '更新時に期限を過去の日付に変更する場合は無効' do
         book = create(:book, deadline: Date.current + 1)
         book.deadline = Date.current - 1
@@ -122,6 +128,19 @@ RSpec.describe Book, type: :model do
         book = create(:book, deadline: Date.current + 1)
         book.title = '変更後のタイトル'
         expect(book).to be_valid
+      end
+
+      it '読了済み書籍の編集時は過去の日付でも有効' do
+        book = create(:book, deadline: Date.current + 1, status: :completed)
+        book.deadline = Date.current - 1
+        expect(book).to be_valid
+      end
+
+      it '未読書籍の編集時は過去の日付に変更すると無効' do
+        book = create(:book, deadline: Date.current + 1, status: :unread)
+        book.deadline = Date.current - 1
+        expect(book).not_to be_valid
+        expect(book.errors[:deadline]).not_to be_empty
       end
     end
 

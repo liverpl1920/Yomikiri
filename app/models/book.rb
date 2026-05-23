@@ -24,7 +24,7 @@ class Book < ApplicationRecord
   validate :target_pages_not_exceed_total_pages
   validate :current_page_not_exceed_target_pages
   validate :current_page_not_exceed_total_pages
-  validate :deadline_cannot_be_in_the_past, if: -> { new_record? || will_save_change_to_deadline? }
+  validate :deadline_cannot_be_in_the_past, if: -> { new_record? || (!completed? && will_save_change_to_deadline?) }
   validate :cover_image_url_must_be_valid_url, if: -> { cover_image_url.present? }
   validate :completed_at_must_be_valid_date, if: -> { past_reading_checked? && completed_at_input.present? }
   validate :completed_at_must_not_be_in_future, if: -> { past_reading_checked? && completed_at_input.present? }
