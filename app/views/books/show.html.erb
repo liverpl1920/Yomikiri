@@ -52,7 +52,14 @@
     </div>
 
     <% remaining_pages = @book.target_pages - @book.current_page %>
-    <% if !@book.completed? && remaining_pages > 0 %>
+    <%# 積読かつ読了期限未設定の場合は案内を表示 %>
+    <% if @book.unread? && @book.deadline.nil? %>
+      <div class="book-show__deadline-notice" role="alert">
+        <p>読み始めるには読了期限を設定してください。</p>
+        <%= link_to '書籍情報を編集する', edit_book_path(@book), class: 'btn btn--secondary btn--sm' %>
+      </div>
+    <% end %>
+    <% if !@book.completed? && remaining_pages > 0 && !(@book.unread? && @book.deadline.nil?) %>
       <%# 進捗更新フォーム %>
       <div class="book-show__progress-update"
            data-controller="progress-update"
@@ -132,7 +139,7 @@
     <% end %>
 
     <%# 読了ボタン (W-6) %>
-    <% unless @book.completed? %>
+    <% unless @book.completed? || (@book.unread? && @book.deadline.nil?) %>
       <% complete_btn_class = @book.progress_percentage >= 100 ? 'book-show__complete-btn book-show__complete-btn--highlighted' : 'book-show__complete-btn' %>
       <div class="book-show__complete-section">
         <%= button_to '読了にする！', complete_book_path(@book),
@@ -155,9 +162,13 @@
       <div class="book-show__detail-item">
         <dt class="book-show__detail-label">読了期限</dt>
         <dd class="book-show__detail-value">
-          <time datetime="<%= @book.deadline %>">
-            <%= l(@book.deadline, format: :long) %>
-          </time>
+          <% if @book.deadline.present? %>
+            <time datetime="<%= @book.deadline %>">
+              <%= l(@book.deadline, format: :long) %>
+            </time>
+          <% else %>
+            <span class="book-show__detail-none">未設定</span>
+          <% end %>
         </dd>
       </div>
 
@@ -190,6 +201,8 @@
         <dd class="book-show__detail-value">
           <% if @book.completed? %>
             <span class="book-show__quota-done">読了済み</span>
+          <% elsif @book.deadline.nil? %>
+            <span class="book-show__detail-none">-</span>
           <% elsif @book.overdue? %>
             <span class="book-show__quota-overdue">期限超過</span>
           <% else %>
@@ -310,7 +323,7 @@
     <div class="book-show__actions">
       <%= link_to '一覧に戻る', books_path, class: 'btn btn--outline' %>
       <%= link_to '書籍情報を編集する', edit_book_path(@book), class: 'btn btn--secondary' %>
-      <% unless @book.completed? %>
+      <% unless @book.completed? || @book.deadline.nil? %>
         <button type="button" class="btn btn--secondary"
                 data-action="click->modal#openExtend">
           期限を延長する
@@ -390,6 +403,7 @@
   </div>
 
   <%# 期限延長モーダル (W-10) %>
+  <% if @book.deadline.present? %>
   <div class="modal-overlay"
        hidden
        aria-hidden="true"
@@ -436,6 +450,7 @@
       <% end %>
     </div>
   </div>
+  <% end %>
 
   <%# 読了お祝いモーダル (W-13) %>
   <% if flash[:completed_book].present? %>

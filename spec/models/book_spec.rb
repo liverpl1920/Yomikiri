@@ -97,8 +97,38 @@ RSpec.describe Book, type: :model do
     end
 
     describe 'deadline' do
-      it '読了期限がない場合は無効' do
-        expect(build(:book, deadline: nil)).not_to be_valid
+      it '積読書籍（unread）は読了期限なしで有効' do
+        expect(build(:book, deadline: nil, status: :unread)).to be_valid
+      end
+
+      it '読書中書籍（reading）は読了期限なしで無効' do
+        book = build(:book, deadline: nil, status: :reading)
+        expect(book).not_to be_valid
+        expect(book.errors[:deadline]).not_to be_empty
+      end
+
+      it '読了済み書籍（completed）は読了期限なしで有効' do
+        book = build(:book, deadline: nil, status: :completed)
+        expect(book).to be_valid
+      end
+
+      it '過去読書（is_past_reading: true）は読了期限なしで有効' do
+        book = build(:book, deadline: nil)
+        book.is_past_reading = 'true'
+        expect(book).to be_valid
+      end
+
+      it '積読書籍が初回進捗記録で読書中へ遷移する際は読了期限が必須' do
+        book = create(:book, deadline: nil, status: :unread, current_page: 0)
+        book.current_page = 1
+        expect(book).not_to be_valid
+        expect(book.errors[:deadline]).not_to be_empty
+      end
+
+      it '積読書籍が初回進捗記録で遷移する際、期限があれば有効' do
+        book = create(:book, deadline: Date.current + 7, status: :unread, current_page: 0)
+        book.current_page = 1
+        expect(book).to be_valid
       end
 
       it '今日の日付であれば有効（新規作成時）' do
@@ -557,6 +587,24 @@ RSpec.describe Book, type: :model do
 
   describe '#extend_deadline!' do
     let(:book) { create(:book, deadline: Date.current + 7, extension_count: 0) }
+
+    context '期限が未設定（nil）の状態で日付を渡した場合' do
+      let(:book_without_deadline) { create(:book, deadline: nil, status: :unread, extension_count: 0) }
+
+      it 'deadlineが設定される' do
+        book_without_deadline.extend_deadline!(Date.current + 14)
+        expect(book_without_deadline.reload.deadline).to eq(Date.current + 14)
+      end
+
+      it 'extension_countはインクリメントされない（初回設定のため）' do
+        book_without_deadline.extend_deadline!(Date.current + 14)
+        expect(book_without_deadline.reload.extension_count).to eq(0)
+      end
+
+      it 'trueを返す' do
+        expect(book_without_deadline.extend_deadline!(Date.current + 14)).to be_truthy
+      end
+    end
 
     context '現在の期限より後の日付を渡した場合' do
       it 'deadlineが更新される' do

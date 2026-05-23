@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2026_05_23_222517) do
+ActiveRecord::Schema[7.2].define(version: 2026_05_23_231135) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -21,7 +21,7 @@ ActiveRecord::Schema[7.2].define(version: 2026_05_23_222517) do
     t.integer "total_pages", null: false
     t.integer "target_pages", null: false
     t.integer "current_page", default: 0, null: false
-    t.date "deadline", null: false
+    t.date "deadline"
     t.integer "status", default: 0, null: false
     t.integer "extension_count", default: 0, null: false
     t.datetime "completed_at"
