@@ -108,7 +108,7 @@
     <span class="form-field__required" aria-hidden="true">必須</span>
     <%= f.date_field :deadline,
           class: "form-field__input form-field__input--date #{'form-field__input--error' if book.errors[:deadline].any?}",
-          min: Date.current.to_s,
+          min: (book.completed? ? nil : Date.current.to_s),
           data: {
             'book-form-target': 'deadline',
             action: 'change->book-form#calculateQuota'
