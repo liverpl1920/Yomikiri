@@ -37,8 +37,8 @@ class Book < ApplicationRecord
     return false if new_deadline.blank?
     return errors.add(:deadline, :must_be_after_current_deadline) && false if deadline.present? && new_deadline <= deadline
 
+    self.extension_count += 1 if deadline.present?
     self.deadline = new_deadline
-    self.extension_count += 1
     save
   end
 

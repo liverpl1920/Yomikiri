@@ -588,6 +588,24 @@ RSpec.describe Book, type: :model do
   describe '#extend_deadline!' do
     let(:book) { create(:book, deadline: Date.current + 7, extension_count: 0) }
 
+    context '期限が未設定（nil）の状態で日付を渡した場合' do
+      let(:book_without_deadline) { create(:book, deadline: nil, status: :unread, extension_count: 0) }
+
+      it 'deadlineが設定される' do
+        book_without_deadline.extend_deadline!(Date.current + 14)
+        expect(book_without_deadline.reload.deadline).to eq(Date.current + 14)
+      end
+
+      it 'extension_countはインクリメントされない（初回設定のため）' do
+        book_without_deadline.extend_deadline!(Date.current + 14)
+        expect(book_without_deadline.reload.extension_count).to eq(0)
+      end
+
+      it 'trueを返す' do
+        expect(book_without_deadline.extend_deadline!(Date.current + 14)).to be_truthy
+      end
+    end
+
     context '現在の期限より後の日付を渡した場合' do
       it 'deadlineが更新される' do
         new_deadline = Date.current + 14
