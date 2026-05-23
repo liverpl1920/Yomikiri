@@ -160,13 +160,14 @@ RSpec.describe 'Books index search', type: :request do
         expect(response.body).to include('検索条件をクリア')
       end
 
-      it 'メモがある本は一覧に要約が表示される' do
+      it 'メモがある本も一覧に表示されるがメモ欄は表示されない' do
         memo_book = create(:book, user: user, title: 'メモ付き本', memo: "この本は重要ポイントが多い。\n次回は3章から読む")
 
         get books_path
 
+        doc = Nokogiri::HTML.parse(response.body)
         expect(response.body).to include(memo_book.title)
-        expect(response.body).to include('この本は重要ポイントが多い。 次回は3章から読む')
+        expect(doc.css('.book-card__memo')).to be_empty
       end
     end
   end
