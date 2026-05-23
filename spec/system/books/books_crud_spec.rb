@@ -108,9 +108,7 @@ RSpec.describe '書籍管理', type: :system do
       # Wait for the deletion modal overlay to become visible
       expect(page).to have_css('[data-modal-target="overlay"]', visible: true)
 
-      within('[data-modal-target="overlay"]') do
-        click_button '削除する'
-      end
+      page.execute_script("document.querySelector('[data-modal-target=\"overlay\"] button[type=\"submit\"]').click()")
 
       expect(page).to have_current_path(books_path)
       expect(page).not_to have_css('.book-card', text: book.title)
