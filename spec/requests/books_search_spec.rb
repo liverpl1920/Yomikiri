@@ -99,6 +99,15 @@ RSpec.describe 'Books Search', type: :request do
           expect(book['cover_image_url']).to eq('https://cover.openbd.jp/9784873115658.jpg')
         end
 
+        it '検索結果にisbnキーが含まれる' do
+          get search_books_path, params: { q: '9784873115658' }
+
+          json = JSON.parse(response.body)
+          book = json['books'].first
+          expect(book).to have_key('isbn')
+          expect(book['isbn']).to eq('9784873115658')
+        end
+
         it 'ハイフン付きISBNでも検索できる' do
           stub_request(:get, /api\.openbd\.jp\/v1\/get\?isbn=9784873115658/)
             .to_return(status: 200, body: openbd_found_response, headers: { 'Content-Type' => 'application/json' })
@@ -179,6 +188,15 @@ RSpec.describe 'Books Search', type: :request do
           expect(book['author']).to eq('Dustin Boswell, Trevor Foucher')
           expect(book['total_pages']).to eq(260)
           expect(book['cover_image_url']).to eq('https://cover.openbd.jp/9784873115658.jpg')
+        end
+
+        it 'タイトル検索結果にisbnキーが含まれる' do
+          get search_books_path, params: { q: 'リーダブルコード' }
+
+          json = JSON.parse(response.body)
+          book = json['books'].first
+          expect(book).to have_key('isbn')
+          expect(book['isbn']).to eq('9784873115658')
         end
 
         it 'Google thumbnailではなくopenBDの書影URLを優先する' do

@@ -100,11 +100,12 @@ export default class extends Controller {
     }
   }
 
-  _fillFormFromSearch ({ author, genre, total_pages: totalPages, cover_image_url: coverUrl }) {
+  _fillFormFromSearch ({ author, genre, total_pages: totalPages, cover_image_url: coverUrl, isbn }) {
     const authorInput = document.getElementById('book_author')
     const genreInput = document.getElementById('book_genre')
     const totalPagesInput = document.getElementById('book_total_pages')
     const coverUrlInput = document.getElementById('book_cover_image_url')
+    const isbnInput = document.getElementById('book_isbn')
     const missing = []
 
     if (authorInput && author) {
@@ -128,6 +129,10 @@ export default class extends Controller {
       coverUrlInput.value = coverUrl
     } else {
       missing.push('書影')
+    }
+
+    if (isbnInput && isbn) {
+      isbnInput.value = isbn
     }
 
     return missing
