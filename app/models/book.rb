@@ -14,6 +14,7 @@ class Book < ApplicationRecord
   validates :rating, numericality: { in: 1..5, only_integer: true }, allow_nil: true
   validates :review, length: { maximum: 1000 }, allow_blank: true
   validates :cover_image_url, length: { maximum: 2048 }, allow_blank: true
+  validates :isbn, length: { maximum: 13 }, format: { with: /\A(?:\d{13}|\d{9}[\dX])\z/, message: :invalid }, allow_blank: true
   validates :genre, length: { maximum: 100 }, allow_blank: true
   validates :total_pages, presence: true, numericality: { only_integer: true, greater_than: 0 }
   validates :target_pages, presence: true, numericality: { only_integer: true, greater_than: 0 }

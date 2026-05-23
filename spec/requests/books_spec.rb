@@ -250,6 +250,28 @@ RSpec.describe 'Books', type: :request do
         end
       end
 
+      context 'isbnを含む有効なパラメータの場合' do
+        let(:params_with_isbn) do
+          {
+            book: {
+              title: 'ISBNありの本',
+              total_pages: 200,
+              target_pages: 200,
+              current_page: 0,
+              deadline: Date.current + 14,
+              isbn: '9784873115658'
+            }
+          }
+        end
+
+        it '書籍がisbnつきで作成される' do
+          expect {
+            post books_path, params: params_with_isbn
+          }.to change(Book, :count).by(1)
+          expect(Book.last.isbn).to eq('9784873115658')
+        end
+      end
+
       context '無効なcover_image_urlの場合' do
         let(:invalid_cover_params) do
           {

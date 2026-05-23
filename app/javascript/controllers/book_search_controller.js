@@ -80,15 +80,17 @@ export default class extends Controller {
     ul.classList.remove('book-search__results--hidden')
   }
 
-  _fillForm ({ title, author, total_pages: totalPages, cover_image_url: coverUrl }) {
+  _fillForm ({ title, author, total_pages: totalPages, cover_image_url: coverUrl, isbn }) {
     const titleInput = document.getElementById('book_title')
     const authorInput = document.getElementById('book_author')
     const totalPagesInput = document.getElementById('book_total_pages')
     const coverUrlInput = document.getElementById('book_cover_image_url')
+    const isbnInput = document.getElementById('book_isbn')
 
     if (titleInput) titleInput.value = title || ''
     if (authorInput) authorInput.value = author || ''
     if (coverUrlInput) coverUrlInput.value = coverUrl || ''
+    if (isbnInput) isbnInput.value = isbn || ''
 
     if (totalPagesInput) {
       totalPagesInput.value = totalPages ?? ''
