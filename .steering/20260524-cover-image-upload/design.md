@@ -15,7 +15,7 @@
     --> BooksController#create/update
     --> book.cover_image.attach(params[:book][:cover_image])
     --> ActiveStorage::Blob / ActiveStorage::Attachment
-    --> 表示時: rails_blob_url(book.cover_image)
+    --> 表示時: url_for(book.cover_image)
 ```
 
 ### 表示ロジック
@@ -24,7 +24,7 @@
 # BooksHelper#book_cover_src の拡張
 def book_cover_src(book)
   if book.cover_image.attached?
-    rails_blob_url(book.cover_image)
+    url_for(book.cover_image)
   elsif book.cover_image_url.present?
     # 既存の URL ベース表示（後方互換）
     ...

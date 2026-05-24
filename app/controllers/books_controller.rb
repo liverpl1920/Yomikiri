@@ -14,7 +14,7 @@ class BooksController < ApplicationController
   def index
     @search_params = normalized_index_search_params
     @search_active = @search_params.values.any?(&:present?)
-    @books = current_user.books.filtered_for_index(@search_params)
+    @books = current_user.books.with_attached_cover_image.filtered_for_index(@search_params)
   end
 
   def new

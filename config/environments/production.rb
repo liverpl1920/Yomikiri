@@ -114,13 +114,12 @@ Rails.application.configure do
   # Only use :id for inspections in production.
   config.active_record.attributes_for_inspect = [ :id ]
 
-  # Active Storage: S3 互換ストレージ（AWS_ACCESS_KEY_ID 等が設定されている場合）
-  # 未設定時は local ディスクにフォールバック（Render 無料枠では再起動時に消える）
-  if ENV["AWS_ACCESS_KEY_ID"].present?
-    config.active_storage.service = :amazon
-  else
-    config.active_storage.service = :local
-  end
+  # Active Storage: S3 互換ストレージ（AWS_ACCESS_KEY_ID / AWS_SECRET_ACCESS_KEY / AWS_S3_BUCKET が揃っている場合）
+  # 未設定・一部欠落の場合は local ディスクにフォールバック（Render 無料枠では再起動時に消える）
+  s3_configured = ENV["AWS_ACCESS_KEY_ID"].present? &&
+                  ENV["AWS_SECRET_ACCESS_KEY"].present? &&
+                  ENV["AWS_S3_BUCKET"].present?
+  config.active_storage.service = s3_configured ? :amazon : :local
 
   # Enable DNS rebinding protection and other `Host` header attacks.
   # config.hosts = [
