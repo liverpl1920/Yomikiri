@@ -38,6 +38,11 @@ export default class extends Controller {
     const isbn = this.hasIsbnInputTarget ? this.isbnInputTarget.value.trim() : ''
     if (!isbn) return
 
+    if (!this._isValidIsbn(isbn)) {
+      this._setIsbnStatus('ISBNは13桁の数字（ISBN-13）または10桁の数字・末尾X（ISBN-10）で入力してください。')
+      return
+    }
+
     this._setIsbnStatus('書籍情報を取得中...')
     try {
       const res = await fetch(`/books/search?q=${encodeURIComponent(isbn)}`, {
@@ -60,7 +65,7 @@ export default class extends Controller {
       const book = books[0]
       const missing = this._fillFormFromSearch(book, { fillTitle: true })
       this._updateCoverPreview(book.cover_image_url)
-      this._setIsbnStatus(this._buildIsbnFetchResultMessage(missing))
+      this._setIsbnStatus(this._buildFetchResultMessage(missing))
       this.markTitleFetched(book.title || '')
     } catch (_e) {
       this._setIsbnStatus('取得中にエラーが発生しました。')
@@ -188,11 +193,9 @@ export default class extends Controller {
     return `書籍情報を取得しましたが、${missing.join('・')}は取得できませんでした。`
   }
 
-  _buildIsbnFetchResultMessage (missing) {
-    if (missing.length === 0) {
-      return 'タイトル・著者・ページ数・書影をすべて取得しました。'
-    }
-    return `書籍情報を取得しましたが、${missing.join('・')}は取得できませんでした。`
+  _isValidIsbn (raw) {
+    const sanitized = raw.toUpperCase().replace(/[^0-9X]/g, '')
+    return /^(?:\d{13}|\d{9}[\dX])$/.test(sanitized)
   }
 
   _setIsbnStatus (message) {
