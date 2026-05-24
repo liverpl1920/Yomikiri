@@ -8,6 +8,7 @@
 - [x] T4: ISBN取得成功・失敗時のステータスメッセージ整備
 - [x] T5: RSpec (request spec) でISBN入力フィールドの存在確認テストを追加
 - [x] T6: RuboCop・RSpecで全テストパス確認
+- [x] T7: Copilotレビュー指摘を反映（ISBNバリデーション追加・重複メソッド削除・E2E spec追加）
 
 ## 振り返り
 
