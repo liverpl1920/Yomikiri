@@ -186,7 +186,7 @@ class Book < ApplicationRecord
   end
 
   def will_transition_to_reading?
-    unread? && persisted? &&
+    unread? &&
       current_page_changed? &&
       current_page_was.to_i.zero? &&
       current_page.to_i > 0
@@ -206,9 +206,9 @@ class Book < ApplicationRecord
   end
 
   # 初回の進捗記録（current_page が 0 → 1 以上）時に unread → reading へ自動遷移する
+  # 新規作成時も含む（current_page > 0 で登録した場合も reading に設定）
   def auto_set_reading_status
     return unless unread?
-    return unless persisted?
     return unless current_page_changed?
     return unless current_page_was.to_i.zero?
     return if current_page.to_i.zero?
