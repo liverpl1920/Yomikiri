@@ -26,18 +26,25 @@ module SystemSpecSignInHelper
 
   # eagerLoadControllersFrom は dynamic import() を使うため非同期。
   # クリック前にこのメソッドで Stimulus コントローラーの接続を待つ。
-  # 任意の Stimulus コントローラーが接続されるまで最大 10 秒待機する。
-  def wait_for_stimulus
+  # identifier を指定すると特定コントローラーが接続されるまで待機する（最大 15 秒）。
+  def wait_for_stimulus(identifier: nil)
     connected = false
     start = Time.now
-    until Time.now - start > 10
-      if page.evaluate_script("window.Stimulus && window.Stimulus.controllers.length > 0")
+    timeout = 15
+    js_check = if identifier
+                 "window.Stimulus && window.Stimulus.controllers.some(c => c.identifier === '#{identifier}')"
+    else
+                 "window.Stimulus && window.Stimulus.controllers.length > 0"
+    end
+    until Time.now - start > timeout
+      if page.evaluate_script(js_check)
         connected = true
         break
       end
       sleep 0.1
     end
-    expect(connected).to be(true), 'Stimulus controllers did not connect within 10 seconds'
+    label = identifier ? "Stimulus '#{identifier}' controller" : 'Stimulus controllers'
+    expect(connected).to be(true), "#{label} did not connect within #{timeout} seconds"
   end
 end
 

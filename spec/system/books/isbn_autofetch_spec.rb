@@ -68,14 +68,7 @@ RSpec.describe 'タイトル入力からのISBN・書影自動取得', type: :sy
     Warden.instance_variable_set(:@test_mode, false)
     sign_in_via_form(user)
     visit new_book_path
-    wait_for_stimulus
-    # book-form コントローラーの接続を確実に待つ（wait_for_stimulusは任意コントローラーが接続された時点で返るため）
-    start = Time.now
-    until Time.now - start > 10
-      break if page.evaluate_script("window.Stimulus && window.Stimulus.controllers.some(c => c.identifier === 'book-form')")
-
-      sleep 0.1
-    end
+    wait_for_stimulus(identifier: 'book-form')
   end
 
   describe 'タイトル入力→自動取得成功' do

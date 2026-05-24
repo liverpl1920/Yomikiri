@@ -68,7 +68,7 @@ RSpec.describe '積読登録画面でのタイトル検索結果フィードバ�
     Warden.instance_variable_set(:@test_mode, false)
     sign_in_via_form(user)
     visit new_book_path
-    wait_for_stimulus
+    wait_for_stimulus(identifier: 'book-form')
   end
 
   describe '全項目取得成功' do
