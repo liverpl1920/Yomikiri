@@ -31,6 +31,8 @@ class BooksController < ApplicationController
   end
 
   def show
+    @book_memos = @book.book_memos.latest_first
+    @new_book_memo = @book.book_memos.build
   end
 
   def edit
@@ -48,10 +50,12 @@ class BooksController < ApplicationController
     new_page = calculate_new_page
     if new_page.nil?
       @book.errors.add(:base, "ページ数が無効です")
+      prepare_show_vars
       render :show, status: :unprocessable_entity
     elsif persist_progress_with_log(new_page)
       redirect_to @book, notice: "進捗を更新しました。"
     else
+      prepare_show_vars
       render :show, status: :unprocessable_entity
     end
   end
@@ -61,6 +65,7 @@ class BooksController < ApplicationController
       flash[:memo_saved] = true
       redirect_to @book, notice: "コメント・メモを更新しました。"
     else
+      prepare_show_vars
       render :show, status: :unprocessable_entity
     end
   end
@@ -70,10 +75,12 @@ class BooksController < ApplicationController
     if @book.extend_deadline!(new_deadline)
       redirect_to @book, notice: "読了期限を延長しました。", status: :see_other
     else
+      prepare_show_vars
       render :show, status: :unprocessable_entity
     end
   rescue Date::Error
     @book.errors.add(:deadline, :invalid)
+    prepare_show_vars
     render :show, status: :unprocessable_entity
   end
 
@@ -96,6 +103,7 @@ class BooksController < ApplicationController
     if @book.update(review_params)
       redirect_to @book, notice: "評価・感想を保存しました。"
     else
+      prepare_show_vars
       render :show, status: :unprocessable_entity
     end
   end
@@ -176,6 +184,11 @@ class BooksController < ApplicationController
   def set_book
     @book = current_user.books.find_by(id: params[:id])
     render file: Rails.public_path.join("404.html"), status: :not_found, layout: false unless @book
+  end
+
+  def prepare_show_vars
+    @book_memos = @book.book_memos.latest_first
+    @new_book_memo = @book.book_memos.build
   end
 
   def calculate_new_page

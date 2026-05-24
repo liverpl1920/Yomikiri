@@ -14,6 +14,7 @@ Rails.application.routes.draw do
   get "email_change/complete", to: "users/email_changes#complete", as: :email_change_complete
 
   resources :books, only: [ :index, :new, :create, :show, :destroy, :edit, :update ] do
+    resources :book_memos, only: [ :create, :destroy ]
     collection do
       get :search
       get :cover_proxy

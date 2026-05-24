@@ -1214,13 +1214,12 @@ RSpec.describe 'Books', type: :request do
         expect(response.body).not_to include('<script>alert(1)</script>')
       end
 
-      it '表示時に改行が保持される' do
+      it '改行を含むメモがDBに正しく保存される' do
         patch update_memo_book_path(book), params: { book: { memo: "1行目\n2行目" } }
-        follow_redirect!
 
-        expect(response.body).to include('1行目')
-        expect(response.body).to include('2行目')
-        expect(response.body).to include('<br')
+        expect(response).to redirect_to(book_path(book))
+        expect(book.reload.memo).to include("1行目")
+        expect(book.reload.memo).to include("2行目")
       end
 
       it 'メモを更新するとmemo_updated_atが更新される' do
@@ -1231,23 +1230,18 @@ RSpec.describe 'Books', type: :request do
         end
       end
 
-      it 'メモ保存後のリダイレクト先でテキストエリアが空になっている' do
+      it 'メモ保存後のリダイレクト先でメモ入力フォームが表示される' do
         patch update_memo_book_path(book), params: { book: { memo: '保存するメモ' } }
         follow_redirect!
 
-        expect(response.body).to include('name="book[memo]"')
-        expect(response.body).not_to match(/<textarea[^>]*name="book\[memo\]"[^>]*>保存するメモ/)
+        expect(response.body).to include('name="book_memo[content]"')
       end
 
-      it 'メモ保存後のリダイレクト先で記録日時が表示される' do
-        freeze_time do
-          patch update_memo_book_path(book), params: { book: { memo: '日時確認メモ' } }
-          follow_redirect!
+      it 'メモ保存後のリダイレクト先でメモタイムラインが表示される' do
+        patch update_memo_book_path(book), params: { book: { memo: '日時確認メモ' } }
+        follow_redirect!
 
-          expected_datetime = I18n.l(book.reload.memo_updated_at, format: :default)
-          expect(response.body).to include(expected_datetime)
-          expect(response.body).to include('book-show__memo-preview-date')
-        end
+        expect(response.body).to include('memo-timeline')
       end
     end
 
