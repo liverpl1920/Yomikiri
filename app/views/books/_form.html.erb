@@ -128,7 +128,7 @@
   </div>
 
   <%# 読了期限 %>
-  <% deadline_optional_for_form = book.new_record? || book.unread? || book.completed? %>
+  <% deadline_optional_for_form = (book.new_record? && book.current_page.to_i.zero?) || book.unread? || book.completed? %>
   <div class="form-field">
     <%= f.label :deadline, '読了期限', class: 'form-field__label' %>
     <% if deadline_optional_for_form %>

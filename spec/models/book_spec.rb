@@ -131,6 +131,17 @@ RSpec.describe Book, type: :model do
         expect(book).to be_valid
       end
 
+      it '新規作成時に current_page が 1 以上の場合は読了期限が必須' do
+        book = build(:book, deadline: nil, status: :unread, current_page: 5)
+        expect(book).not_to be_valid
+        expect(book.errors[:deadline]).not_to be_empty
+      end
+
+      it '新規作成時に current_page が 1 以上で期限があれば有効' do
+        book = build(:book, deadline: Date.current + 7, status: :unread, current_page: 5)
+        expect(book).to be_valid
+      end
+
       it '今日の日付であれば有効（新規作成時）' do
         expect(build(:book, deadline: Date.current)).to be_valid
       end
@@ -555,8 +566,14 @@ RSpec.describe Book, type: :model do
       end
 
       context '新規作成時' do
-        it '新規作成では current_page が 0 以外でもステータスを自動変更しない' do
-          book = build(:book, status: :unread, current_page: 5)
+        it '新規作成で current_page が 1 以上の場合、ステータスが reading になる' do
+          book = build(:book, status: :unread, current_page: 5, deadline: Date.current + 7)
+          book.save!
+          expect(book.reload).to be_reading
+        end
+
+        it '新規作成で current_page が 0 の場合、ステータスは unread のまま' do
+          book = build(:book, status: :unread, current_page: 0)
           book.save!
           expect(book.reload).to be_unread
         end
