@@ -137,16 +137,27 @@
                   <%= t("book.status.#{book.status}") %>
                 </span>
 
-                <%# 読了期限 %>
+                <%# 読了日 or 読了期限 %>
                 <div class="book-card__deadline">
-                  <span class="book-card__deadline-label">読了期限</span>
-                  <span class="book-card__deadline-value">
-                    <% if book.deadline.present? %>
-                      <%= l(book.deadline, format: :long) %>
-                    <% else %>
-                      未設定
-                    <% end %>
-                  </span>
+                  <% if book.completed? %>
+                    <span class="book-card__deadline-label">読了日</span>
+                    <span class="book-card__deadline-value">
+                      <% if book.completed_at.present? %>
+                        <%= l(book.completed_at.to_date, format: :long) %>
+                      <% else %>
+                        未設定
+                      <% end %>
+                    </span>
+                  <% else %>
+                    <span class="book-card__deadline-label">読了期限</span>
+                    <span class="book-card__deadline-value">
+                      <% if book.deadline.present? %>
+                        <%= l(book.deadline, format: :long) %>
+                      <% else %>
+                        未設定
+                      <% end %>
+                    </span>
+                  <% end %>
                 </div>
 
                 <%# 進捗バー %>

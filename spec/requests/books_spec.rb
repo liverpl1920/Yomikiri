@@ -127,6 +127,28 @@ RSpec.describe 'Books', type: :request do
           expect(response.body).to include(book_far.title)
           expect(response.body).not_to include(other_book.title)
         end
+
+        context '読了済み本の日付表示' do
+          it '読了済み本に「読了日」ラベルが表示される' do
+            get books_path
+
+            expect(response.body).to include('読了日')
+          end
+
+          it '読了済み本の completed_at の日付が表示される' do
+            completed_date = Date.current - 3
+            book_completed.update!(completed_at: completed_date.in_time_zone)
+            get books_path
+
+            expect(response.body).to include(I18n.l(completed_date, format: :long))
+          end
+
+          it '未読/読書中の本に「読了期限」ラベルが表示される' do
+            get books_path
+
+            expect(response.body).to include('読了期限')
+          end
+        end
       end
 
       context 'ログイン後のリダイレクト' do
