@@ -1142,10 +1142,10 @@ RSpec.describe 'Books', type: :request do
       end
 
       it '他ユーザーの書籍は読了にできない（404）' do
-        other_book = create(:book, user: other_user, current_page: 100, target_pages: 100)
+        other_book = create(:book, user: other_user, current_page: 100, target_pages: 100, deadline: Date.current + 7)
         patch complete_book_path(other_book)
         expect(response).to have_http_status(:not_found)
-        expect(other_book.reload.status).to eq('unread')
+        expect(other_book.reload.status).to eq('reading')
       end
     end
 
