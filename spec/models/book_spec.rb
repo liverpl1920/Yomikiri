@@ -284,6 +284,67 @@ RSpec.describe Book, type: :model do
         expect(book.errors[:cover_image_url]).not_to be_empty
       end
     end
+
+    describe 'cover_image（Active Storage）' do
+      it '添付なしは有効' do
+        book = build(:book)
+        expect(book.cover_image.attached?).to be false
+        expect(book).to be_valid
+      end
+
+      it 'JPEG画像は有効' do
+        book = build(:book)
+        book.cover_image.attach(
+          io: StringIO.new("fake jpeg data"),
+          filename: 'cover.jpg',
+          content_type: 'image/jpeg'
+        )
+        expect(book).to be_valid
+      end
+
+      it 'PNG画像は有効' do
+        book = build(:book)
+        book.cover_image.attach(
+          io: StringIO.new("fake png data"),
+          filename: 'cover.png',
+          content_type: 'image/png'
+        )
+        expect(book).to be_valid
+      end
+
+      it 'WebP画像は有効' do
+        book = build(:book)
+        book.cover_image.attach(
+          io: StringIO.new("fake webp data"),
+          filename: 'cover.webp',
+          content_type: 'image/webp'
+        )
+        expect(book).to be_valid
+      end
+
+      it '不正なコンテントタイプは無効' do
+        book = build(:book)
+        book.cover_image.attach(
+          io: StringIO.new("fake gif data"),
+          filename: 'cover.gif',
+          content_type: 'image/gif'
+        )
+        expect(book).not_to be_valid
+        expect(book.errors[:cover_image]).not_to be_empty
+      end
+
+      it '5MBを超えるファイルは無効' do
+        book = build(:book)
+        large_data = 'a' * (5.megabytes + 1)
+        book.cover_image.attach(
+          io: StringIO.new(large_data),
+          filename: 'large.jpg',
+          content_type: 'image/jpeg'
+        )
+        expect(book).not_to be_valid
+        expect(book.errors[:cover_image]).not_to be_empty
+      end
+    end
   end
 
   describe 'アソシエーション' do

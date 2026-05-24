@@ -1,4 +1,5 @@
 <%= form_with(model: book,
+               multipart: true,
                data: {
                  controller: 'book-form',
                  action: 'submit->book-form#submitWithAutoFetch'
@@ -87,6 +88,28 @@
           autocomplete: 'off' %>
     <% if book.errors[:genre].any? %>
       <span class="form-field__error"><%= book.errors[:genre].first %></span>
+    <% end %>
+  </div>
+
+  <%# 書影アップロード %>
+  <div class="form-field">
+    <%= f.label :cover_image, '書影画像', class: 'form-field__label' %>
+    <span class="form-field__optional">任意</span>
+    <% if book.cover_image.attached? %>
+      <div class="form-field__current-cover">
+        <%= image_tag url_for(book.cover_image),
+              alt: "現在の書影",
+              class: "form-field__cover-preview",
+              width: 80 %>
+        <span class="form-field__hint">現在の書影。変更する場合は新しい画像を選択してください。</span>
+      </div>
+    <% end %>
+    <%= f.file_field :cover_image,
+          class: "form-field__file #{'form-field__input--error' if book.errors[:cover_image].any?}",
+          accept: 'image/jpeg,image/png,image/webp' %>
+    <small class="form-field__hint">JPEG・PNG・WebP形式、5MB以内。ISBNで取得した書影がある場合は自動設定されます。</small>
+    <% if book.errors[:cover_image].any? %>
+      <span class="form-field__error"><%= book.errors[:cover_image].first %></span>
     <% end %>
   </div>
 

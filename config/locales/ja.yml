@@ -22,6 +22,7 @@ ja:
         author: "著者"
         memo: "コメント・メモ"
         cover_image_url: "書影URL"
+        cover_image: "書影画像"
         total_pages: "総ページ数"
         target_pages: "読了対象ページ数"
         current_page: "現在ページ"
@@ -47,6 +48,9 @@ ja:
               less_than_or_equal_to_total_pages: "は総ページ数（%{count}ページ）以下にしてください"
             cover_image_url:
               invalid_url: "は有効なURL（http://またはhttps://）を入力してください"
+            cover_image:
+              invalid_content_type: "はJPEG・PNG・WebP形式でアップロードしてください"
+              too_large: "は5MB以内でアップロードしてください"
             completed_at_input:
               future_date: "は未来の日付にできません"
         user:

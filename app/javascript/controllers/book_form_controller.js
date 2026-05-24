@@ -83,7 +83,9 @@ export default class extends Controller {
 
     const coverUrlInput = document.getElementById('book_cover_image_url')
     const hasCoverImage = coverUrlInput && coverUrlInput.value.trim() !== ''
-    if (hasCoverImage || this.lastAutoFetchedTitle === title) return
+    const coverFileInput = document.getElementById('book_cover_image')
+    const hasCoverFile = coverFileInput && coverFileInput.files && coverFileInput.files.length > 0
+    if (hasCoverImage || hasCoverFile || this.lastAutoFetchedTitle === title) return
 
     event.preventDefault()
     try {

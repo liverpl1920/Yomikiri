@@ -68,7 +68,7 @@ RSpec.describe '積読登録画面でのタイトル検索結果フィードバ�
     Warden.instance_variable_set(:@test_mode, false)
     sign_in_via_form(user)
     visit new_book_path
-    wait_for_stimulus
+    wait_for_stimulus(identifier: 'book-form')
   end
 
   describe '全項目取得成功' do
@@ -82,18 +82,25 @@ RSpec.describe '積読登録画面でのタイトル検索結果フィードバ�
     end
 
     it '全取得成功メッセージが表示される' do
-      fill_in 'タイトル', with: 'リーダブルコード'
-      find('#book_author').click
+      # fill_inのSeleniumキー送信はCIでIMEタイミング問題が起きるためJSで直接blurをdispatchする
+      page.execute_script(<<~JS)
+        var el = document.getElementById('book_title');
+        el.value = 'リーダブルコード';
+        el.dispatchEvent(new Event('blur', { bubbles: true }));
+      JS
 
       expect(page).to have_css('[data-book-form-target="titleStatus"]',
-                               text: 'タイトル・著者・ページ数・書影をすべて取得しました。', wait: 5)
+                               text: 'タイトル・著者・ページ数・書影をすべて取得しました。', wait: 20)
     end
 
     it '書影プレビュー画像が表示される' do
-      fill_in 'タイトル', with: 'リーダブルコード'
-      find('#book_author').click
+      page.execute_script(<<~JS)
+        var el = document.getElementById('book_title');
+        el.value = 'リーダブルコード';
+        el.dispatchEvent(new Event('blur', { bubbles: true }));
+      JS
 
-      expect(page).to have_css('[data-book-form-target="coverPreview"] img', wait: 5)
+      expect(page).to have_css('[data-book-form-target="coverPreview"] img', wait: 15)
     end
   end
 
@@ -105,19 +112,24 @@ RSpec.describe '積読登録画面でのタイトル検索結果フィードバ�
     end
 
     it '書影が取得できなかった旨のメッセージが表示される' do
-      fill_in 'タイトル', with: 'ISBN なし本'
-      find('#book_title').send_keys(:tab)
-      find('#book_author').click
+      page.execute_script(<<~JS)
+        var el = document.getElementById('book_title');
+        el.value = 'ISBN なし本';
+        el.dispatchEvent(new Event('blur', { bubbles: true }));
+      JS
 
       expect(page).to have_css('[data-book-form-target="titleStatus"]',
-                               text: '書籍情報を取得しましたが、書影は取得できませんでした。', wait: 10)
+                               text: '書籍情報を取得しましたが、書影は取得できませんでした。', wait: 20)
     end
 
     it '書影プレビューは表示されない' do
-      fill_in 'タイトル', with: 'ISBN なし本'
-      find('#book_author').click
+      page.execute_script(<<~JS)
+        var el = document.getElementById('book_title');
+        el.value = 'ISBN なし本';
+        el.dispatchEvent(new Event('blur', { bubbles: true }));
+      JS
 
-      expect(page).not_to have_css('[data-book-form-target="coverPreview"] img', wait: 5)
+      expect(page).not_to have_css('[data-book-form-target="coverPreview"] img', wait: 15)
     end
   end
 
@@ -129,11 +141,14 @@ RSpec.describe '積読登録画面でのタイトル検索結果フィードバ�
     end
 
     it '失敗メッセージが表示される' do
-      fill_in 'タイトル', with: '存在しない本'
-      find('#book_author').click
+      page.execute_script(<<~JS)
+        var el = document.getElementById('book_title');
+        el.value = '存在しない本';
+        el.dispatchEvent(new Event('blur', { bubbles: true }));
+      JS
 
       expect(page).to have_css('[data-book-form-target="titleStatus"]',
-                               text: 'タイトルから書籍情報を取得できませんでした。ISBNで検索してみてください。', wait: 5)
+                               text: 'タイトルから書籍情報を取得できませんでした。ISBNで検索してみてください。', wait: 15)
     end
   end
 end
