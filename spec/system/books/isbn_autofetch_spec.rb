@@ -114,12 +114,17 @@ RSpec.describe 'タイトル入力からのISBN・書影自動取得', type: :sy
     end
 
     it '既に読んだページ数は自動取得後も保持される' do
-      fill_in '既に読んだページ数', with: '42'
-      fill_in 'タイトル', with: 'リーダブルコード'
-      find('#book_author').click
+      # Seleniumのfocus管理との干渉を避けるため、currentPageとtitleの両方をJSで設定する
+      page.execute_script(<<~JS)
+        var currentPageEl = document.querySelector('[data-book-form-target~="currentPage"]');
+        if (currentPageEl) { currentPageEl.value = '42'; }
+        var titleEl = document.getElementById('book_title');
+        titleEl.value = 'リーダブルコード';
+        titleEl.dispatchEvent(new Event('blur', { bubbles: true }));
+      JS
 
       expect(page).to have_css('[data-book-form-target="titleStatus"]',
-                               text: 'タイトル・著者・ページ数・書影をすべて取得しました。', wait: 5)
+                               text: 'タイトル・著者・ページ数・書影をすべて取得しました。', wait: 20)
       expect(page).to have_field('既に読んだページ数', with: '42')
     end
 

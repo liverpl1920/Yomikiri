@@ -5,6 +5,7 @@ class Book < ApplicationRecord
 
   belongs_to :user
   has_many :reading_logs, dependent: :destroy
+  has_many :book_memos, dependent: :destroy
   has_one_attached :cover_image
 
   attr_accessor :is_past_reading, :completed_at_input

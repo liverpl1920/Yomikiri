@@ -616,7 +616,63 @@
   word-break: break-word;
 }
 
-/* ---- Googleカレンダー連携 ---- */
+/* ---- メモタイムライン ---- */
+.memo-timeline {
+  margin-top: var(--spacing-md);
+}
+
+.memo-timeline__empty {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+  text-align: center;
+  padding: var(--spacing-md) 0;
+}
+
+.memo-timeline__list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+  border-top: 1px solid var(--color-border);
+  padding-top: var(--spacing-md);
+}
+
+.memo-timeline__item {
+  border-left: 3px solid var(--color-primary, #4a90d9);
+  padding-left: var(--spacing-md);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.memo-timeline__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-sm);
+}
+
+.memo-timeline__date {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+}
+
+.memo-timeline__delete-btn {
+  font-size: var(--font-size-xs, 0.75rem);
+  padding: 2px 8px;
+  line-height: 1.5;
+}
+
+.memo-timeline__body {
+  line-height: 1.7;
+  color: var(--color-text);
+  word-break: break-word;
+  font-size: var(--font-size-base);
+}
+
+
 .book-show__gcal {
   background-color: var(--color-bg-surface);
   border: 1px solid var(--color-border);
