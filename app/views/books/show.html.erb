@@ -290,16 +290,6 @@
                 </label>
               <% end %>
             </div>
-            <% if @book.rating.present? %>
-              <div class="book-show__stars-display" aria-label="現在の評価: <%= @book.rating %>点">
-                <% @book.rating.times do %>
-                  <span class="book-show__star-filled" aria-hidden="true">★</span>
-                <% end %>
-                <% (5 - @book.rating).times do %>
-                  <span class="book-show__star-empty" aria-hidden="true">☆</span>
-                <% end %>
-              </div>
-            <% end %>
           </div>
 
           <div class="book-show__review-field">
