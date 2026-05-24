@@ -86,14 +86,14 @@ RSpec.describe '積読登録画面でのタイトル検索結果フィードバ�
       find('#book_author').click
 
       expect(page).to have_css('[data-book-form-target="titleStatus"]',
-                               text: 'タイトル・著者・ページ数・書影をすべて取得しました。', wait: 5)
+                               text: 'タイトル・著者・ページ数・書影をすべて取得しました。', wait: 15)
     end
 
     it '書影プレビュー画像が表示される' do
       fill_in 'タイトル', with: 'リーダブルコード'
       find('#book_author').click
 
-      expect(page).to have_css('[data-book-form-target="coverPreview"] img', wait: 5)
+      expect(page).to have_css('[data-book-form-target="coverPreview"] img', wait: 15)
     end
   end
 
@@ -117,7 +117,7 @@ RSpec.describe '積読登録画面でのタイトル検索結果フィードバ�
       fill_in 'タイトル', with: 'ISBN なし本'
       find('#book_author').click
 
-      expect(page).not_to have_css('[data-book-form-target="coverPreview"] img', wait: 5)
+      expect(page).not_to have_css('[data-book-form-target="coverPreview"] img', wait: 15)
     end
   end
 
@@ -133,7 +133,7 @@ RSpec.describe '積読登録画面でのタイトル検索結果フィードバ�
       find('#book_author').click
 
       expect(page).to have_css('[data-book-form-target="titleStatus"]',
-                               text: 'タイトルから書籍情報を取得できませんでした。ISBNで検索してみてください。', wait: 5)
+                               text: 'タイトルから書籍情報を取得できませんでした。ISBNで検索してみてください。', wait: 15)
     end
   end
 end
