@@ -1214,7 +1214,7 @@ RSpec.describe 'Books', type: :request do
         expect(response.body).not_to include('<script>alert(1)</script>')
       end
 
-      it '表示時に改行が保持される' do
+      it '改行を含むメモがDBに正しく保存される' do
         patch update_memo_book_path(book), params: { book: { memo: "1行目\n2行目" } }
 
         expect(response).to redirect_to(book_path(book))

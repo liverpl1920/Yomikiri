@@ -28,9 +28,29 @@
 
 ## フェーズ5: 最終確認
 
-- [ ] `bundle exec rspec` を実行し全テスト通過を確認する
-- [ ] `bundle exec rubocop` を実行しエラーなしを確認する
+- [x] `bundle exec rspec` を実行し全テスト通過を確認する（564 examples, 0 failures）
+- [x] `bundle exec rubocop` を実行しエラーなしを確認する
+
+## フェーズ6: コミット・PR
+
+- [x] コミット: `#239 メモタイムライン機能の実装`
+- [x] ブランチ push: `feature/#239-book-memo-timeline`
+- [x] PR 作成: #240
+- [x] CI 確認: RuboCop & Brakeman & bundler-audit PASS、RSpec PASS
 
 ---
 
 ## 振り返り（実装完了後に記載）
+
+### うまくいったこと
+- `BookMemo` モデル・コントローラー・ルーティング・ビューの一連の実装がスムーズに完了した
+- `prepare_show_vars` プライベートメソッドを追加し、`render :show` を呼ぶ全エラーパスを網羅できた
+- テスト設計が明確で、モデル・リクエスト・システムテストの各レイヤーをカバーできた
+
+### 苦労した点
+- **BooksController 回帰22件**: `render :show` 時に `@book_memos` / `@new_book_memo` が未設定でエラー。`prepare_show_vars` の追加と全エラーパスへの呼び出しで解消
+- **isbn_autofetch_spec の不安定テスト (line 116)**: `fill_in`（Selenium フォーカス管理）+ `execute_script dispatchEvent blur` の組み合わせがフルスイート時に競合。`currentPage` の設定も `execute_script` に統一し、Selenium フォーカス状態の干渉を除去して解消
+
+### 学び
+- Selenium の `fill_in` は実際にブラウザフォーカスを動かすため、その後の `execute_script` による合成イベント発火と干渉することがある。複数フィールドを連携してテストする場合は `execute_script` で一括設定するほうが安定する
+- システムテストはフルスイートでのみ再現する不安定テストが存在する。孤立実行で通っても、フルスイート（多数のスペック前実行あり）で失敗するケースがあることを念頭に置く

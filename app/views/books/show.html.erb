@@ -266,8 +266,8 @@
                         book_book_memo_path(@book, memo),
                         method: :delete,
                         class: 'memo-timeline__delete-btn btn btn--danger btn--sm',
-                        form: { data: { turbo: false },
-                                'aria-label': "#{l(memo.created_at, format: :default)}のメモを削除" } %>
+                        'aria-label': "#{l(memo.created_at, format: :default)}のメモを削除",
+                        form: { data: { turbo: false } } %>
                 </div>
                 <div class="memo-timeline__body">
                   <%= simple_format(memo.content) %>
