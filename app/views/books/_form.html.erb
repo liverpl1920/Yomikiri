@@ -18,6 +18,31 @@
     </div>
   <% end %>
 
+  <%# ISBN入力による書籍情報の自動取得 %>
+  <div class="form-field isbn-fetch">
+    <%= label_tag :isbn_input, 'ISBN（書籍情報を自動取得）', class: 'form-field__label' %>
+    <span class="form-field__optional">任意</span>
+    <div class="isbn-fetch__row">
+      <%= text_field_tag :isbn_input, book.isbn,
+            class: 'form-field__input isbn-fetch__input',
+            placeholder: '例: 9784873115658',
+            autocomplete: 'off',
+            inputmode: 'numeric',
+            maxlength: 17,
+            data: {
+              'book-form-target': 'isbnInput',
+              action: 'keydown.enter->book-form#fetchByIsbnOnEnter'
+            } %>
+      <button type="button"
+              class="btn btn--outline isbn-fetch__btn"
+              data-action="click->book-form#fetchByIsbn">
+        書籍情報を取得
+      </button>
+    </div>
+    <small class="form-field__hint">ISBNを入力して「書籍情報を取得」を押すと、タイトルや著者などを自動入力します</small>
+    <p class="book-form__isbn-status" data-book-form-target="isbnStatus" aria-live="polite"></p>
+  </div>
+
   <%# タイトル %>
   <div class="form-field" data-controller="title-autocomplete">
     <%= f.label :title, 'タイトル', class: 'form-field__label' %>

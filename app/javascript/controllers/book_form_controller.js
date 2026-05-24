@@ -2,7 +2,7 @@ import { Controller } from '@hotwired/stimulus'
 
 export default class extends Controller {
   static targets = ['totalPages', 'targetPages', 'deadline', 'quotaDisplay',
-    'title', 'titleStatus', 'coverPreview', 'currentPage']
+    'title', 'titleStatus', 'coverPreview', 'currentPage', 'isbnInput', 'isbnStatus']
 
   connect () {
     this.calculateQuota()
@@ -32,6 +32,49 @@ export default class extends Controller {
     if (!title) return false
 
     return this._fetchBookByTitle(title)
+  }
+
+  async fetchByIsbn () {
+    const isbn = this.hasIsbnInputTarget ? this.isbnInputTarget.value.trim() : ''
+    if (!isbn) return
+
+    if (!this._isValidIsbn(isbn)) {
+      this._setIsbnStatus('ISBNは13桁の数字（ISBN-13）または10桁の数字・末尾X（ISBN-10）で入力してください。')
+      return
+    }
+
+    this._setIsbnStatus('書籍情報を取得中...')
+    try {
+      const res = await fetch(`/books/search?q=${encodeURIComponent(isbn)}`, {
+        headers: { Accept: 'application/json' }
+      })
+      if (!res.ok) throw new Error('Network error')
+
+      const data = await res.json()
+      if (data.error) {
+        this._setIsbnStatus(data.error)
+        return
+      }
+
+      const books = data.books || []
+      if (books.length === 0) {
+        this._setIsbnStatus('ISBNに一致する書籍が見つかりませんでした。')
+        return
+      }
+
+      const book = books[0]
+      const missing = this._fillFormFromSearch(book, { fillTitle: true })
+      this._updateCoverPreview(book.cover_image_url)
+      this._setIsbnStatus(this._buildFetchResultMessage(missing))
+      this.markTitleFetched(book.title || '')
+    } catch (_e) {
+      this._setIsbnStatus('取得中にエラーが発生しました。')
+    }
+  }
+
+  fetchByIsbnOnEnter (event) {
+    event.preventDefault()
+    this.fetchByIsbn()
   }
 
   async submitWithAutoFetch (event) {
@@ -100,13 +143,18 @@ export default class extends Controller {
     }
   }
 
-  _fillFormFromSearch ({ author, genre, total_pages: totalPages, cover_image_url: coverUrl, isbn }) {
+  _fillFormFromSearch ({ title, author, genre, total_pages: totalPages, cover_image_url: coverUrl, isbn }, { fillTitle = false } = {}) {
+    const titleInput = this.hasTitleTarget ? this.titleTarget : null
     const authorInput = document.getElementById('book_author')
     const genreInput = document.getElementById('book_genre')
     const totalPagesInput = document.getElementById('book_total_pages')
     const coverUrlInput = document.getElementById('book_cover_image_url')
     const isbnInput = document.getElementById('book_isbn')
     const missing = []
+
+    if (fillTitle && titleInput && title) {
+      titleInput.value = title
+    }
 
     if (authorInput && author) {
       authorInput.value = author
@@ -143,6 +191,17 @@ export default class extends Controller {
       return 'タイトル・著者・ページ数・書影をすべて取得しました。'
     }
     return `書籍情報を取得しましたが、${missing.join('・')}は取得できませんでした。`
+  }
+
+  _isValidIsbn (raw) {
+    const sanitized = raw.toUpperCase().replace(/[^0-9X]/g, '')
+    return /^(?:\d{13}|\d{9}[\dX])$/.test(sanitized)
+  }
+
+  _setIsbnStatus (message) {
+    if (this.hasIsbnStatusTarget) {
+      this.isbnStatusTarget.textContent = message
+    }
   }
 
   _updateCoverPreview (coverUrl) {
