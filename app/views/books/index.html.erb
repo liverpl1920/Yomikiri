@@ -97,7 +97,7 @@
               <%# 書影 %>
               <div class="book-card__cover-wrapper">
                 <div class="book-card__cover <%= book.deadline_urgency_class %>">
-                  <% cover_src = book_cover_src(book.cover_image_url) %>
+                  <% cover_src = book_cover_src(book) %>
                   <% if cover_src %>
                     <img src="<%= cover_src %>"
                          alt="<%= book.title %>の書影"

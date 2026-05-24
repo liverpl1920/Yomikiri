@@ -1,8 +1,11 @@
 class Book < ApplicationRecord
   MEMO_MAX_LENGTH = 2000
+  COVER_IMAGE_CONTENT_TYPES = %w[image/jpeg image/png image/webp].freeze
+  COVER_IMAGE_MAX_SIZE = 5.megabytes
 
   belongs_to :user
   has_many :reading_logs, dependent: :destroy
+  has_one_attached :cover_image
 
   attr_accessor :is_past_reading, :completed_at_input
 
@@ -29,6 +32,8 @@ class Book < ApplicationRecord
   validate :cover_image_url_must_be_valid_url, if: -> { cover_image_url.present? }
   validate :completed_at_must_be_valid_date, if: -> { past_reading_checked? && completed_at_input.present? }
   validate :completed_at_must_not_be_in_future, if: -> { past_reading_checked? && completed_at_input.present? }
+  validate :cover_image_content_type, if: -> { cover_image.attached? }
+  validate :cover_image_size, if: -> { cover_image.attached? }
 
   before_save :auto_set_reading_status
   before_save :apply_past_reading_settings
@@ -203,6 +208,18 @@ class Book < ApplicationRecord
     errors.add(:cover_image_url, :invalid_url) unless uri.is_a?(URI::HTTP) || uri.is_a?(URI::HTTPS)
   rescue URI::InvalidURIError
     errors.add(:cover_image_url, :invalid_url)
+  end
+
+  def cover_image_content_type
+    return if COVER_IMAGE_CONTENT_TYPES.include?(cover_image.content_type)
+
+    errors.add(:cover_image, :invalid_content_type)
+  end
+
+  def cover_image_size
+    return if cover_image.byte_size <= COVER_IMAGE_MAX_SIZE
+
+    errors.add(:cover_image, :too_large)
   end
 
   # 初回の進捗記録（current_page が 0 → 1 以上）時に unread → reading へ自動遷移する
