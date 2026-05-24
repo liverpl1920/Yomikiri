@@ -226,7 +226,12 @@ class BooksController < ApplicationController
     pages_read = current_page.to_i - previous_page.to_i
     return if pages_read <= 0
 
-    @book.reading_logs.create!(pages_read: pages_read, read_at: Date.current)
+    @book.reading_logs.create!(
+      pages_read: pages_read,
+      read_at: Date.current,
+      start_page: previous_page.to_i,
+      end_page: current_page.to_i
+    )
   end
 
   def book_params

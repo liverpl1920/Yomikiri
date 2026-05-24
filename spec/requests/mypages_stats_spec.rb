@@ -59,6 +59,44 @@ RSpec.describe 'Mypage stats', type: :request do
         expect(response.body).to include('20')
       end
 
+      it 'カスタム期間集計を表示する' do
+        book = create(:book, user: user, title: 'カスタム本')
+
+        create(:reading_log, book: book, read_at: Date.new(2026, 5, 5), pages_read: 15)
+        create(:reading_log, book: book, read_at: Date.new(2026, 5, 1), pages_read: 99) # 範囲外
+
+        get stats_mypage_path(period: 'custom', start_date: '2026-05-03', end_date: '2026-05-10')
+
+        expect(response).to have_http_status(:ok)
+        expect(response.body).to include('カスタム期間集計')
+        expect(response.body).to include('カスタム本')
+        expect(response.body).to include('15')
+      end
+
+      it '日別ページ数グラフを表示する' do
+        book = create(:book, user: user, title: '日別本')
+        create(:reading_log, book: book, read_at: Date.new(2026, 5, 15), pages_read: 25)
+
+        get stats_mypage_path(period: 'weekly')
+
+        expect(response).to have_http_status(:ok)
+        expect(response.body).to include('日別読了ページ数')
+      end
+
+      it '読書ログ詳細テーブルを表示する' do
+        book = create(:book, user: user, title: 'ログ詳細本')
+        create(:reading_log, book: book, read_at: Date.new(2026, 5, 17), pages_read: 30,
+               start_page: 50, end_page: 80)
+
+        get stats_mypage_path(period: 'weekly')
+
+        expect(response).to have_http_status(:ok)
+        expect(response.body).to include('読書ログ詳細')
+        expect(response.body).to include('ログ詳細本')
+        expect(response.body).to include('50ページ')
+        expect(response.body).to include('80ページ')
+      end
+
       it 'データなしの場合はゼロと空表示を返す' do
         get stats_mypage_path(period: 'weekly')
 

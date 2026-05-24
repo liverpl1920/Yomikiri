@@ -2,7 +2,7 @@
 
 class MypagesController < ApplicationController
   DAILY_LOG_WINDOW_DAYS = 7
-  STATS_PERIODS = %w[weekly monthly].freeze
+  STATS_PERIODS = %w[weekly monthly custom].freeze
 
   before_action :authenticate_user!
   before_action :set_completed_books, only: %i[show update]
@@ -12,10 +12,18 @@ class MypagesController < ApplicationController
 
   def stats
     @period = normalized_period
-    @summary = ReadingReportSummaryService.call(user: current_user, period_type: @period)
+    @custom_start_date = parse_custom_date(:start_date)
+    @custom_end_date = parse_custom_date(:end_date)
+    @summary = ReadingReportSummaryService.call(
+      user: current_user,
+      period_type: @period,
+      start_date: @custom_start_date,
+      end_date: @custom_end_date
+    )
     @completed_books_count = completed_books_count_in_period
     @average_pages_per_day = average_pages_per_day
     @max_pages_read = @summary[:books].map { |book| book[:pages_read] }.max.to_i
+    @max_daily_pages = @summary[:daily_pages].values.max.to_i
   end
 
   def update
@@ -55,6 +63,12 @@ class MypagesController < ApplicationController
   def normalized_period
     period = params[:period].to_s
     STATS_PERIODS.include?(period) ? period : "weekly"
+  end
+
+  def parse_custom_date(param_key)
+    Date.parse(params[param_key].to_s)
+  rescue ArgumentError, TypeError
+    nil
   end
 
   def completed_books_count_in_period
