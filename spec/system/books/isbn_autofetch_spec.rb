@@ -190,6 +190,39 @@ RSpec.describe 'タイトル入力からのISBN・書影自動取得', type: :sy
     end
   end
 
+  describe 'auto-fetch後にファイルをアップロードして登録' do
+    before do
+      stub_request(:get, /www\.googleapis\.com\/books\/v1\/volumes/)
+        .to_return(status: 200, body: google_books_response_with_isbn,
+                   headers: { 'Content-Type' => 'application/json' })
+      stub_request(:get, /api\.openbd\.jp\/v1\/get\?isbn=9784873115658/)
+        .to_return(status: 200, body: openbd_response_with_cover,
+                   headers: { 'Content-Type' => 'application/json' })
+    end
+
+    it 'auto-fetch後にファイルを選択してもcover_image_urlバリデーションエラーが発生しない' do
+      # タイトル入力でauto-fetchを起動してcover_image_urlをセット
+      page.execute_script(<<~JS)
+        var el = document.getElementById('book_title');
+        el.value = 'リーダブルコード';
+        el.dispatchEvent(new Event('blur', { bubbles: true }));
+      JS
+      expect(page).to have_css('[data-book-form-target="titleStatus"]',
+                               text: 'タイトル・著者・ページ数・書影をすべて取得しました。', wait: 20)
+
+      # cover_image_url hidden フィールドにURLが入っていることを確認
+      cover_url_value = page.evaluate_script("document.getElementById('book_cover_image_url').value")
+      expect(cover_url_value).not_to be_empty
+
+      # ファイルを選択すると cover_image_url がクリアされること
+      attach_file('book[cover_image]', Rails.root.join('spec/fixtures/files/test_cover.png').to_s,
+                  make_visible: true)
+
+      cover_url_after = page.evaluate_script("document.getElementById('book_cover_image_url').value")
+      expect(cover_url_after).to eq('')
+    end
+  end
+
   describe 'ISBNボタンによる書籍情報取得' do
     let(:openbd_not_found_response) { '[null]' }
 

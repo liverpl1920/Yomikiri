@@ -10,7 +10,7 @@ Stimulus コントローラー（`book_form_controller.js`）に `clearCoverImag
 
 #### 方針A: Stimulus action を使う（採用）
 
-- コントローラーに `clearCoverImageUrl(event)` メソッドを追加する
+- コントローラーに `clearCoverImageUrl()` メソッドを追加する
 - ビュー (`_form.html.erb`) の `f.file_field :cover_image` に `data-action: "change->book-form#clearCoverImageUrl"` を追加する
 
 この方針は既存のStimulusパターンと一貫しており、宣言的で分かりやすい。
