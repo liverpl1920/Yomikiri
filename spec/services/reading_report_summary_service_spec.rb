@@ -84,7 +84,7 @@ RSpec.describe ReadingReportSummaryService do
 
     it '読書ログ詳細を返す' do
       create(:reading_log, book: book_a, read_at: Date.new(2026, 5, 17), pages_read: 30,
-             start_page: 10, end_page: 40)
+             start_page: 11, end_page: 40)
       create(:reading_log, book: book_b, read_at: Date.new(2026, 5, 15), pages_read: 20,
              start_page: nil, end_page: nil)
 
@@ -94,7 +94,7 @@ RSpec.describe ReadingReportSummaryService do
       details = summary[:reading_log_details]
       expect(details.size).to eq(2)
       expect(details.first[:book_title]).to eq('リファクタリング')
-      expect(details.first[:start_page]).to eq(10)
+      expect(details.first[:start_page]).to eq(11)
       expect(details.first[:end_page]).to eq(40)
       expect(details.first[:pages_read]).to eq(30)
       expect(details.last[:start_page]).to be_nil

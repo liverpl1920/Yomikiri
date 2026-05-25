@@ -2,6 +2,7 @@
 
 class ReadingReportSummaryService
   PERIOD_TYPES = %i[weekly monthly custom].freeze
+  MAX_CUSTOM_PERIOD_DAYS = 366
 
   def self.call(user:, period_type:, reference_date: Date.current, start_date: nil, end_date: nil)
     new(user:, period_type:, reference_date:, start_date:, end_date:).call
@@ -56,7 +57,11 @@ class ReadingReportSummaryService
       when :monthly
         reference_date.beginning_of_month..reference_date.end_of_month
       when :custom
-        (custom_start_date || reference_date)..(custom_end_date || reference_date)
+        start = custom_start_date || reference_date
+        finish = custom_end_date || reference_date
+        start, finish = finish, start if start > finish
+        finish = start + MAX_CUSTOM_PERIOD_DAYS - 1 if (finish - start).to_i >= MAX_CUSTOM_PERIOD_DAYS
+        start..finish
       end
     end
   end

@@ -86,14 +86,14 @@ RSpec.describe 'Mypage stats', type: :request do
       it '読書ログ詳細テーブルを表示する' do
         book = create(:book, user: user, title: 'ログ詳細本')
         create(:reading_log, book: book, read_at: Date.new(2026, 5, 17), pages_read: 30,
-               start_page: 50, end_page: 80)
+               start_page: 51, end_page: 80)
 
         get stats_mypage_path(period: 'weekly')
 
         expect(response).to have_http_status(:ok)
         expect(response.body).to include('読書ログ詳細')
         expect(response.body).to include('ログ詳細本')
-        expect(response.body).to include('50ページ')
+        expect(response.body).to include('51ページ')
         expect(response.body).to include('80ページ')
       end
 

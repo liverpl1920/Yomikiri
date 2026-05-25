@@ -91,7 +91,7 @@
             <div class="mypage-stats__daily-row">
               <span class="mypage-stats__daily-date"><%= l(date, format: :short) %></span>
               <div class="mypage-stats__daily-bar-wrap">
-                <div class="mypage-stats__daily-bar" style="width: <%= ratio %>%" role="img" aria-label="<%= date %> <%= pages %>ページ"></div>
+                <div class="mypage-stats__daily-bar" style="width: <%= ratio %>%" aria-hidden="true"></div>
               </div>
               <span class="mypage-stats__daily-pages"><%= pages > 0 ? "#{pages}p" : "-" %></span>
             </div>
@@ -134,11 +134,11 @@
           <table class="mypage-stats__log-table">
             <thead>
               <tr>
-                <th class="mypage-stats__log-th">日付</th>
-                <th class="mypage-stats__log-th">書籍名</th>
-                <th class="mypage-stats__log-th">開始ページ</th>
-                <th class="mypage-stats__log-th">終了ページ</th>
-                <th class="mypage-stats__log-th">読了ページ数</th>
+                <th class="mypage-stats__log-th" scope="col">日付</th>
+                <th class="mypage-stats__log-th" scope="col">書籍名</th>
+                <th class="mypage-stats__log-th" scope="col">開始ページ</th>
+                <th class="mypage-stats__log-th" scope="col">終了ページ</th>
+                <th class="mypage-stats__log-th" scope="col">読了ページ数</th>
               </tr>
             </thead>
             <tbody>

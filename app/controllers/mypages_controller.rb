@@ -12,8 +12,7 @@ class MypagesController < ApplicationController
 
   def stats
     @period = normalized_period
-    @custom_start_date = parse_custom_date(:start_date)
-    @custom_end_date = parse_custom_date(:end_date)
+    @custom_start_date, @custom_end_date = normalized_custom_dates
     @summary = ReadingReportSummaryService.call(
       user: current_user,
       period_type: @period,
@@ -69,6 +68,14 @@ class MypagesController < ApplicationController
     Date.parse(params[param_key].to_s)
   rescue ArgumentError, TypeError
     nil
+  end
+
+  def normalized_custom_dates
+    start_date = parse_custom_date(:start_date)
+    end_date = parse_custom_date(:end_date)
+    return [ start_date, end_date ] unless start_date && end_date && start_date > end_date
+
+    [ end_date, start_date ]
   end
 
   def completed_books_count_in_period

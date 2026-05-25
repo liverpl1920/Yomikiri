@@ -229,7 +229,7 @@ class BooksController < ApplicationController
     @book.reading_logs.create!(
       pages_read: pages_read,
       read_at: Date.current,
-      start_page: previous_page.to_i,
+      start_page: previous_page.to_i + 1,
       end_page: current_page.to_i
     )
   end
