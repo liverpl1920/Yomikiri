@@ -238,6 +238,14 @@
 
       <%= form_with model: [@book, @new_book_memo], data: { turbo: false } do |f| %>
         <div class="book-show__memo-field">
+          <%= f.label :page_number, '対象ページ（任意）', class: 'book-show__memo-label' %>
+          <%= f.text_field :page_number,
+                class: 'book-show__memo-page-input',
+                maxlength: BookMemo::PAGE_NUMBER_MAX_LENGTH,
+                placeholder: '例: 100、100-120、p.200' %>
+          <small class="book-show__memo-help">最大20文字</small>
+        </div>
+        <div class="book-show__memo-field">
           <%= f.text_area :content,
                 class: 'book-show__memo-input',
                 rows: 4,
@@ -259,16 +267,35 @@
             <% @book_memos.each do |memo| %>
               <li class="memo-timeline__item">
                 <div class="memo-timeline__header">
-                  <time class="memo-timeline__date" datetime="<%= memo.created_at.iso8601 %>">
-                    <%= l(memo.created_at, format: :default) %>
-                  </time>
-                  <%= button_to '削除',
-                        book_book_memo_path(@book, memo),
-                        method: :delete,
-                        class: 'memo-timeline__delete-btn btn btn--danger btn--sm',
-                        'aria-label': "#{l(memo.created_at, format: :default)}のメモを削除",
-                        form: { data: { turbo: false } } %>
+                  <div class="memo-timeline__timestamps">
+                    <time class="memo-timeline__date" datetime="<%= memo.created_at.iso8601 %>">
+                      作成：<%= l(memo.created_at, format: :default) %>
+                    </time>
+                    <% if memo.edited? %>
+                      <time class="memo-timeline__date memo-timeline__date--edited" datetime="<%= memo.updated_at.iso8601 %>">
+                        更新：<%= l(memo.updated_at, format: :default) %>
+                      </time>
+                    <% end %>
+                  </div>
+                  <div class="memo-timeline__actions">
+                    <%= link_to '編集',
+                          edit_book_book_memo_path(@book, memo),
+                          class: 'memo-timeline__edit-btn btn btn--secondary btn--sm',
+                          'aria-label': "#{l(memo.created_at, format: :default)}のメモを編集" %>
+                    <%= button_to '削除',
+                          book_book_memo_path(@book, memo),
+                          method: :delete,
+                          class: 'memo-timeline__delete-btn btn btn--danger btn--sm',
+                          'aria-label': "#{l(memo.created_at, format: :default)}のメモを削除",
+                          form: { data: { turbo: false } } %>
+                  </div>
                 </div>
+                <% if memo.page_number.present? %>
+                  <div class="memo-timeline__page">
+                    <span class="memo-timeline__page-label">対象ページ：</span>
+                    <span class="memo-timeline__page-value"><%= memo.page_number %></span>
+                  </div>
+                <% end %>
                 <div class="memo-timeline__body">
                   <%= simple_format(memo.content) %>
                 </div>

@@ -103,4 +103,117 @@ RSpec.describe 'BookMemos', type: :request do
       end
     end
   end
+
+  describe 'GET /books/:book_id/book_memos/:id/edit' do
+    let!(:memo) { create(:book_memo, book: book) }
+
+    context '未ログインの場合' do
+      it 'ログイン画面へリダイレクトされる' do
+        get edit_book_book_memo_path(book, memo)
+
+        expect(response).to redirect_to(new_user_session_path)
+      end
+    end
+
+    context 'ログイン済みの場合' do
+      before { sign_in user }
+
+      it '200を返す' do
+        get edit_book_book_memo_path(book, memo)
+
+        expect(response).to have_http_status(:ok)
+      end
+
+      context '他ユーザーの書籍のメモへのアクセス' do
+        let(:other_book) { create(:book, user: other_user) }
+        let!(:other_memo) { create(:book_memo, book: other_book) }
+
+        it '404を返す' do
+          get edit_book_book_memo_path(other_book, other_memo)
+
+          expect(response).to have_http_status(:not_found)
+        end
+      end
+    end
+  end
+
+  describe 'PATCH /books/:book_id/book_memos/:id' do
+    let!(:memo) { create(:book_memo, book: book) }
+
+    context '未ログインの場合' do
+      it 'ログイン画面へリダイレクトされる' do
+        patch book_book_memo_path(book, memo), params: { book_memo: { content: '更新後のメモ' } }
+
+        expect(response).to redirect_to(new_user_session_path)
+      end
+    end
+
+    context 'ログイン済みの場合' do
+      before { sign_in user }
+
+      context '有効なパラメータの場合' do
+        it '302リダイレクトを返す' do
+          patch book_book_memo_path(book, memo), params: { book_memo: { content: '更新後のメモ' } }
+
+          expect(response).to redirect_to(book_path(book))
+        end
+
+        it 'メモが更新される' do
+          patch book_book_memo_path(book, memo), params: { book_memo: { content: '更新後のメモ' } }
+
+          expect(memo.reload.content).to eq('更新後のメモ')
+        end
+
+        it 'page_numberが更新される' do
+          patch book_book_memo_path(book, memo), params: { book_memo: { content: memo.content, page_number: '100-120' } }
+
+          expect(memo.reload.page_number).to eq('100-120')
+        end
+      end
+
+      context '無効なパラメータの場合（contentが空）' do
+        it '422を返す' do
+          patch book_book_memo_path(book, memo), params: { book_memo: { content: '' } }
+
+          expect(response).to have_http_status(:unprocessable_entity)
+        end
+
+        it 'メモが更新されない' do
+          original_content = memo.content
+          patch book_book_memo_path(book, memo), params: { book_memo: { content: '' } }
+
+          expect(memo.reload.content).to eq(original_content)
+        end
+      end
+
+      context '他ユーザーの書籍のメモへのアクセス' do
+        let(:other_book) { create(:book, user: other_user) }
+        let!(:other_memo) { create(:book_memo, book: other_book) }
+
+        it '404を返す' do
+          patch book_book_memo_path(other_book, other_memo), params: { book_memo: { content: '更新後のメモ' } }
+
+          expect(response).to have_http_status(:not_found)
+        end
+      end
+    end
+  end
+
+  describe 'POST /books/:book_id/book_memos (page_number付き)' do
+    context 'ログイン済みの場合' do
+      before { sign_in user }
+
+      it 'page_numberが保存される' do
+        post book_book_memos_path(book), params: { book_memo: { content: 'テストメモ', page_number: '100' } }
+
+        expect(book.book_memos.last.page_number).to eq('100')
+      end
+
+      it 'page_numberが未入力でも作成できる' do
+        post book_book_memos_path(book), params: { book_memo: { content: 'テストメモ', page_number: '' } }
+
+        expect(book.book_memos.last.page_number).to be_blank
+      end
+    end
+  end
 end

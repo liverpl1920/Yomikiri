@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2026_05_24_221649) do
+ActiveRecord::Schema[7.2].define(version: 2026_05_25_220315) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -47,6 +47,7 @@ ActiveRecord::Schema[7.2].define(version: 2026_05_24_221649) do
     t.text "content", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "page_number"
     t.index ["book_id"], name: "index_book_memos_on_book_id"
   end
 

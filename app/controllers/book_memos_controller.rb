@@ -3,7 +3,7 @@
 class BookMemosController < ApplicationController
   before_action :authenticate_user!
   before_action :set_book
-  before_action :set_book_memo, only: [ :destroy ]
+  before_action :set_book_memo, only: [ :destroy, :edit, :update ]
 
   def create
     @book_memo = @book.book_memos.build(book_memo_params)
@@ -13,6 +13,17 @@ class BookMemosController < ApplicationController
       @book_memos = @book.book_memos.latest_first
       @new_book_memo = @book_memo
       render "books/show", status: :unprocessable_entity
+    end
+  end
+
+  def edit
+  end
+
+  def update
+    if @book_memo.update(book_memo_params)
+      redirect_to @book, notice: "メモを更新しました。"
+    else
+      render :edit, status: :unprocessable_entity
     end
   end
 
@@ -34,6 +45,6 @@ class BookMemosController < ApplicationController
   end
 
   def book_memo_params
-    params.require(:book_memo).permit(:content)
+    params.require(:book_memo).permit(:content, :page_number)
   end
 end
