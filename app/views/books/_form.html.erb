@@ -106,7 +106,8 @@
     <% end %>
     <%= f.file_field :cover_image,
           class: "form-field__file #{'form-field__input--error' if book.errors[:cover_image].any?}",
-          accept: 'image/jpeg,image/png,image/webp' %>
+          accept: 'image/jpeg,image/png,image/webp',
+          data: { action: 'change->book-form#clearCoverImageUrl' } %>
     <small class="form-field__hint">JPEG・PNG・WebP形式、5MB以内。ISBNで取得した書影がある場合は自動設定されます。</small>
     <% if book.errors[:cover_image].any? %>
       <span class="form-field__error"><%= book.errors[:cover_image].first %></span>
