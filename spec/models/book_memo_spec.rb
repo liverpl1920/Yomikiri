@@ -80,6 +80,12 @@ RSpec.describe BookMemo, type: :model do
         memo = create(:book_memo, created_at: now, updated_at: now + 0.5.seconds)
         expect(memo.edited?).to be false
       end
+
+      it 'updated_atとcreated_atの差がちょうど1秒の場合は編集済みではない' do
+        now = Time.current
+        memo = create(:book_memo, created_at: now, updated_at: now + 1.second)
+        expect(memo.edited?).to be false
+      end
     end
   end
 end
