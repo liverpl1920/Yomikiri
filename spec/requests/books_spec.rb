@@ -936,6 +936,8 @@ RSpec.describe 'Books', type: :request do
           expect(log.book).to eq(book)
           expect(log.pages_read).to eq(20)
           expect(log.read_at).to eq(Date.current)
+          expect(log.start_page).to eq(11)
+          expect(log.end_page).to eq(30)
         end
 
         it '更新後、書籍詳細画面へリダイレクトされる' do

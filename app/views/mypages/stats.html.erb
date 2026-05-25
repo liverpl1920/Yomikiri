@@ -21,7 +21,36 @@
             class: ["mypage-stats__period-tab", (@period == 'monthly' ? 'mypage-stats__period-tab--active' : nil)].compact.join(' '),
             role: 'tab',
             aria: { selected: (@period == 'monthly').to_s } %>
+      <%= link_to 'カスタム期間',
+            stats_mypage_path(period: 'custom'),
+            class: ["mypage-stats__period-tab", (@period == 'custom' ? 'mypage-stats__period-tab--active' : nil)].compact.join(' '),
+            role: 'tab',
+            aria: { selected: (@period == 'custom').to_s } %>
     </div>
+
+    <% if @period == 'custom' %>
+      <div class="mypage-stats__custom-form">
+        <%= form_with url: stats_mypage_path, method: :get, local: true, class: 'mypage-stats__custom-form-inner' do |f| %>
+          <%= hidden_field_tag :period, 'custom' %>
+          <div class="mypage-stats__custom-form-fields">
+            <div class="mypage-stats__custom-form-field">
+              <%= label_tag :start_date, '開始日', class: 'mypage-stats__custom-form-label' %>
+              <%= date_field_tag :start_date,
+                    (@custom_start_date || @summary[:start_date]),
+                    class: 'mypage-stats__custom-form-input' %>
+            </div>
+            <span class="mypage-stats__custom-form-sep">〜</span>
+            <div class="mypage-stats__custom-form-field">
+              <%= label_tag :end_date, '終了日', class: 'mypage-stats__custom-form-label' %>
+              <%= date_field_tag :end_date,
+                    (@custom_end_date || @summary[:end_date]),
+                    class: 'mypage-stats__custom-form-input' %>
+            </div>
+            <%= submit_tag '表示', class: 'btn btn--primary' %>
+          </div>
+        <% end %>
+      </div>
+    <% end %>
 
     <div class="mypage-stats__period-summary">
       <p class="mypage-stats__period-label">
@@ -50,6 +79,27 @@
       </article>
     </div>
 
+    <section class="mypage-stats__daily">
+      <h2 class="mypage-stats__breakdown-title">日別読了ページ数</h2>
+
+      <% if @summary[:daily_pages].values.sum.zero? %>
+        <p class="mypage-stats__empty">この期間の読書記録はありません。</p>
+      <% else %>
+        <div class="mypage-stats__daily-chart" aria-label="日別読了ページ数グラフ">
+          <% @summary[:daily_pages].each do |date, pages| %>
+            <% ratio = @max_daily_pages.positive? ? ((pages.to_f / @max_daily_pages) * 100).round(1) : 0 %>
+            <div class="mypage-stats__daily-row">
+              <span class="mypage-stats__daily-date"><%= l(date, format: :short) %></span>
+              <div class="mypage-stats__daily-bar-wrap">
+                <div class="mypage-stats__daily-bar" style="width: <%= ratio %>%" aria-hidden="true"></div>
+              </div>
+              <span class="mypage-stats__daily-pages"><%= pages > 0 ? "#{pages}p" : "-" %></span>
+            </div>
+          <% end %>
+        </div>
+      <% end %>
+    </section>
+
     <section class="mypage-stats__breakdown">
       <h2 class="mypage-stats__breakdown-title">書籍別の読了ページ内訳</h2>
 
@@ -73,5 +123,39 @@
         </ul>
       <% end %>
     </section>
+
+    <section class="mypage-stats__log-details">
+      <h2 class="mypage-stats__breakdown-title">読書ログ詳細</h2>
+
+      <% if @summary[:reading_log_details].empty? %>
+        <p class="mypage-stats__empty">この期間の読書記録はありません。</p>
+      <% else %>
+        <div class="mypage-stats__log-table-wrap">
+          <table class="mypage-stats__log-table">
+            <thead>
+              <tr>
+                <th class="mypage-stats__log-th" scope="col">日付</th>
+                <th class="mypage-stats__log-th" scope="col">書籍名</th>
+                <th class="mypage-stats__log-th" scope="col">開始ページ</th>
+                <th class="mypage-stats__log-th" scope="col">終了ページ</th>
+                <th class="mypage-stats__log-th" scope="col">読了ページ数</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% @summary[:reading_log_details].each do |log| %>
+                <tr class="mypage-stats__log-row">
+                  <td class="mypage-stats__log-td"><%= l(log[:read_at], format: :default) %></td>
+                  <td class="mypage-stats__log-td"><%= log[:book_title] %></td>
+                  <td class="mypage-stats__log-td"><%= log[:start_page].present? ? "#{log[:start_page]}ページ" : "-" %></td>
+                  <td class="mypage-stats__log-td"><%= log[:end_page].present? ? "#{log[:end_page]}ページ" : "-" %></td>
+                  <td class="mypage-stats__log-td"><%= log[:pages_read] %>ページ</td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        </div>
+      <% end %>
+    </section>
   </div>
 </section>
+
