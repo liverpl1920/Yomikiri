@@ -61,9 +61,8 @@
     <% end %>
     <% if !@book.completed? && remaining_pages > 0 && !(@book.unread? && @book.deadline.nil?) %>
       <%# 進捗更新フォーム %>
-      <div class="book-show__progress-update"
-           data-controller="progress-update"
-           data-progress-update-max-value="<%= remaining_pages %>">
+       <div class="book-show__progress-update"
+         data-controller="progress-update">
 
         <%# バリデーションエラー表示 %>
         <% if @book.errors.any? %>
@@ -84,22 +83,11 @@
           <div class="progress-update__field">
             <label class="progress-update__label" for="pages_read">今日読んだページ数</label>
             <div class="progress-update__input-group">
-              <button type="button" class="progress-update__step-btn"
-                      aria-label="1ページ減らす"
-                      data-action="click->progress-update#decrement">
-                −
-              </button>
               <input type="number" id="pages_read" name="pages_read"
                      class="progress-update__input"
                      value="1" min="1"
                      max="<%= @book.target_pages - @book.current_page %>"
-                     data-progress-update-target="pagesRead"
                      aria-label="今日読んだページ数">
-              <button type="button" class="progress-update__step-btn"
-                      aria-label="1ページ増やす"
-                      data-action="click->progress-update#increment">
-                ＋
-              </button>
             </div>
           </div>
           <%= f.submit "更新する", class: "btn btn--primary" %>

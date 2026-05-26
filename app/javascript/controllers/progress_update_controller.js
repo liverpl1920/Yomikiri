@@ -1,25 +1,7 @@
 import { Controller } from '@hotwired/stimulus'
 
 export default class extends Controller {
-  static targets = ['pagesRead', 'advancedSection']
-  static values = { max: Number }
-
-  increment () {
-    const input = this.pagesReadTarget
-    const current = parseInt(input.value, 10) || 0
-    const max = this.maxValue
-    if (current < max) {
-      input.value = current + 1
-    }
-  }
-
-  decrement () {
-    const input = this.pagesReadTarget
-    const current = parseInt(input.value, 10) || 0
-    if (current > 1) {
-      input.value = current - 1
-    }
-  }
+  static targets = ['advancedSection']
 
   toggleAdvanced (event) {
     const button = event.currentTarget

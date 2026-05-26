@@ -37,28 +37,13 @@ RSpec.describe '進捗更新', type: :system do
       visit book_path(book)
     end
 
-    it '＋ボタンで入力値が増加する' do
+    it '進捗更新フォームに +/− ボタンが表示されない' do
       visit book_path(book)
       wait_for_stimulus
 
-      initial_value = page.evaluate_script("document.getElementById('pages_read').value").to_i
-
-      page.execute_script("document.querySelector('[data-action~=\"click->progress-update#increment\"]').click()")
-
-      new_value = page.evaluate_script("document.getElementById('pages_read').value").to_i
-      expect(new_value).to eq(initial_value + 1)
-    end
-
-    it '－ボタンで入力値が減少する（最低値1で止まる）' do
-      visit book_path(book)
-      wait_for_stimulus
-
-      # まず値を3に設定してからデクリメント
-      page.execute_script("document.getElementById('pages_read').value = 3")
-      page.execute_script("document.querySelector('[data-action~=\"click->progress-update#decrement\"]').click()")
-
-      value_after_decrement = page.evaluate_script("document.getElementById('pages_read').value").to_i
-      expect(value_after_decrement).to eq(2)
+      expect(page).to have_field('pages_read')
+      expect(page).to have_no_css('[data-action~="click->progress-update#increment"]')
+      expect(page).to have_no_css('[data-action~="click->progress-update#decrement"]')
     end
 
     it '「現在ページを直接入力」ボタンで折りたたみが展開する' do
