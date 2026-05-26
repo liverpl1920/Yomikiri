@@ -193,18 +193,6 @@
   color: var(--color-text-muted);
 }
 
-.book-card__genre {
-  display: inline-block;
-  font-size: 0.75rem;
-  font-weight: 500;
-  color: var(--color-text-muted);
-  background-color: #f3f4f6;
-  border: 1px solid #e5e7eb;
-  border-radius: 99px;
-  padding: 0.1rem 0.5rem;
-  width: fit-content;
-}
-
 .book-card__memo {
   font-size: var(--font-size-sm);
   color: var(--color-text-muted);
@@ -235,6 +223,23 @@
 .book-card__status--completed {
   background-color: #dcfce7;
   color: #15803d;
+}
+
+.book-card__rating {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.book-card__rating-label {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+}
+
+.book-card__rating-stars {
+  font-size: var(--font-size-sm);
+  color: #d97706;
+  letter-spacing: 0.08em;
 }
 
 /* ---- 読了期限 ---- */
@@ -616,63 +621,7 @@
   word-break: break-word;
 }
 
-/* ---- メモタイムライン ---- */
-.memo-timeline {
-  margin-top: var(--spacing-md);
-}
-
-.memo-timeline__empty {
-  font-size: var(--font-size-sm);
-  color: var(--color-text-muted);
-  text-align: center;
-  padding: var(--spacing-md) 0;
-}
-
-.memo-timeline__list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-md);
-  border-top: 1px solid var(--color-border);
-  padding-top: var(--spacing-md);
-}
-
-.memo-timeline__item {
-  border-left: 3px solid var(--color-primary, #4a90d9);
-  padding-left: var(--spacing-md);
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-xs);
-}
-
-.memo-timeline__header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--spacing-sm);
-}
-
-.memo-timeline__date {
-  font-size: var(--font-size-sm);
-  color: var(--color-text-muted);
-}
-
-.memo-timeline__delete-btn {
-  font-size: var(--font-size-xs, 0.75rem);
-  padding: 2px 8px;
-  line-height: 1.5;
-}
-
-.memo-timeline__body {
-  line-height: 1.7;
-  color: var(--color-text);
-  word-break: break-word;
-  font-size: var(--font-size-base);
-}
-
-
+/* ---- Googleカレンダー連携 ---- */
 .book-show__gcal {
   background-color: var(--color-bg-surface);
   border: 1px solid var(--color-border);
@@ -1278,30 +1227,6 @@
   }
 }
 
-/* ---- ISBN自動取得エリア ---- */
-.isbn-fetch__row {
-  display: flex;
-  gap: var(--spacing-sm);
-  align-items: stretch;
-}
-
-.isbn-fetch__input {
-  flex: 1;
-  min-width: 0;
-}
-
-.isbn-fetch__btn {
-  flex-shrink: 0;
-  white-space: nowrap;
-}
-
-.book-form__isbn-status {
-  font-size: 0.8125rem;
-  color: var(--color-text-secondary);
-  margin-top: 0.25rem;
-  min-height: 1.25rem;
-}
-
 .book-form__title-status {
   font-size: 0.8125rem;
   color: var(--color-text-secondary);
@@ -1396,6 +1321,74 @@
     text-overflow: ellipsis;
     white-space: nowrap;
   }
+
+.book-card__genre {
+  display: inline-block;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--color-text-muted);
+  background-color: #f3f4f6;
+  border: 1px solid #e5e7eb;
+  border-radius: 99px;
+  padding: 0.1rem 0.5rem;
+  width: fit-content;
+}
+
+/* ---- メモタイムライン ---- */
+.memo-timeline {
+  margin-top: var(--spacing-md);
+}
+
+.memo-timeline__empty {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+  text-align: center;
+  padding: var(--spacing-md) 0;
+}
+
+.memo-timeline__list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+  border-top: 1px solid var(--color-border);
+  padding-top: var(--spacing-md);
+}
+
+.memo-timeline__item {
+  border-left: 3px solid var(--color-primary, #4a90d9);
+  padding-left: var(--spacing-md);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.memo-timeline__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-sm);
+}
+
+.memo-timeline__date {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+}
+
+.memo-timeline__delete-btn {
+  font-size: var(--font-size-xs, 0.75rem);
+  padding: 2px 8px;
+  line-height: 1.5;
+}
+
+.memo-timeline__body {
+  line-height: 1.7;
+  color: var(--color-text);
+  word-break: break-word;
+  font-size: var(--font-size-base);
+}
 
 /* =============================================
    検索フィルターオートコンプリート (ISSUE#216)

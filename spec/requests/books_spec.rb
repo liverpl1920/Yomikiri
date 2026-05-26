@@ -48,7 +48,12 @@ RSpec.describe 'Books', type: :request do
       context '書籍が複数ある場合' do
         let!(:book_far) { create(:book, user: user, title: '遠い期限の本', deadline: Date.current + 30, status: :unread) }
         let!(:book_near) { create(:book, user: user, title: '近い期限の本', deadline: Date.current + 3, status: :reading) }
-        let!(:book_completed) { create(:book, user: user, title: '読了済みの本', deadline: Date.current + 5, status: :completed) }
+        let!(:book_completed) do
+          create(:book, user: user, title: '読了済みの本', deadline: Date.current + 5, status: :completed, rating: 4)
+        end
+        let!(:book_completed_without_rating) do
+          create(:book, user: user, title: '評価未設定の読了本', deadline: Date.current + 8, status: :completed, rating: nil)
+        end
 
         it '200 OK を返す' do
           get books_path
@@ -74,6 +79,69 @@ RSpec.describe 'Books', type: :request do
           expect(response.body).to include(book_far.title)
           expect(response.body).to include(book_near.title)
           expect(response.body).to include(book_completed.title)
+          expect(response.body).to include(book_completed_without_rating.title)
+        end
+
+        it '読了済みかつ評価ありの本に評価（★）が表示される' do
+          get books_path
+
+          doc = Nokogiri::HTML.parse(response.body)
+          target_item = doc.css('.book-list__item').find do |item|
+            item.at_css('.book-card__title')&.text&.strip == book_completed.title
+          end
+
+          expect(target_item).to be_present
+          expect(target_item.at_css('.book-card__rating-stars')&.text&.strip).to eq('★★★★')
+        end
+
+        it '評価の境界値（1点/5点）でも星数が一致して表示される' do
+          completed_rating_1 = create(:book, user: user, title: '評価1の読了本', status: :completed, rating: 1,
+                                              deadline: Date.current + 9)
+          completed_rating_5 = create(:book, user: user, title: '評価5の読了本', status: :completed, rating: 5,
+                                              deadline: Date.current + 10)
+
+          get books_path
+
+          doc = Nokogiri::HTML.parse(response.body)
+          rating_map = {
+            completed_rating_1.title => '★',
+            completed_rating_5.title => '★★★★★'
+          }
+
+          rating_map.each do |title, stars|
+            target_item = doc.css('.book-list__item').find do |item|
+              item.at_css('.book-card__title')&.text&.strip == title
+            end
+
+            expect(target_item).to be_present
+            expect(target_item.at_css('.book-card__rating-stars')&.text&.strip).to eq(stars)
+          end
+        end
+
+        it '読了済みでも評価未設定の本には評価（★）が表示されない' do
+          get books_path
+
+          doc = Nokogiri::HTML.parse(response.body)
+          target_item = doc.css('.book-list__item').find do |item|
+            item.at_css('.book-card__title')&.text&.strip == book_completed_without_rating.title
+          end
+
+          expect(target_item).to be_present
+          expect(target_item.css('.book-card__rating-stars')).to be_empty
+        end
+
+        it '未読/読書中の本には評価（★）が表示されない' do
+          get books_path
+
+          doc = Nokogiri::HTML.parse(response.body)
+          [ book_far.title, book_near.title ].each do |title|
+            target_item = doc.css('.book-list__item').find do |item|
+              item.at_css('.book-card__title')&.text&.strip == title
+            end
+
+            expect(target_item).to be_present
+            expect(target_item.css('.book-card__rating-stars')).to be_empty
+          end
         end
 
         it '未了本が期限の近い順に表示される（読了本より前に）' do
