@@ -301,6 +301,13 @@ export default class extends Controller {
     note.classList.remove('quota-preview__note--error')
   }
 
+  clearCoverImageUrl () {
+    const coverUrlInput = document.getElementById('book_cover_image_url')
+    if (coverUrlInput) {
+      coverUrlInput.value = ''
+    }
+  }
+
   toggleCompletedAtField (event) {
     const field = document.getElementById('completed_at_field')
     if (!field) return
