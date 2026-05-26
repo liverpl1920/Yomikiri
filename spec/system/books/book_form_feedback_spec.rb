@@ -148,7 +148,7 @@ RSpec.describe '積読登録画面でのタイトル検索結果フィードバ�
       JS
 
       expect(page).to have_css('[data-book-form-target="titleStatus"]',
-                               text: 'タイトルから書籍情報を取得できませんでした。ISBNで検索してみてください。', wait: 15)
+                               text: 'タイトルから書籍情報を取得できませんでした。', wait: 15)
     end
   end
 end

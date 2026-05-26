@@ -157,7 +157,7 @@ RSpec.describe 'タイトル入力からのISBN・書影自動取得', type: :sy
       JS
 
       expect(page).to have_css('[data-book-form-target="titleStatus"]',
-                               text: 'タイトルから書籍情報を取得できませんでした。ISBNで検索してみてください。', wait: 20)
+                               text: 'タイトルから書籍情報を取得できませんでした。', wait: 20)
     end
   end
 
@@ -221,78 +221,5 @@ RSpec.describe 'タイトル入力からのISBN・書影自動取得', type: :sy
       cover_url_after = page.evaluate_script("document.getElementById('book_cover_image_url').value")
       expect(cover_url_after).to eq('')
     end
-  end
-
-  describe 'ISBNボタンによる書籍情報取得' do
-    let(:openbd_not_found_response) { '[null]' }
-
-    context '有効なISBNで書籍が見つかる場合' do
-      before do
-        stub_request(:get, /api\.openbd\.jp\/v1\/get\?isbn=9784873115658/)
-          .to_return(status: 200, body: openbd_response_with_cover,
-                     headers: { 'Content-Type' => 'application/json' })
-      end
-
-      it 'タイトル・著者・ページ数・書影が自動入力される' do
-        page.execute_script(<<~JS)
-          document.querySelector('[data-book-form-target="isbnInput"]').value = '9784873115658';
-        JS
-        find('[data-action="click->book-form#fetchByIsbn"]').click
-
-        expect(page).to have_css('[data-book-form-target="isbnStatus"]',
-                                 text: 'タイトル・著者・ページ数・書影をすべて取得しました。', wait: 20)
-        expect(page).to have_field('タイトル', with: 'リーダブルコード', wait: 5)
-        expect(page).to have_field('著者', with: 'Dustin Boswell', wait: 5)
-        expect(page).to have_field('総ページ数', with: '260', wait: 5)
-      end
-
-      it 'Enterキーで取得ボタンと同じ動作をする' do
-        isbn_input = find('[data-book-form-target="isbnInput"]')
-        page.execute_script(
-          "document.querySelector('[data-book-form-target=\"isbnInput\"]').value = '9784873115658';"
-        )
-        isbn_input.send_keys(:return)
-
-        expect(page).to have_css('[data-book-form-target="isbnStatus"]',
-                                 text: 'タイトル・著者・ページ数・書影をすべて取得しました。', wait: 20)
-      end
-    end
-
-    context '有効なISBNで書籍が見つからない場合' do
-      before do
-        stub_request(:get, /api\.openbd\.jp\/v1\/get\?isbn=9784000000000/)
-          .to_return(status: 200, body: openbd_not_found_response,
-                     headers: { 'Content-Type' => 'application/json' })
-      end
-
-      it 'ISBN未発見メッセージが表示されフォームは汚染されない' do
-        page.execute_script(<<~JS)
-          document.querySelector('[data-book-form-target="isbnInput"]').value = '9784000000000';
-        JS
-        find('[data-action="click->book-form#fetchByIsbn"]').click
-
-        expect(page).to have_css('[data-book-form-target="isbnStatus"]',
-                                 text: 'ISBNに一致する書籍が見つかりませんでした。', wait: 20)
-        expect(page).to have_field('タイトル', with: '', wait: 5)
-        expect(page).to have_field('著者', with: '', wait: 5)
-      end
-    end
-
-    context '無効なISBNを入力した場合' do
-      it 'バリデーションエラーメッセージが表示されサーバーリクエストを行わない' do
-        page.execute_script(<<~JS)
-          document.querySelector('[data-book-form-target="isbnInput"]').value = '12345';
-        JS
-        find('[data-action="click->book-form#fetchByIsbn"]').click
-
-        expect(page).to have_css('[data-book-form-target="isbnStatus"]',
-                                 text: 'ISBNは13桁の数字（ISBN-13）または10桁の数字・末尾X（ISBN-10）で入力してください。', wait: 5)
-        expect(page).to have_field('タイトル', with: '', wait: 3)
-      end
-    end
-  end
-
-  def wait_for_book_form_controller
-    wait_for_stimulus
   end
 end

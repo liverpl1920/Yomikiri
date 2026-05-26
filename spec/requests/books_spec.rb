@@ -181,10 +181,10 @@ RSpec.describe 'Books', type: :request do
         expect(response.body).to include('積読を登録する')
       end
 
-      it 'ISBN入力フィールドが表示される' do
+      it 'ISBN入力フィールドが表示されない' do
         get new_book_path
-        expect(response.body).to include('isbn_input')
-        expect(response.body).to include('書籍情報を取得')
+        expect(response.body).not_to include('isbn_input')
+        expect(response.body).not_to include('書籍情報を取得')
       end
     end
 
@@ -830,6 +830,14 @@ RSpec.describe 'Books', type: :request do
         book = create(:book, user: user)
         get edit_book_path(book)
         expect(response).to have_http_status(:ok)
+      end
+
+      it '編集画面にISBN入力UIが表示されない' do
+        book = create(:book, user: user)
+        get edit_book_path(book)
+
+        expect(response.body).not_to include('isbn_input')
+        expect(response.body).not_to include('書籍情報を取得')
       end
 
       it '他ユーザーの書籍の編集画面は404になる' do
