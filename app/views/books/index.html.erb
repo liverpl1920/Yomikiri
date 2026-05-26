@@ -137,6 +137,13 @@
                   <%= t("book.status.#{book.status}") %>
                 </span>
 
+                <% if book.completed? && book.rating.present? %>
+                  <div class="book-card__rating" aria-label="評価 <%= book.rating %> 点">
+                    <span class="book-card__rating-label">評価</span>
+                    <span class="book-card__rating-stars" aria-hidden="true"><%= '★' * book.rating %></span>
+                  </div>
+                <% end %>
+
                 <%# 読了日 or 読了期限 %>
                 <div class="book-card__deadline">
                   <% if book.completed? %>
