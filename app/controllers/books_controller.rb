@@ -86,12 +86,28 @@ class BooksController < ApplicationController
 
   def complete
     completed_at = @book.completed_at || Time.current
-    if @book.update(status: :completed, current_page: @book.target_pages, completed_at: completed_at)
+    previous_page = @book.current_page.to_i
+    success = false
+
+    Book.transaction do
+      success = @book.update(status: :completed, current_page: @book.target_pages, completed_at: completed_at)
+      raise ActiveRecord::Rollback unless success
+
+      create_reading_log_for_completion!(previous_page)
+    end
+
+    if success
       flash[:completed_book] = @book.title
       redirect_to @book
     else
+      prepare_show_vars
       render :show, status: :unprocessable_entity
     end
+  rescue ActiveRecord::RecordInvalid
+    @book.reload
+    @book.errors.add(:base, "読書ログの記録に失敗しました")
+    prepare_show_vars
+    render :show, status: :unprocessable_entity
   end
 
   def destroy
@@ -231,6 +247,19 @@ class BooksController < ApplicationController
       read_at: Date.current,
       start_page: previous_page.to_i + 1,
       end_page: current_page.to_i
+    )
+  end
+
+  def create_reading_log_for_completion!(previous_page)
+    current_page = @book.current_page.to_i
+    pages_read = current_page - previous_page.to_i
+    return if pages_read <= 0
+
+    @book.reading_logs.create!(
+      pages_read: pages_read,
+      read_at: Date.current,
+      start_page: previous_page.to_i + 1,
+      end_page: current_page
     )
   end
 

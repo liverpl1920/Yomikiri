@@ -1134,6 +1134,41 @@ RSpec.describe 'Books', type: :request do
           expect(reading_book.reload.current_page).to eq(100)
         end
 
+        it '未記録ページ分のReadingLogが作成される' do
+          reading_book = create(:book, user: user, current_page: 80, target_pages: 100, status: :reading)
+
+          expect {
+            patch complete_book_path(reading_book)
+          }.to change(ReadingLog, :count).by(1)
+
+          reading_log = reading_book.reading_logs.order(:created_at).last
+          expect(reading_log.pages_read).to eq(20)
+          expect(reading_log.start_page).to eq(81)
+          expect(reading_log.end_page).to eq(100)
+          expect(reading_log.read_at).to eq(Date.current)
+        end
+
+        it '差分が0の場合はReadingLogを作成しない' do
+          expect {
+            patch complete_book_path(book)
+          }.not_to change(ReadingLog, :count)
+        end
+
+        it 'ReadingLogの作成に失敗した場合は読了更新をロールバックする' do
+          reading_book = create(:book, user: user, current_page: 80, target_pages: 100, status: :reading, completed_at: nil)
+          allow_any_instance_of(BooksController).to receive(:create_reading_log_for_completion!).and_raise(
+            ActiveRecord::RecordInvalid.new(ReadingLog.new)
+          )
+
+          patch complete_book_path(reading_book)
+
+          expect(response).to have_http_status(:unprocessable_entity)
+          reading_book.reload
+          expect(reading_book.status).to eq('reading')
+          expect(reading_book.current_page).to eq(80)
+          expect(reading_book.completed_at).to be_nil
+        end
+
         it '書籍詳細画面へリダイレクトされる' do
           patch complete_book_path(book)
           expect(response).to redirect_to(book_path(book))
