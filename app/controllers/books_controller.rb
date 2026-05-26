@@ -104,6 +104,7 @@ class BooksController < ApplicationController
       render :show, status: :unprocessable_entity
     end
   rescue ActiveRecord::RecordInvalid
+    @book.reload
     @book.errors.add(:base, "読書ログの記録に失敗しました")
     prepare_show_vars
     render :show, status: :unprocessable_entity
