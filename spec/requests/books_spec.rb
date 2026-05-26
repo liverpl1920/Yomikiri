@@ -90,6 +90,7 @@ RSpec.describe 'Books', type: :request do
             item.at_css('.book-card__title')&.text&.strip == book_completed.title
           end
 
+          expect(target_item).to be_present
           expect(target_item.at_css('.book-card__rating-stars')&.text&.strip).to eq('★★★★')
         end
 
@@ -112,6 +113,7 @@ RSpec.describe 'Books', type: :request do
               item.at_css('.book-card__title')&.text&.strip == title
             end
 
+            expect(target_item).to be_present
             expect(target_item.at_css('.book-card__rating-stars')&.text&.strip).to eq(stars)
           end
         end
@@ -124,6 +126,7 @@ RSpec.describe 'Books', type: :request do
             item.at_css('.book-card__title')&.text&.strip == book_completed_without_rating.title
           end
 
+          expect(target_item).to be_present
           expect(target_item.css('.book-card__rating-stars')).to be_empty
         end
 
@@ -136,6 +139,7 @@ RSpec.describe 'Books', type: :request do
               item.at_css('.book-card__title')&.text&.strip == title
             end
 
+            expect(target_item).to be_present
             expect(target_item.css('.book-card__rating-stars')).to be_empty
           end
         end
