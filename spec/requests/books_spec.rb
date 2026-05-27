@@ -82,6 +82,16 @@ RSpec.describe 'Books', type: :request do
           expect(response.body).to include(book_completed_without_rating.title)
         end
 
+        it '書影画像には読み込み失敗時フォールバックが設定される' do
+          create(:book, user: user, title: '書影あり', cover_image_url: 'https://cover.openbd.jp/9784873115658.jpg')
+
+          get books_path
+
+          expect(response.body).to include('book-card__cover-image')
+          expect(response.body).to include('onerror="this.onerror=null;this.style.display=')
+          expect(response.body).to include('book-card__cover-placeholder" aria-hidden="true" style="display: none;"')
+        end
+
         it '読了済みかつ評価ありの本に評価（★）が表示される' do
           get books_path
 
@@ -724,6 +734,16 @@ RSpec.describe 'Books', type: :request do
         get book_path(book)
         expect(response.body).to include('https://cover.openbd.jp/9784873115658.jpg')
         expect(response.body).to include('<img')
+      end
+
+      it '書影画像には読み込み失敗時フォールバックが設定される' do
+        book = create(:book, user: user, cover_image_url: 'https://cover.openbd.jp/9784873115658.jpg')
+
+        get book_path(book)
+
+        expect(response.body).to include('book-show__cover-image')
+        expect(response.body).to include('onerror="this.onerror=null;this.style.display=')
+        expect(response.body).to include('book-show__cover-placeholder" aria-hidden="true" style="display: none;"')
       end
 
       it 'cover_image_urlがない場合はプレースホルダーが表示される' do

@@ -156,23 +156,31 @@ class BooksController < ApplicationController
   def cover_proxy
     url = params[:url].to_s
     uri = URI.parse(url)
-    return head :forbidden unless ALLOWED_COVER_HOSTS.include?(uri.host)
+    unless ALLOWED_COVER_HOSTS.include?(uri.host)
+      Rails.logger.warn("[BooksController#cover_proxy] forbidden_host url=#{url}")
+      return head :forbidden
+    end
 
     result = fetch_with_redirects(uri)
     case result
     when :forbidden
+      Rails.logger.warn("[BooksController#cover_proxy] forbidden_redirect url=#{url}")
       head :forbidden
     when Net::HTTPResponse
       content_type = result["content-type"] || "image/jpeg"
       send_data result.body, type: content_type, disposition: "inline"
     else
+      Rails.logger.warn("[BooksController#cover_proxy] image_not_found url=#{url}")
       head :not_found
     end
   rescue URI::InvalidURIError
+    Rails.logger.warn("[BooksController#cover_proxy] invalid_url url=#{url.inspect}")
     head :bad_request
   rescue Net::OpenTimeout, Net::ReadTimeout
+    Rails.logger.warn("[BooksController#cover_proxy] timeout url=#{url}")
     head :not_found
-  rescue StandardError
+  rescue StandardError => e
+    Rails.logger.error("[BooksController#cover_proxy] fetch_failed url=#{url} error=#{e.class}: #{e.message}")
     head :not_found
   end
 
@@ -188,13 +196,16 @@ class BooksController < ApplicationController
 
     if response.is_a?(Net::HTTPRedirection)
       location = response["location"]
-      redirect_uri = URI.parse(location)
+      redirect_uri = URI.join(uri.to_s, location)
       return :forbidden unless ALLOWED_REDIRECT_HOSTS.include?(redirect_uri.host)
 
       fetch_with_redirects(redirect_uri, redirect_count + 1)
     elsif response.is_a?(Net::HTTPSuccess)
       response
     end
+  rescue URI::InvalidURIError => e
+    Rails.logger.warn("[BooksController#fetch_with_redirects] invalid_redirect_uri uri=#{uri} error=#{e.class}: #{e.message}")
+    nil
   end
 
   def set_book

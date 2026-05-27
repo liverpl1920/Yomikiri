@@ -344,6 +344,32 @@ RSpec.describe Book, type: :model do
         expect(book).not_to be_valid
         expect(book.errors[:cover_image]).not_to be_empty
       end
+
+      it '2冊連続で書影を添付しても先に登録した書影が維持される' do
+        user = create(:user)
+        book1 = create(:book, user: user)
+        book2 = create(:book, user: user)
+
+        file_data = Rails.root.join('spec/fixtures/files/test_cover.png').binread
+
+        book1.cover_image.attach(
+          io: StringIO.new(file_data),
+          filename: 'cover-1.png',
+          content_type: 'image/png'
+        )
+
+        first_blob_id = book1.cover_image.blob.id
+
+        book2.cover_image.attach(
+          io: StringIO.new(file_data),
+          filename: 'cover-2.png',
+          content_type: 'image/png'
+        )
+
+        expect(book1.reload.cover_image).to be_attached
+        expect(book2.reload.cover_image).to be_attached
+        expect(book1.cover_image.blob.id).to eq(first_blob_id)
+      end
     end
   end
 
