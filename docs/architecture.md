@@ -184,7 +184,11 @@ config.active_record.default_timezone = :local # DBへの保存もローカル�
 ```ruby
 # 書影表示ヘルパー例
 def book_cover_url(book)
-  book.cover_image_url.presence || asset_path('placeholder_book.png')
+  if book.cover_image.attached?
+    url_for(book.cover_image)
+  else
+    book.cover_image_url.presence || asset_path('placeholder_book.png')
+  end
 end
 ```
 
