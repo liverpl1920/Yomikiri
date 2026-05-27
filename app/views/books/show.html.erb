@@ -157,13 +157,16 @@
         <% plot_height = chart_height - chart_padding[:top] - chart_padding[:bottom] %>
         <% y_ticks = [0, (max_pages / 2.0).ceil, max_pages].uniq.sort.reverse %>
         <% x_label_indexes = [0, chart_rows.size / 2, chart_rows.size - 1].uniq %>
+        <% x_positions = chart_rows.each_index.map do |index|
+             if chart_rows.size == 1
+               chart_padding[:left] + (plot_width / 2.0)
+             else
+               chart_padding[:left] + (plot_width * index / (chart_rows.size - 1).to_f)
+             end
+           end %>
 
         <% point_strings = chart_rows.each_with_index.map do |row, index|
-             x = if chart_rows.size == 1
-                   chart_padding[:left] + (plot_width / 2.0)
-                 else
-                   chart_padding[:left] + (plot_width * index / (chart_rows.size - 1).to_f)
-                 end
+             x = x_positions[index]
              y = chart_padding[:top] + plot_height - (row[:pages_read].to_f / max_pages * plot_height)
              "#{x.round(2)},#{y.round(2)}"
            end %>
@@ -197,11 +200,7 @@
               points="<%= point_strings.join(' ') %>" />
 
             <% chart_rows.each_with_index do |row, index| %>
-              <% x = if chart_rows.size == 1
-                       chart_padding[:left] + (plot_width / 2.0)
-                     else
-                       chart_padding[:left] + (plot_width * index / (chart_rows.size - 1).to_f)
-                     end %>
+              <% x = x_positions[index] %>
               <% y = chart_padding[:top] + plot_height - (row[:pages_read].to_f / max_pages * plot_height) %>
               <circle
                 cx="<%= x.round(2) %>"
@@ -212,11 +211,7 @@
 
             <% x_label_indexes.each do |index| %>
               <% row = chart_rows[index] %>
-              <% x = if chart_rows.size == 1
-                       chart_padding[:left] + (plot_width / 2.0)
-                     else
-                       chart_padding[:left] + (plot_width * index / (chart_rows.size - 1).to_f)
-                     end %>
+              <% x = x_positions[index] %>
               <text x="<%= x.round(2) %>" y="<%= chart_height - 8 %>" class="book-show__chart-x-label"><%= l(row[:date], format: :short) %></text>
             <% end %>
           </svg>

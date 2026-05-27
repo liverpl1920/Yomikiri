@@ -50,6 +50,12 @@ class BookMemosController < ApplicationController
   end
 
   def prepare_progress_chart_data
+    unless @book.reading_logs.exists?
+      @progress_chart_data = []
+      @progress_chart_max_pages = 0
+      return
+    end
+
     end_date = progress_chart_end_date
     start_date = progress_chart_start_date(end_date)
 
