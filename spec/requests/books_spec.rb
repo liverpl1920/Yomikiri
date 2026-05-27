@@ -804,6 +804,67 @@ RSpec.describe 'Books', type: :request do
         expect(response.body).to include('book-show__progress-bar')
       end
 
+      it '読書進捗グラフが表示される（ログあり）' do
+        travel_to(Date.new(2026, 5, 12)) do
+          book = create(:book, user: user)
+          create(:reading_log, book: book, read_at: Date.new(2026, 5, 10), pages_read: 20)
+
+          get book_path(book)
+
+          expect(response.body).to include('読書進捗グラフ')
+          expect(response.body).to include('横軸: 日付 / 縦軸: ページ数')
+          expect(response.body).to include('book-show__chart-line')
+          expect(response.body).to include('data-date="2026-05-10"')
+          expect(response.body).to include('data-pages="20"')
+        end
+      end
+
+      it '表示期間の開始日は初回読書ログ日になる（作成日では始まらない）' do
+        travel_to(Date.new(2026, 5, 20)) do
+          book = create(:book, user: user)
+          book.update_column(:created_at, Time.zone.parse('2026-05-10 09:00:00'))
+          create(:reading_log, book: book, read_at: Date.new(2026, 5, 15), pages_read: 7)
+
+          get book_path(book)
+
+          expect(response.body).to include('data-date="2026-05-15"')
+          expect(response.body).not_to include('data-date="2026-05-10"')
+        end
+      end
+
+      it '記録がない日は 0 ページとして表示される' do
+        travel_to(Date.new(2026, 5, 12)) do
+          book = create(:book, user: user)
+          create(:reading_log, book: book, read_at: Date.new(2026, 5, 10), pages_read: 12)
+
+          get book_path(book)
+
+          expect(response.body).to include('data-date="2026-05-11"')
+          expect(response.body).to include('data-pages="0"')
+        end
+      end
+
+      it '読了済み本は読了日までをグラフ表示期間にする' do
+        travel_to(Date.new(2026, 5, 20)) do
+          book = create(:book, user: user, status: :completed, completed_at: Time.zone.parse('2026-05-14 10:00:00'))
+          create(:reading_log, book: book, read_at: Date.new(2026, 5, 13), pages_read: 18)
+          create(:reading_log, book: book, read_at: Date.new(2026, 5, 16), pages_read: 9)
+
+          get book_path(book)
+
+          expect(response.body).to include('data-date="2026-05-14"')
+          expect(response.body).not_to include('data-date="2026-05-16"')
+        end
+      end
+
+      it '読書ログがない場合は空状態メッセージを表示する' do
+        book = create(:book, user: user)
+
+        get book_path(book)
+
+        expect(response.body).to include('読書ログがまだありません。進捗を記録するとグラフが表示されます。')
+      end
+
       it '延長回数が表示される' do
         book = create(:book, user: user, extension_count: 2)
         get book_path(book)

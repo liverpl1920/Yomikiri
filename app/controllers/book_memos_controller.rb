@@ -12,6 +12,7 @@ class BookMemosController < ApplicationController
     else
       @book_memos = @book.book_memos.latest_first
       @new_book_memo = @book_memo
+      prepare_progress_chart_data
       render "books/show", status: :unprocessable_entity
     end
   end
@@ -46,5 +47,39 @@ class BookMemosController < ApplicationController
 
   def book_memo_params
     params.require(:book_memo).permit(:content, :page_number)
+  end
+
+  def prepare_progress_chart_data
+    unless @book.reading_logs.exists?
+      @progress_chart_data = []
+      @progress_chart_max_pages = 0
+      return
+    end
+
+    end_date = progress_chart_end_date
+    start_date = progress_chart_start_date(end_date)
+
+    logs_by_date = @book.reading_logs
+                        .where(read_at: start_date..end_date)
+                        .group(:read_at)
+                        .sum(:pages_read)
+
+    @progress_chart_data = (start_date..end_date).map do |date|
+      { date: date, pages_read: logs_by_date.fetch(date, 0) }
+    end
+    @progress_chart_max_pages = @progress_chart_data.map { |row| row[:pages_read] }.max.to_i
+  end
+
+  def progress_chart_end_date
+    return @book.completed_at.to_date if @book.completed? && @book.completed_at.present?
+
+    Date.current
+  end
+
+  def progress_chart_start_date(end_date)
+    first_log_date = @book.reading_logs.minimum(:read_at)
+    start_date = first_log_date || @book.created_at.to_date || end_date
+
+    start_date > end_date ? end_date : start_date
   end
 end
