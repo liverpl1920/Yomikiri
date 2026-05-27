@@ -1543,6 +1543,129 @@
   justify-content: flex-end;
 }
 
+.book-show__chart {
+  margin-top: var(--spacing-xl);
+  padding: var(--spacing-lg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius-lg);
+  background: var(--color-bg-surface);
+}
+
+.book-show__chart-header {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--spacing-sm);
+  align-items: baseline;
+  flex-wrap: wrap;
+  margin-bottom: var(--spacing-md);
+}
+
+.book-show__chart-title {
+  margin: 0;
+  font-size: var(--font-size-lg);
+}
+
+.book-show__chart-note {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+}
+
+.book-show__chart-axes {
+  margin: 0 0 var(--spacing-sm);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+}
+
+.book-show__chart-scroll {
+  width: 100%;
+  overflow-x: auto;
+  padding-bottom: var(--spacing-xs);
+}
+
+.book-show__chart-svg {
+  display: block;
+  min-width: 520px;
+  width: 100%;
+}
+
+.book-show__chart-grid {
+  stroke: #e2e8f0;
+  stroke-width: 1;
+}
+
+.book-show__chart-axis {
+  stroke: #94a3b8;
+  stroke-width: 1.5;
+}
+
+.book-show__chart-line {
+  fill: none;
+  stroke: #2563eb;
+  stroke-width: 2.5;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+
+.book-show__chart-point {
+  stroke: #ffffff;
+  stroke-width: 1.5;
+}
+
+.book-show__chart-point--active {
+  fill: #2563eb;
+}
+
+.book-show__chart-point--zero {
+  fill: #94a3b8;
+}
+
+.book-show__chart-y-label {
+  text-anchor: end;
+  fill: #64748b;
+  font-size: 11px;
+}
+
+.book-show__chart-x-label {
+  text-anchor: middle;
+  fill: #64748b;
+  font-size: 11px;
+}
+
+.book-show__chart-table-wrap {
+  margin-top: var(--spacing-md);
+  max-height: 220px;
+  overflow: auto;
+}
+
+.book-show__chart-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--font-size-sm);
+}
+
+.book-show__chart-table th,
+.book-show__chart-table td {
+  border-bottom: 1px solid var(--color-border);
+  padding: 0.45rem 0.5rem;
+  text-align: left;
+}
+
+.book-show__chart-empty {
+  margin: 0;
+  color: var(--color-text-muted);
+}
+
+@media (max-width: 640px) {
+  .book-show__chart {
+    padding: var(--spacing-md);
+  }
+
+  .book-show__chart-table-wrap {
+    max-height: 180px;
+  }
+}
+
 .sr-only {
   position: absolute;
   width: 1px;

@@ -31,8 +31,7 @@ class BooksController < ApplicationController
   end
 
   def show
-    @book_memos = @book.book_memos.latest_first
-    @new_book_memo = @book.book_memos.build
+    prepare_show_vars
   end
 
   def edit
@@ -219,6 +218,35 @@ class BooksController < ApplicationController
   def prepare_show_vars
     @book_memos = @book.book_memos.latest_first
     @new_book_memo = @book.book_memos.build
+    prepare_progress_chart_data
+  end
+
+  def prepare_progress_chart_data
+    end_date = progress_chart_end_date
+    start_date = progress_chart_start_date(end_date)
+
+    logs_by_date = @book.reading_logs
+                        .where(read_at: start_date..end_date)
+                        .group(:read_at)
+                        .sum(:pages_read)
+
+    @progress_chart_data = (start_date..end_date).map do |date|
+      { date: date, pages_read: logs_by_date.fetch(date, 0) }
+    end
+    @progress_chart_max_pages = @progress_chart_data.map { |row| row[:pages_read] }.max.to_i
+  end
+
+  def progress_chart_end_date
+    return @book.completed_at.to_date if @book.completed? && @book.completed_at.present?
+
+    Date.current
+  end
+
+  def progress_chart_start_date(end_date)
+    first_log_date = @book.reading_logs.minimum(:read_at)
+    start_date = first_log_date || @book.created_at.to_date || end_date
+
+    start_date > end_date ? end_date : start_date
   end
 
   def calculate_new_page

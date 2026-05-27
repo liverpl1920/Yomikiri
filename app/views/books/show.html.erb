@@ -139,6 +139,111 @@
       </div>
     <% end %>
 
+
+    <section class="book-show__chart" aria-label="読書進捗グラフ">
+      <div class="book-show__chart-header">
+        <h2 class="book-show__chart-title">読書進捗グラフ</h2>
+        <p class="book-show__chart-note">記録がない日は 0 ページとして表示します。</p>
+      </div>
+      <p class="book-show__chart-axes">横軸: 日付 / 縦軸: ページ数</p>
+
+      <% if @progress_chart_data.any? { |row| row[:pages_read].positive? } %>
+        <% chart_rows = @progress_chart_data %>
+        <% max_pages = [@progress_chart_max_pages, 1].max %>
+        <% chart_width = [chart_rows.size * 28, 520].max %>
+        <% chart_height = 220 %>
+        <% chart_padding = { left: 48, right: 20, top: 16, bottom: 30 } %>
+        <% plot_width = chart_width - chart_padding[:left] - chart_padding[:right] %>
+        <% plot_height = chart_height - chart_padding[:top] - chart_padding[:bottom] %>
+        <% y_ticks = [0, (max_pages / 2.0).ceil, max_pages].uniq.sort.reverse %>
+        <% x_label_indexes = [0, chart_rows.size / 2, chart_rows.size - 1].uniq %>
+
+        <% point_strings = chart_rows.each_with_index.map do |row, index|
+             x = if chart_rows.size == 1
+                   chart_padding[:left] + (plot_width / 2.0)
+                 else
+                   chart_padding[:left] + (plot_width * index / (chart_rows.size - 1).to_f)
+                 end
+             y = chart_padding[:top] + plot_height - (row[:pages_read].to_f / max_pages * plot_height)
+             "#{x.round(2)},#{y.round(2)}"
+           end %>
+
+        <div class="book-show__chart-scroll">
+          <svg
+            class="book-show__chart-svg"
+            viewBox="0 0 <%= chart_width %> <%= chart_height %>"
+            role="img"
+            aria-label="日別読書ページ数の折れ線グラフ">
+            <% y_ticks.each do |tick| %>
+              <% y = chart_padding[:top] + plot_height - (tick.to_f / max_pages * plot_height) %>
+              <line
+                x1="<%= chart_padding[:left] %>"
+                y1="<%= y.round(2) %>"
+                x2="<%= chart_width - chart_padding[:right] %>"
+                y2="<%= y.round(2) %>"
+                class="book-show__chart-grid" />
+              <text x="<%= chart_padding[:left] - 8 %>" y="<%= y.round(2) + 4 %>" class="book-show__chart-y-label"><%= tick %></text>
+            <% end %>
+
+            <line
+              x1="<%= chart_padding[:left] %>"
+              y1="<%= chart_height - chart_padding[:bottom] %>"
+              x2="<%= chart_width - chart_padding[:right] %>"
+              y2="<%= chart_height - chart_padding[:bottom] %>"
+              class="book-show__chart-axis" />
+
+            <polyline
+              class="book-show__chart-line"
+              points="<%= point_strings.join(' ') %>" />
+
+            <% chart_rows.each_with_index do |row, index| %>
+              <% x = if chart_rows.size == 1
+                       chart_padding[:left] + (plot_width / 2.0)
+                     else
+                       chart_padding[:left] + (plot_width * index / (chart_rows.size - 1).to_f)
+                     end %>
+              <% y = chart_padding[:top] + plot_height - (row[:pages_read].to_f / max_pages * plot_height) %>
+              <circle
+                cx="<%= x.round(2) %>"
+                cy="<%= y.round(2) %>"
+                r="<%= row[:pages_read].positive? ? 3.2 : 2.2 %>"
+                class="book-show__chart-point <%= row[:pages_read].positive? ? 'book-show__chart-point--active' : 'book-show__chart-point--zero' %>" />
+            <% end %>
+
+            <% x_label_indexes.each do |index| %>
+              <% row = chart_rows[index] %>
+              <% x = if chart_rows.size == 1
+                       chart_padding[:left] + (plot_width / 2.0)
+                     else
+                       chart_padding[:left] + (plot_width * index / (chart_rows.size - 1).to_f)
+                     end %>
+              <text x="<%= x.round(2) %>" y="<%= chart_height - 8 %>" class="book-show__chart-x-label"><%= l(row[:date], format: :short) %></text>
+            <% end %>
+          </svg>
+        </div>
+
+        <div class="book-show__chart-table-wrap" aria-label="日別読書ページ数テーブル">
+          <table class="book-show__chart-table">
+            <thead>
+              <tr>
+                <th scope="col">日付</th>
+                <th scope="col">ページ数</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% chart_rows.each do |row| %>
+                <tr data-date="<%= row[:date] %>" data-pages="<%= row[:pages_read] %>">
+                  <td><%= l(row[:date], format: :default) %></td>
+                  <td><%= row[:pages_read] %> ページ</td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        </div>
+      <% else %>
+        <p class="book-show__chart-empty">読書ログがまだありません。進捗を記録するとグラフが表示されます。</p>
+      <% end %>
+    </section>
     <dl class="book-show__details">
       <div class="book-show__detail-item">
         <dt class="book-show__detail-label">ステータス</dt>
