@@ -87,13 +87,12 @@ RSpec.describe 'タイトル入力からのISBN・書影自動取得', type: :sy
     end
 
     it 'タイトルを入力してフォーカスを外すと書籍情報が自動入力される' do
-      # JSで直接値を設定＋フォーカス（fill_inのSeniumキー送信はCIでIMEタイミング問題が起きるため）
+      # JSで直接値を設定してblurイベントを明示的に発火（CIでのフォーカス遷移差異を回避）
       page.execute_script(<<~JS)
         var el = document.getElementById('book_title');
         el.value = 'リーダブルコード';
-        el.focus();
+        el.dispatchEvent(new Event('blur', { bubbles: true }));
       JS
-      find('#book_author').click
 
       # fetch完了をステータスメッセージで確認してからフィールド値を検証する
       expect(page).to have_css('[data-book-form-target="titleStatus"]',

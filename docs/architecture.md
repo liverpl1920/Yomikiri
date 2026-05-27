@@ -175,24 +175,30 @@ config.active_record.default_timezone = :local # DBへの保存もローカル�
 
 ### MVP フェーズ
 
-- **外部URL文字列をそのまま保存**: `books.cover_image_url` カラムに文字列で格納
-- openBD API から取得したURLをそのまま使用
-- ユーザーが任意でURLを入力可能（未設定時はプレースホルダー画像表示）
-- **Active Storage は使用しない**（インフラ複雑化を避けるため）
+- **Active Storage（S3）を主系として使用**: `Book` の `has_one_attached :cover_image` でユーザーアップロードを保持
+- `books.cover_image_url` は外部URL書影の補助経路として併用
+- 表示時は `cover_image` 添付を優先し、未添付時に `cover_image_url` を利用
+- production では S3 必須（`AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `AWS_REGION`, `AWS_S3_BUCKET`）。不足時は fail-fast で起動失敗
+- 画像読み込み失敗時は UI でプレースホルダー表示へフォールバック
 
 ```ruby
 # 書影表示ヘルパー例
 def book_cover_url(book)
-  book.cover_image_url.presence || asset_path('placeholder_book.png')
+  if book.cover_image.attached?
+    url_for(book.cover_image)
+  else
+    book.cover_image_url.presence || asset_path('placeholder_book.png')
+  end
 end
 ```
 
-### 本リリース以降（検討事項）
+### 運用上の注意点
 
-| 方式 | メリット | デメリット |
-|------|---------|-----------|
-| Active Storage + Cloudinary | ユーザーアップロード対応 | 設定複雑、コスト発生 |
-| 外部URLのみ（現行維持） | シンプル | リンク切れリスク |
+| 項目 | 方針 |
+|------|------|
+| production ストレージ | `:amazon` 固定（`:local` フォールバック禁止） |
+| 環境変数不足 | 起動時に例外を発生させ、誤設定状態で運用しない |
+| 外部URL書影 | リンク切れや取得失敗の可能性があるため UI フォールバックを適用 |
 
 ---
 

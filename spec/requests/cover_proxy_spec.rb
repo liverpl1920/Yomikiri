@@ -144,6 +144,19 @@ RSpec.describe 'Books Cover Proxy', type: :request do
           end
         end
 
+        context 'Location ヘッダーが欠落している場合' do
+          before do
+            stub_request(:get, google_image_url)
+              .to_return(status: 302, headers: {})
+          end
+
+          it '404 Not Found を返す' do
+            get cover_proxy_books_path, params: { url: google_image_url }
+
+            expect(response).to have_http_status(:not_found)
+          end
+        end
+
         context '最大リダイレクト数を超える場合' do
           let(:redirect_url2) { 'https://books.google.com/books/image2.jpg' }
           let(:redirect_url3) { 'https://books.google.com/books/image3.jpg' }

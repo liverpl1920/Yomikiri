@@ -102,7 +102,9 @@
                     <img src="<%= cover_src %>"
                          alt="<%= book.title %>の書影"
                          class="book-card__cover-image"
-                         loading="lazy">
+                         loading="lazy"
+                         onerror="this.onerror=null;this.style.display='none';this.nextElementSibling.style.display='inline-flex';">
+                    <span class="book-card__cover-placeholder" aria-hidden="true" style="display: none;">📖</span>
                   <% else %>
                     <span class="book-card__cover-placeholder" aria-hidden="true">📖</span>
                   <% end %>
