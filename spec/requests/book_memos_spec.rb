@@ -37,6 +37,14 @@ RSpec.describe 'BookMemos', type: :request do
 
           expect(book.book_memos.last.content).to eq('テストメモ')
         end
+
+        it '装飾記法を含むメモを保存できる' do
+          content = 'これは**重要**です [color=#ff0000]確認[/color]'
+
+          post book_book_memos_path(book), params: { book_memo: { content: content } }
+
+          expect(book.book_memos.last.content).to eq(content)
+        end
       end
 
       context '無効なパラメータの場合（contentが空）' do
@@ -169,6 +177,14 @@ RSpec.describe 'BookMemos', type: :request do
 
           expect(memo.reload.page_number).to eq('100-120')
         end
+
+        it '装飾記法を含むメモに更新できる' do
+          formatted = '**強調** [color=#1d4ed8]青文字[/color]'
+
+          patch book_book_memo_path(book, memo), params: { book_memo: { content: formatted } }
+
+          expect(memo.reload.content).to eq(formatted)
+        end
       end
 
       context '無効なパラメータの場合（contentが空）' do
@@ -214,6 +230,28 @@ RSpec.describe 'BookMemos', type: :request do
 
         expect(book.book_memos.last.page_number).to be_blank
       end
+    end
+  end
+
+  describe 'GET /books/:id (メモ装飾表示)' do
+    before { sign_in user }
+
+    it '太字と文字色が変換されて表示される' do
+      create(:book_memo, book: book, content: '**重要** [color=#ff0000]要確認[/color]')
+
+      get book_path(book)
+
+      expect(response.body).to include('<strong>重要</strong>')
+      expect(response.body).to include('<span style="color: #ff0000;">要確認</span>')
+    end
+
+    it '不正なHTMLはエスケープされる' do
+      create(:book_memo, book: book, content: '<script>alert(1)</script>')
+
+      get book_path(book)
+
+      expect(response.body).not_to include('<script>alert(1)</script>')
+      expect(response.body).to include('&lt;script&gt;alert(1)&lt;/script&gt;')
     end
   end
 end
