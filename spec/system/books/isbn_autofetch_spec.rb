@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-RSpec.describe 'タイトル入力からのISBN・書影自動取得', type: :system, js: true do
+RSpec.describe '情報取得ボタンによるISBN・書影取得', type: :system, js: true do
   let!(:user) { create(:user) }
 
   let(:google_books_response_with_isbn) do
@@ -71,7 +71,12 @@ RSpec.describe 'タイトル入力からのISBN・書影自動取得', type: :sy
     wait_for_stimulus(identifier: 'book-form')
   end
 
-  describe 'タイトル入力→自動取得成功' do
+  def fetch_by_button(title)
+    fill_in 'タイトル', with: title
+    click_button '情報取得'
+  end
+
+  describe '情報取得ボタン押下で取得成功' do
     before do
       stub_request(:get, /www\.googleapis\.com\/books\/v1\/volumes/)
         .to_return(status: 200, body: google_books_response_with_isbn,
@@ -86,13 +91,8 @@ RSpec.describe 'タイトル入力からのISBN・書影自動取得', type: :sy
       expect(page).not_to have_field('書影URL')
     end
 
-    it 'タイトルを入力してフォーカスを外すと書籍情報が自動入力される' do
-      # JSで直接値を設定してblurイベントを明示的に発火（CIでのフォーカス遷移差異を回避）
-      page.execute_script(<<~JS)
-        var el = document.getElementById('book_title');
-        el.value = 'リーダブルコード';
-        el.dispatchEvent(new Event('blur', { bubbles: true }));
-      JS
+    it 'タイトル入力して情報取得ボタンを押すと書籍情報が入力される' do
+      fetch_by_button('リーダブルコード')
 
       # fetch完了をステータスメッセージで確認してからフィールド値を検証する
       expect(page).to have_css('[data-book-form-target="titleStatus"]',
@@ -101,30 +101,46 @@ RSpec.describe 'タイトル入力からのISBN・書影自動取得', type: :sy
       expect(page).to have_field('総ページ数', with: '260', wait: 5)
     end
 
-    it '自動取得成功時は成功メッセージが表示される' do
+    it 'タイトル入力してblurしても情報取得は実行されない' do
       page.execute_script(<<~JS)
         var el = document.getElementById('book_title');
         el.value = 'リーダブルコード';
         el.dispatchEvent(new Event('blur', { bubbles: true }));
       JS
 
+      expect(page).not_to have_css('[data-book-form-target="titleStatus"]', text: '取得', wait: 2)
+      expect(page).to have_field('著者', with: '')
+    end
+
+    it '手動取得成功時は成功メッセージが表示される' do
+      fetch_by_button('リーダブルコード')
+
       expect(page).to have_css('[data-book-form-target="titleStatus"]',
                                text: 'タイトル・著者・ページ数・書影をすべて取得しました。', wait: 20)
     end
 
-    it '既に読んだページ数は自動取得後も保持される' do
+    it '既に読んだページ数は手動取得後も保持される' do
       # Seleniumのfocus管理との干渉を避けるため、currentPageとtitleの両方をJSで設定する
       page.execute_script(<<~JS)
         var currentPageEl = document.querySelector('[data-book-form-target~="currentPage"]');
         if (currentPageEl) { currentPageEl.value = '42'; }
-        var titleEl = document.getElementById('book_title');
-        titleEl.value = 'リーダブルコード';
-        titleEl.dispatchEvent(new Event('blur', { bubbles: true }));
       JS
+
+      fetch_by_button('リーダブルコード')
 
       expect(page).to have_css('[data-book-form-target="titleStatus"]',
                                text: 'タイトル・著者・ページ数・書影をすべて取得しました。', wait: 20)
       expect(page).to have_field('既に読んだページ数', with: '42')
+    end
+
+    it '読了対象ページ数は手動入力済みなら手動取得後も保持される' do
+      fill_in '読了対象ページ数', with: '123'
+
+      fetch_by_button('リーダブルコード')
+
+      expect(page).to have_css('[data-book-form-target="titleStatus"]',
+                               text: 'タイトル・著者・ページ数・書影をすべて取得しました。', wait: 20)
+      expect(page).to have_field('読了対象ページ数', with: '123')
     end
 
     it '既に読んだページ数を考慮してノルマプレビューを表示する' do
@@ -140,7 +156,7 @@ RSpec.describe 'タイトル入力からのISBN・書影自動取得', type: :sy
     end
   end
 
-  describe 'タイトル入力→自動取得失敗' do
+  describe '情報取得ボタン押下で取得失敗' do
     before do
       stub_request(:get, /www\.googleapis\.com\/books\/v1\/volumes/)
         .to_return(status: 200, body: google_books_empty_response,
@@ -148,12 +164,7 @@ RSpec.describe 'タイトル入力からのISBN・書影自動取得', type: :sy
     end
 
     it 'タイトル検索で結果がない場合、失敗メッセージが表示される' do
-      # JSで直接値を設定してblurイベントを発火（fill_inのSeleniumキー送信はCIでIMEタイミング問題が起きるため）
-      page.execute_script(<<~JS)
-        var el = document.getElementById('book_title');
-        el.value = '存在しない本のタイトル';
-        el.dispatchEvent(new Event('blur', { bubbles: true }));
-      JS
+      fetch_by_button('存在しない本のタイトル')
 
       expect(page).to have_css('[data-book-form-target="titleStatus"]',
                                text: 'タイトルから書籍情報を取得できませんでした。', wait: 20)
@@ -171,8 +182,7 @@ RSpec.describe 'タイトル入力からのISBN・書影自動取得', type: :sy
     end
 
     it '書影URLが書籍に保存される' do
-      fill_in 'タイトル', with: 'リーダブルコード'
-      find('#book_author').click
+      fetch_by_button('リーダブルコード')
       expect(page).to have_css('[data-book-form-target="titleStatus"]',
                                text: 'タイトル・著者・ページ数・書影をすべて取得しました。', wait: 5)
 
@@ -189,7 +199,7 @@ RSpec.describe 'タイトル入力からのISBN・書影自動取得', type: :sy
     end
   end
 
-  describe 'auto-fetch後にファイルをアップロードして登録' do
+  describe '情報取得後にファイルをアップロードして登録' do
     before do
       stub_request(:get, /www\.googleapis\.com\/books\/v1\/volumes/)
         .to_return(status: 200, body: google_books_response_with_isbn,
@@ -199,13 +209,9 @@ RSpec.describe 'タイトル入力からのISBN・書影自動取得', type: :sy
                    headers: { 'Content-Type' => 'application/json' })
     end
 
-    it 'auto-fetch後にファイルを選択してもcover_image_urlバリデーションエラーが発生しない' do
-      # タイトル入力でauto-fetchを起動してcover_image_urlをセット
-      page.execute_script(<<~JS)
-        var el = document.getElementById('book_title');
-        el.value = 'リーダブルコード';
-        el.dispatchEvent(new Event('blur', { bubbles: true }));
-      JS
+    it '情報取得後にファイルを選択してもcover_image_urlバリデーションエラーが発生しない' do
+      # 情報取得ボタンでcover_image_urlをセット
+      fetch_by_button('リーダブルコード')
       expect(page).to have_css('[data-book-form-target="titleStatus"]',
                                text: 'タイトル・著者・ページ数・書影をすべて取得しました。', wait: 20)
 
