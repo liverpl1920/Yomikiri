@@ -151,4 +151,89 @@ RSpec.describe '積読登録画面でのタイトル検索結果フィードバ�
                                text: 'タイトルから書籍情報を取得できませんでした。', wait: 15)
     end
   end
+
+  describe '手動入力保護: 書影取得時に手動編集済みフィールドが上書きされない' do
+    let(:google_books_with_genre_response) do
+      {
+        'items' => [
+          {
+            'volumeInfo' => {
+              'title' => 'リーダブルコード',
+              'authors' => [ 'Dustin Boswell' ],
+              'pageCount' => 260,
+              'categories' => [ 'Computers' ],
+              'industryIdentifiers' => [
+                { 'type' => 'ISBN_13', 'identifier' => '9784873115658' }
+              ]
+            }
+          }
+        ]
+      }.to_json
+    end
+
+    before do
+      stub_request(:get, /www\.googleapis\.com\/books\/v1\/volumes/)
+        .to_return(status: 200, body: google_books_with_genre_response,
+                   headers: { 'Content-Type' => 'application/json' })
+      stub_request(:get, /api\.openbd\.jp\/v1\/get\?isbn=9784873115658/)
+        .to_return(status: 200, body: openbd_response_with_cover,
+                   headers: { 'Content-Type' => 'application/json' })
+    end
+
+    it '手動入力済みのジャンルは書影取得後も保持される' do
+      page.execute_script(<<~JS)
+        document.getElementById('book_genre').value = 'ミステリー';
+      JS
+
+      page.execute_script(<<~JS)
+        var el = document.getElementById('book_title');
+        el.value = 'リーダブルコード';
+        el.dispatchEvent(new Event('blur', { bubbles: true }));
+      JS
+
+      expect(page).to have_css('[data-book-form-target="titleStatus"]',
+                               text: 'タイトル・著者・ページ数・書影をすべて取得しました。', wait: 20)
+      expect(find('#book_genre').value).to eq('ミステリー')
+    end
+
+    it '手動入力済みの総ページ数は書影取得後も保持される' do
+      page.execute_script(<<~JS)
+        document.getElementById('book_total_pages').value = '999';
+      JS
+
+      page.execute_script(<<~JS)
+        var el = document.getElementById('book_title');
+        el.value = 'リーダブルコード';
+        el.dispatchEvent(new Event('blur', { bubbles: true }));
+      JS
+
+      expect(page).to have_css('[data-book-form-target="titleStatus"]',
+                               text: 'タイトル・著者・ページ数・書影をすべて取得しました。', wait: 20)
+      expect(find('#book_total_pages').value).to eq('999')
+    end
+
+    it 'ジャンルが空の場合はAPIの値で自動入力される' do
+      page.execute_script(<<~JS)
+        var el = document.getElementById('book_title');
+        el.value = 'リーダブルコード';
+        el.dispatchEvent(new Event('blur', { bubbles: true }));
+      JS
+
+      expect(page).to have_css('[data-book-form-target="titleStatus"]',
+                               text: 'タイトル・著者・ページ数・書影をすべて取得しました。', wait: 20)
+      expect(find('#book_genre').value).to eq('Computers')
+    end
+
+    it '総ページ数が空の場合はAPIの値で自動入力される' do
+      page.execute_script(<<~JS)
+        var el = document.getElementById('book_title');
+        el.value = 'リーダブルコード';
+        el.dispatchEvent(new Event('blur', { bubbles: true }));
+      JS
+
+      expect(page).to have_css('[data-book-form-target="titleStatus"]',
+                               text: 'タイトル・著者・ページ数・書影をすべて取得しました。', wait: 20)
+      expect(find('#book_total_pages').value).to eq('260')
+    end
+  end
 end

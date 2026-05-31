@@ -116,18 +116,24 @@ export default class extends Controller {
     }
 
     if (authorInput && author) {
-      authorInput.value = author
+      if (!authorInput.value.trim()) {
+        authorInput.value = author
+      }
     } else {
       missing.push('著者')
     }
 
     if (genreInput && genre) {
-      genreInput.value = genre
+      if (!genreInput.value.trim()) {
+        genreInput.value = genre
+      }
     }
 
     if (totalPagesInput && totalPages) {
-      totalPagesInput.value = totalPages
-      totalPagesInput.dispatchEvent(new Event('input'))
+      if (!totalPagesInput.value.trim()) {
+        totalPagesInput.value = totalPages
+        totalPagesInput.dispatchEvent(new Event('input'))
+      }
     } else {
       missing.push('ページ数')
     }
