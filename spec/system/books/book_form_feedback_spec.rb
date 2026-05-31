@@ -72,7 +72,11 @@ RSpec.describe '積読登録画面でのタイトル検索結果フィードバ�
   end
 
   def fetch_by_button(title)
-    fill_in 'タイトル', with: title
+    page.execute_script(<<~JS)
+      var el = document.getElementById('book_title');
+      el.value = #{title.to_json};
+      el.dispatchEvent(new Event('input', { bubbles: true }));
+    JS
     click_button '情報取得'
   end
 
@@ -96,6 +100,8 @@ RSpec.describe '積読登録画面でのタイトル検索結果フィードバ�
     it '書影プレビュー画像が表示される' do
       fetch_by_button('リーダブルコード')
 
+      expect(page).to have_css('[data-book-form-target="titleStatus"]',
+                               text: 'タイトル・著者・ページ数・書影をすべて取得しました。', wait: 20)
       expect(page).to have_css('[data-book-form-target="coverPreview"] img', wait: 15)
     end
   end
@@ -169,11 +175,7 @@ RSpec.describe '積読登録画面でのタイトル検索結果フィードバ�
         document.getElementById('book_genre').value = 'ミステリー';
       JS
 
-      page.execute_script(<<~JS)
-        var el = document.getElementById('book_title');
-        el.value = 'リーダブルコード';
-        el.dispatchEvent(new Event('blur', { bubbles: true }));
-      JS
+      fetch_by_button('リーダブルコード')
 
       expect(page).to have_css('[data-book-form-target="titleStatus"]',
                                text: 'タイトル・著者・ページ数・書影をすべて取得しました。', wait: 20)
@@ -185,11 +187,7 @@ RSpec.describe '積読登録画面でのタイトル検索結果フィードバ�
         document.getElementById('book_total_pages').value = '999';
       JS
 
-      page.execute_script(<<~JS)
-        var el = document.getElementById('book_title');
-        el.value = 'リーダブルコード';
-        el.dispatchEvent(new Event('blur', { bubbles: true }));
-      JS
+      fetch_by_button('リーダブルコード')
 
       expect(page).to have_css('[data-book-form-target="titleStatus"]',
                                text: 'タイトル・著者・ページ数・書影をすべて取得しました。', wait: 20)
@@ -197,11 +195,7 @@ RSpec.describe '積読登録画面でのタイトル検索結果フィードバ�
     end
 
     it 'ジャンルが空の場合はAPIの値で自動入力される' do
-      page.execute_script(<<~JS)
-        var el = document.getElementById('book_title');
-        el.value = 'リーダブルコード';
-        el.dispatchEvent(new Event('blur', { bubbles: true }));
-      JS
+      fetch_by_button('リーダブルコード')
 
       expect(page).to have_css('[data-book-form-target="titleStatus"]',
                                text: 'タイトル・著者・ページ数・書影をすべて取得しました。', wait: 20)
@@ -209,11 +203,7 @@ RSpec.describe '積読登録画面でのタイトル検索結果フィードバ�
     end
 
     it '総ページ数が空の場合はAPIの値で自動入力される' do
-      page.execute_script(<<~JS)
-        var el = document.getElementById('book_title');
-        el.value = 'リーダブルコード';
-        el.dispatchEvent(new Event('blur', { bubbles: true }));
-      JS
+      fetch_by_button('リーダブルコード')
 
       expect(page).to have_css('[data-book-form-target="titleStatus"]',
                                text: 'タイトル・著者・ページ数・書影をすべて取得しました。', wait: 20)
