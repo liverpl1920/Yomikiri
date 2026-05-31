@@ -283,7 +283,7 @@ RSpec.describe 'タイトル入力中オートコンプリート機能', type: :
   end
 
   describe '既存のISBN検索フローに回帰がない' do
-    it 'タイトル入力後フォーカスアウトでも書籍情報を取得できる（既存blurフロー）' do
+    it 'タイトル入力後のblurでは取得されず、情報取得ボタン押下で取得できる' do
       stub_google_books(google_books_single_response)
       stub_openbd_not_found
 
@@ -293,6 +293,10 @@ RSpec.describe 'タイトル入力中オートコンプリート機能', type: :
         el.focus();
       JS
       find('#book_author').click
+
+      expect(page).to have_field('著者', with: '', wait: 5)
+
+      click_button '情報取得'
 
       expect(page).to have_field('著者', with: 'Dustin Boswell', wait: 10)
     end

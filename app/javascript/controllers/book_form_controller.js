@@ -8,7 +8,6 @@ export default class extends Controller {
     this.calculateQuota()
     this.fetchingTitle = null
     this.fetchPromise = null
-    this.lastAutoFetchedTitle = ''
     this.syncCompletedAtFieldVisibility()
   }
 
@@ -18,7 +17,7 @@ export default class extends Controller {
   }
 
   markTitleFetched (title) {
-    this.lastAutoFetchedTitle = title || ''
+    this.fetchingTitle = title || ''
   }
 
   applyAutocompleteSelection (book) {
@@ -27,29 +26,14 @@ export default class extends Controller {
     this._setTitleStatus('書籍情報を自動入力しました')
   }
 
-  async autoFetchByTitle () {
+  async fetchByTitle () {
     const title = this.hasTitleTarget ? this.titleTarget.value.trim() : ''
-    if (!title) return false
+    if (!title) {
+      this._setTitleStatus('タイトルを入力してください。')
+      return false
+    }
 
     return this._fetchBookByTitle(title)
-  }
-
-  async submitWithAutoFetch (event) {
-    const title = this.hasTitleTarget ? this.titleTarget.value.trim() : ''
-    if (!title) return
-
-    const coverUrlInput = document.getElementById('book_cover_image_url')
-    const hasCoverImage = coverUrlInput && coverUrlInput.value.trim() !== ''
-    const coverFileInput = document.getElementById('book_cover_image')
-    const hasCoverFile = coverFileInput && coverFileInput.files && coverFileInput.files.length > 0
-    if (hasCoverImage || hasCoverFile || this.lastAutoFetchedTitle === title) return
-
-    event.preventDefault()
-    try {
-      await this._fetchBookByTitle(title)
-    } finally {
-      setTimeout(() => this.element.submit(), 0)
-    }
   }
 
   async _fetchBookByTitle (title) {
@@ -91,7 +75,8 @@ export default class extends Controller {
 
       const book = books[0]
       const missing = this._fillFormFromSearch(book)
-      this._updateCoverPreview(book.cover_image_url)
+      const coverUrlInput = document.getElementById('book_cover_image_url')
+      this._updateCoverPreview(coverUrlInput ? coverUrlInput.value : '')
       this._setTitleStatus(this._buildFetchResultMessage(missing))
       return true
     } catch (_e) {
@@ -107,6 +92,8 @@ export default class extends Controller {
     const authorInput = document.getElementById('book_author')
     const genreInput = document.getElementById('book_genre')
     const totalPagesInput = document.getElementById('book_total_pages')
+    const targetPagesInput = document.getElementById('book_target_pages')
+    const currentPageInput = document.getElementById('book_current_page')
     const coverUrlInput = document.getElementById('book_cover_image_url')
     const isbnInput = document.getElementById('book_isbn')
     const missing = []
@@ -116,24 +103,35 @@ export default class extends Controller {
     }
 
     if (authorInput && author) {
-      authorInput.value = author
+      if (!authorInput.value.trim()) {
+        authorInput.value = author
+      }
     } else {
       missing.push('著者')
     }
 
     if (genreInput && genre) {
-      genreInput.value = genre
+      if (!genreInput.value.trim()) {
+        genreInput.value = genre
+      }
     }
 
     if (totalPagesInput && totalPages) {
-      totalPagesInput.value = totalPages
-      totalPagesInput.dispatchEvent(new Event('input'))
+      if (!totalPagesInput.value.trim()) {
+        totalPagesInput.value = totalPages
+        totalPagesInput.dispatchEvent(new Event('input'))
+      } else if (targetPagesInput && currentPageInput) {
+        // 入力済みの target/current を尊重しつつノルマ表示だけ再計算する。
+        this.calculateQuota()
+      }
     } else {
       missing.push('ページ数')
     }
 
     if (coverUrlInput && coverUrl) {
-      coverUrlInput.value = coverUrl
+      if (!coverUrlInput.value.trim()) {
+        coverUrlInput.value = coverUrl
+      }
     } else {
       missing.push('書影')
     }

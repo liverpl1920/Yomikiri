@@ -1,8 +1,7 @@
 <%= form_with(model: book,
                multipart: true,
                data: {
-                 controller: 'book-form',
-                 action: 'submit->book-form#submitWithAutoFetch'
+                 controller: 'book-form'
                }) do |f| %>
 
   <%# バリデーションエラー一覧 %>
@@ -30,7 +29,7 @@
           data: {
             'book-form-target': 'title',
             'title-autocomplete-target': 'input',
-            action: 'blur->book-form#autoFetchByTitle input->title-autocomplete#onInput keydown->title-autocomplete#onKeydown'
+            action: 'input->title-autocomplete#onInput keydown->title-autocomplete#onKeydown'
           } %>
         <ul class="title-autocomplete__list title-autocomplete__list--hidden"
           data-title-autocomplete-target="list"
@@ -41,6 +40,11 @@
     <% end %>
     <p class="book-form__title-status" data-book-form-target="titleStatus" aria-live="polite"></p>
     <div class="book-cover-preview" data-book-form-target="coverPreview" hidden></div>
+    <button type="button"
+            class="btn btn--outline"
+            data-action="click->book-form#fetchByTitle">
+      情報取得
+    </button>
   </div>
 
   <%# 著者 %>
@@ -83,7 +87,7 @@
           class: "form-field__file #{'form-field__input--error' if book.errors[:cover_image].any?}",
           accept: 'image/jpeg,image/png,image/webp',
           data: { action: 'change->book-form#clearCoverImageUrl' } %>
-    <small class="form-field__hint">JPEG・PNG・WebP形式、5MB以内。タイトル入力で取得された書影がある場合は自動設定されます。</small>
+    <small class="form-field__hint">JPEG・PNG・WebP形式、5MB以内。情報取得で見つかった書影は未設定時のみ自動設定されます。</small>
     <% if book.errors[:cover_image].any? %>
       <span class="form-field__error"><%= book.errors[:cover_image].first %></span>
     <% end %>
