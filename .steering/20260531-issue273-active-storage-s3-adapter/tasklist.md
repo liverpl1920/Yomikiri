@@ -36,6 +36,7 @@
 計画と異なった点:
 - add-feature 手順に含まれる `npm test` / `npm run lint` / `npm run typecheck` は本リポジトリに npm scripts が定義されておらず実行不可だった。
 - 代替として、この Rails リポジトリの標準品質ゲートである対象 RSpec と RuboCop の通過で検証を完了した。
+- Copilot 指摘を受け、`B2_ENDPOINT` の https URL 妥当性検証と、S3 アダプタ解決の実行ベーステストを追加した。
 
 新たに必要になったタスク:
 - なし

@@ -36,5 +36,19 @@ RSpec.describe ActiveStorageS3ConfigValidator do
       expect { described_class.assert!(env) }
         .to raise_error(KeyError, /Missing required Active Storage B2 env vars: B2_ACCESS_KEY_ID/)
     end
+
+    it 'B2_ENDPOINT が http の場合は ArgumentError を発生させる' do
+      env = valid_env.merge('B2_ENDPOINT' => 'http://s3.us-west-004.backblazeb2.com')
+
+      expect { described_class.assert!(env) }
+        .to raise_error(ArgumentError, /B2_ENDPOINT must be an https URL/)
+    end
+
+    it 'B2_ENDPOINT が不正なURIの場合は ArgumentError を発生させる' do
+      env = valid_env.merge('B2_ENDPOINT' => 'not a uri')
+
+      expect { described_class.assert!(env) }
+        .to raise_error(ArgumentError, /B2_ENDPOINT must be an https URL/)
+    end
   end
 end
