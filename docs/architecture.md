@@ -178,7 +178,7 @@ config.active_record.default_timezone = :local # DBへの保存もローカル�
 - **Active Storage（S3）を主系として使用**: `Book` の `has_one_attached :cover_image` でユーザーアップロードを保持
 - `books.cover_image_url` は外部URL書影の補助経路として併用
 - 表示時は `cover_image` 添付を優先し、未添付時に `cover_image_url` を利用
-- production では S3 必須（`AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `AWS_REGION`, `AWS_S3_BUCKET`）。不足時は fail-fast で起動失敗
+- production では Backblaze B2（S3互換）必須（`B2_ACCESS_KEY_ID`, `B2_SECRET_ACCESS_KEY`, `B2_REGION`, `B2_BUCKET`, `B2_ENDPOINT`）。不足時は fail-fast で起動失敗
 - 画像読み込み失敗時は UI でプレースホルダー表示へフォールバック
 
 ```ruby
@@ -196,7 +196,7 @@ end
 
 | 項目 | 方針 |
 |------|------|
-| production ストレージ | `:amazon` 固定（`:local` フォールバック禁止） |
+| production ストレージ | `:backblaze` 固定（`:local` フォールバック禁止） |
 | 環境変数不足 | 起動時に例外を発生させ、誤設定状態で運用しない |
 | 外部URL書影 | リンク切れや取得失敗の可能性があるため UI フォールバックを適用 |
 

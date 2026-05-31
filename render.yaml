@@ -29,11 +29,13 @@ services:
         sync: false
       - key: RAKUTEN_APPLICATION_ID
         sync: false
-      - key: AWS_ACCESS_KEY_ID
+      - key: B2_ACCESS_KEY_ID
         sync: false
-      - key: AWS_SECRET_ACCESS_KEY
+      - key: B2_SECRET_ACCESS_KEY
         sync: false
-      - key: AWS_REGION
+      - key: B2_REGION
         sync: false
-      - key: AWS_S3_BUCKET
+      - key: B2_BUCKET
+        sync: false
+      - key: B2_ENDPOINT
         sync: false

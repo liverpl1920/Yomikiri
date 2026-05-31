@@ -5,10 +5,11 @@ require 'rails_helper'
 RSpec.describe ActiveStorageS3ConfigValidator do
   let(:valid_env) do
     {
-      'AWS_ACCESS_KEY_ID' => 'access',
-      'AWS_SECRET_ACCESS_KEY' => 'secret',
-      'AWS_REGION' => 'ap-northeast-1',
-      'AWS_S3_BUCKET' => 'bucket-name'
+      'B2_ACCESS_KEY_ID' => 'access',
+      'B2_SECRET_ACCESS_KEY' => 'secret',
+      'B2_REGION' => 'us-west-004',
+      'B2_BUCKET' => 'bucket-name',
+      'B2_ENDPOINT' => 'https://s3.us-west-004.backblazeb2.com'
     }
   end
 
@@ -18,9 +19,9 @@ RSpec.describe ActiveStorageS3ConfigValidator do
     end
 
     it '不足しているキーを返す' do
-      env = valid_env.merge('AWS_REGION' => '', 'AWS_S3_BUCKET' => nil)
+      env = valid_env.merge('B2_REGION' => '', 'B2_ENDPOINT' => nil)
 
-      expect(described_class.missing_keys(env)).to contain_exactly('AWS_REGION', 'AWS_S3_BUCKET')
+      expect(described_class.missing_keys(env)).to contain_exactly('B2_REGION', 'B2_ENDPOINT')
     end
   end
 
@@ -30,10 +31,10 @@ RSpec.describe ActiveStorageS3ConfigValidator do
     end
 
     it '不足キーがある場合は KeyError を発生させる' do
-      env = valid_env.merge('AWS_ACCESS_KEY_ID' => nil)
+      env = valid_env.merge('B2_ACCESS_KEY_ID' => nil)
 
       expect { described_class.assert!(env) }
-        .to raise_error(KeyError, /Missing required Active Storage S3 env vars: AWS_ACCESS_KEY_ID/)
+        .to raise_error(KeyError, /Missing required Active Storage B2 env vars: B2_ACCESS_KEY_ID/)
     end
   end
 end

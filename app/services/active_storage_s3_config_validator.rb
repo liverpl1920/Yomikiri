@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class ActiveStorageS3ConfigValidator
-  REQUIRED_ENV_KEYS = %w[AWS_ACCESS_KEY_ID AWS_SECRET_ACCESS_KEY AWS_REGION AWS_S3_BUCKET].freeze
+  REQUIRED_ENV_KEYS = %w[B2_ACCESS_KEY_ID B2_SECRET_ACCESS_KEY B2_REGION B2_BUCKET B2_ENDPOINT].freeze
 
   def self.missing_keys(env = ENV)
     REQUIRED_ENV_KEYS.select { |key| env[key].blank? }
@@ -11,6 +11,6 @@ class ActiveStorageS3ConfigValidator
     missing = missing_keys(env)
     return if missing.empty?
 
-    raise KeyError, "Missing required Active Storage S3 env vars: #{missing.join(', ')}"
+    raise KeyError, "Missing required Active Storage B2 env vars: #{missing.join(', ')}"
   end
 end
