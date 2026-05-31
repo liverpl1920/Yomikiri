@@ -331,9 +331,9 @@ Renderダッシュボードで以下の環境変数を設定してください�
 | `DATABASE_URL` | NeonのPostgreSQL接続文字列 | Neonダッシュボード → Connection Details → Connection String（末尾に `?sslmode=require` を付与） |
 | `RAILS_MASTER_KEY` | Railsのマスターキー | `config/master.key` の内容（本番用は別途生成推奨） |
 
-#### Active Storage（S3）を有効化する場合に追加で必要な環境変数
+#### production で Active Storage（Backblaze B2 / S3互換）に必須の環境変数
 
-以下 5 つは `feature/#25-active-storage-setup` を反映する場合のみ必須です。
+production では起動時に B2 必須環境変数を検証するため、以下 5 つは必須です。
 
 | 環境変数 | 説明 | 取得方法 |
 |----------|------|---------|
@@ -380,7 +380,7 @@ Renderのサービスダッシュボード → **Environment** タブで以下�
 | `RAILS_LOG_TO_STDOUT` | `true` |
 | `RAILS_SERVE_STATIC_FILES` | `true` |
 
-Active Storage（Backblaze B2 / S3互換）有効化時のみ、以下も設定してください。
+production では以下も必ず設定してください。
 
 | キー | 値 |
 |------|----|

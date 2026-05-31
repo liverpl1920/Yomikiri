@@ -97,7 +97,7 @@ flowchart TD
 ```
 app/
   services/
-    active_storage_backblaze_b2_config_validator.rb   # 追加または更新
+    active_storage_s3_config_validator.rb             # 更新
 config/
   environments/
     production.rb                                     # 更新
@@ -105,7 +105,7 @@ config/
 render.yaml                                           # 更新
 spec/
   services/
-    active_storage_backblaze_b2_config_validator_spec.rb # 更新または追加
+    active_storage_s3_config_validator_spec.rb          # 更新
   config/
     production_active_storage_config_spec.rb           # 更新
     storage_config_spec.rb                             # 追加
