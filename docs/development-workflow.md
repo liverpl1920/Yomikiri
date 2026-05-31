@@ -313,16 +313,17 @@ services:
 
 > **Note**: `sync: false` の環境変数は Render Dashboard の Environment タブで手動設定してください。
 
-### Active Storage（S3）反映時の事前チェック（Issue #112 対応）
+### Active Storage（Backblaze B2 / S3互換）反映時の事前チェック（Issue #112 対応）
 
 `feature/#25-active-storage-setup` を main にマージする前に、以下を必ず実施してください。
 
-1. AWS 側で S3 バケットを作成済みであること
+1. Backblaze B2 側で S3 互換バケットを作成済みであること
 2. Render Dashboard の Environment に次を設定済みであること
-    - `AWS_ACCESS_KEY_ID`
-    - `AWS_SECRET_ACCESS_KEY`
-    - `AWS_REGION`（例: `ap-northeast-1`）
-    - `AWS_BUCKET`
+  - `B2_ACCESS_KEY_ID`
+  - `B2_SECRET_ACCESS_KEY`
+  - `B2_REGION`（例: `us-west-004`）
+  - `B2_BUCKET`
+  - `B2_ENDPOINT`（例: `https://s3.us-west-004.backblazeb2.com`）
 3. `render.yaml` の `sync: false` は「値は Git 管理せず、Render 側で手動設定する」意味であることを理解していること
 
 上記が未実施のまま `feature/#25-active-storage-setup` をマージすると、本番起動時に環境変数不足で起動不能になるリスクがあります。
@@ -337,7 +338,7 @@ services:
 
 ### PR レビュー時チェックリスト（Active Storage 反映時）
 
-- [ ] Render Dashboard に `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `AWS_REGION`, `AWS_BUCKET` が設定済み
+- [ ] Render Dashboard に `B2_ACCESS_KEY_ID`, `B2_SECRET_ACCESS_KEY`, `B2_REGION`, `B2_BUCKET`, `B2_ENDPOINT` が設定済み
 - [ ] `feature/#25-active-storage-setup` の反映後に `/up` が正常応答することを確認済み
 - [ ] `feature/#26-cover-image-upload` は `feature/#25` のデプロイ確認後にマージする
 - [ ] `sync: false` の環境変数が「手動設定前提」であることをレビューで確認済み

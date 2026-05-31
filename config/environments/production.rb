@@ -115,9 +115,9 @@ Rails.application.configure do
   # Only use :id for inspections in production.
   config.active_record.attributes_for_inspect = [ :id ]
 
-  # Active Storage: production では S3 を必須化する。
+  # Active Storage: production では Backblaze B2 を必須化する。
   ActiveStorageS3ConfigValidator.assert!
-  config.active_storage.service = :amazon
+  config.active_storage.service = :backblaze
 
   # Enable DNS rebinding protection and other `Host` header attacks.
   # config.hosts = [

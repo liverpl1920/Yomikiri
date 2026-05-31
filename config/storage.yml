@@ -6,12 +6,14 @@ local:
   service: Disk
   root: <%= Rails.root.join("storage") %>
 
-amazon:
+backblaze:
   service: S3
-  access_key_id: <%= ENV["AWS_ACCESS_KEY_ID"] %>
-  secret_access_key: <%= ENV["AWS_SECRET_ACCESS_KEY"] %>
-  region: <%= ENV["AWS_REGION"] %>
-  bucket: <%= ENV["AWS_S3_BUCKET"] %>
+  access_key_id: <%= ENV["B2_ACCESS_KEY_ID"] %>
+  secret_access_key: <%= ENV["B2_SECRET_ACCESS_KEY"] %>
+  region: <%= ENV["B2_REGION"] %>
+  bucket: <%= ENV["B2_BUCKET"] %>
+  endpoint: <%= ENV["B2_ENDPOINT"] %>
+  force_path_style: true
 
 # Use bin/rails credentials:edit to set the Azure Storage secret (as azure_storage:storage_access_key)
 # microsoft:

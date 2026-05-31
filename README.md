@@ -333,14 +333,15 @@ Renderダッシュボードで以下の環境変数を設定してください�
 
 #### Active Storage（S3）を有効化する場合に追加で必要な環境変数
 
-以下 4 つは `feature/#25-active-storage-setup` を反映する場合のみ必須です。
+以下 5 つは `feature/#25-active-storage-setup` を反映する場合のみ必須です。
 
 | 環境変数 | 説明 | 取得方法 |
 |----------|------|---------|
-| `AWS_ACCESS_KEY_ID` | Active Storage (S3) のアクセスキー | AWS IAM ユーザーのアクセスキー |
-| `AWS_SECRET_ACCESS_KEY` | Active Storage (S3) のシークレットキー | AWS IAM ユーザーのシークレットキー |
-| `AWS_REGION` | S3 バケットのリージョン | 例: `ap-northeast-1` |
-| `AWS_BUCKET` | 保存先 S3 バケット名 | 作成した S3 バケット名 |
+| `B2_ACCESS_KEY_ID` | Active Storage (Backblaze B2) のアクセスキー | Backblaze B2 の S3 アクセスキー ID |
+| `B2_SECRET_ACCESS_KEY` | Active Storage (Backblaze B2) のシークレットキー | Backblaze B2 のアプリケーションキー |
+| `B2_REGION` | B2 互換 S3 のリージョン | 例: `us-west-004` |
+| `B2_BUCKET` | 保存先 B2 バケット名 | 作成した B2 バケット名 |
+| `B2_ENDPOINT` | B2 の S3 互換エンドポイント | 例: `https://s3.us-west-004.backblazeb2.com` |
 
 ### セットアップ手順
 
@@ -379,14 +380,15 @@ Renderのサービスダッシュボード → **Environment** タブで以下�
 | `RAILS_LOG_TO_STDOUT` | `true` |
 | `RAILS_SERVE_STATIC_FILES` | `true` |
 
-Active Storage（S3）有効化時のみ、以下も設定してください。
+Active Storage（Backblaze B2 / S3互換）有効化時のみ、以下も設定してください。
 
 | キー | 値 |
 |------|----|
-| `AWS_ACCESS_KEY_ID` | AWS IAM アクセスキー |
-| `AWS_SECRET_ACCESS_KEY` | AWS IAM シークレットキー |
-| `AWS_REGION` | S3 のリージョン |
-| `AWS_BUCKET` | S3 バケット名 |
+| `B2_ACCESS_KEY_ID` | Backblaze B2 の S3 アクセスキー ID |
+| `B2_SECRET_ACCESS_KEY` | Backblaze B2 のアプリケーションキー |
+| `B2_REGION` | B2 のリージョン |
+| `B2_BUCKET` | B2 バケット名 |
+| `B2_ENDPOINT` | B2 の S3 互換エンドポイント |
 
 #### 4. 初回デプロイを実行する
 
