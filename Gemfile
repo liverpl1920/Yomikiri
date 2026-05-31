@@ -8,6 +8,7 @@ gem "importmap-rails"
 gem "turbo-rails"
 gem "stimulus-rails"
 gem "jbuilder"
+gem "aws-sdk-s3", require: false
 gem "devise", "~> 5.0"
 gem "rails-i18n", "~> 7.0"
 gem "tzinfo-data", platforms: %i[ windows jruby ]
