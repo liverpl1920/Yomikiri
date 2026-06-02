@@ -37,6 +37,22 @@
         <%= t("book.status.#{@book.status}") %>
       </span>
     </div>
+    
+    <% if @book.completed? && (@book.rating.present? || @book.review.present?) %>
+      <section class="book-show__review-section" aria-label="書籍の評価と感想">
+        <div class="book-show__review-header">
+          <h2 class="book-show__review-title">あなたの評価・感想</h2>
+          <% if @book.rating.present? && @book.rating.to_i.between?(1, 5) %>
+            <div class="book-show__rating-stars" aria-label="評価: <%= @book.rating %> / 5">
+              <%= "★" * @book.rating.to_i %><%= "☆" * (5 - @book.rating.to_i) %>
+            </div>
+          <% end %>
+        </div>
+        <% if @book.review.present? %>
+          <div class="book-show__review-body"><%= simple_format(@book.review) %></div>
+        <% end %>
+      </section>
+    <% end %>
 
     <div class="book-show__progress">
       <div class="book-show__progress-header">
@@ -627,9 +643,27 @@
             </dd>
           </div>
         </dl>
-        <div class="modal__actions">
-          <%= link_to '一覧に戻る', books_path, class: 'btn btn--primary' %>
-        </div>
+        <%= form_with model: @book, url: update_review_book_path(@book), method: :patch, class: 'celebration-modal__review-form', data: { turbo: false } do |f| %>
+          <div class="celebration-modal__field">
+            <label class="celebration-modal__form-label">評価</label>
+            <div class="rating-input">
+              <% (1..5).reverse_each do |i| %>
+                <%= f.radio_button :rating, i, id: "star#{i}", class: 'rating-input__star' %>
+                <label for="star<%= i %>" class="rating-input__label">★</label>
+              <% end %>
+            </div>
+          </div>
+
+          <div class="celebration-modal__field">
+            <%= f.label :review, '感想', class: 'celebration-modal__form-label' %>
+            <%= f.text_area :review, class: 'celebration-modal__review-input', placeholder: '本を読み終えた感想を自由に記載しましょう！', maxlength: 1000 %>
+          </div>
+
+          <div class="celebration-modal__form-actions">
+            <%= f.submit '評価・感想を保存して一覧に戻る', class: 'btn btn--primary' %>
+            <%= link_to '保存せずに一覧に戻る', books_path, class: 'btn btn--outline' %>
+          </div>
+        <% end %>
       </div>
     </div>
   <% end %>

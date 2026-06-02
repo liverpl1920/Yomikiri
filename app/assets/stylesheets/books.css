@@ -1027,6 +1027,102 @@
   color: #15803d;
 }
 
+/* ---- 評価・感想入力フォーム (お祝いモーダル内) ---- */
+.celebration-modal__review-form {
+  width: 100%;
+  border-top: 1px solid var(--color-border);
+  padding-top: var(--spacing-lg);
+  margin-top: var(--spacing-md);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+  text-align: left;
+}
+
+.celebration-modal__form-label {
+  display: block;
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  color: var(--color-text-muted);
+  margin-bottom: var(--spacing-xs);
+}
+
+.rating-input {
+  display: flex;
+  flex-direction: row-reverse;
+  justify-content: flex-end;
+  gap: 0.25rem;
+}
+
+.rating-input__star {
+  display: none;
+}
+
+.rating-input__label {
+  font-size: 2.25rem;
+  color: #e5e7eb;
+  cursor: pointer;
+  transition: color 0.1s ease-in-out;
+}
+
+.rating-input__star:checked ~ .rating-input__label,
+.rating-input__label:hover,
+.rating-input__label:hover ~ .rating-input__label {
+  color: #fbbf24;
+}
+
+.celebration-modal__review-input {
+  width: 100%;
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius);
+  padding: var(--spacing-sm);
+  font-size: var(--font-size-base);
+  resize: vertical;
+  min-height: 80px;
+}
+
+.celebration-modal__form-actions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  width: 100%;
+}
+
+/* ---- 詳細画面での表示用 ---- */
+.book-show__review-section {
+  background-color: var(--color-bg-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius-lg);
+  padding: var(--spacing-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.book-show__review-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.book-show__review-title {
+  font-size: var(--font-size-base);
+  font-weight: 700;
+}
+
+.book-show__rating-stars {
+  color: #fbbf24;
+  font-size: var(--font-size-lg);
+  letter-spacing: 0.1em;
+}
+
+.book-show__review-body {
+  line-height: 1.7;
+  color: var(--color-text);
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
 /* ========================
    積読登録フォーム
    ======================== */

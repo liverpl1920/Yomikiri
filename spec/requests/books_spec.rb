@@ -1470,7 +1470,7 @@ RSpec.describe 'Books', type: :request do
       it '評価と感想を保存できる' do
         patch update_review_book_path(book), params: { book: { rating: 4, review: '面白かった' } }
 
-        expect(response).to redirect_to(book_path(book))
+        expect(response).to redirect_to(books_path)
         expect(book.reload.rating).to eq(4)
         expect(book.reload.review).to eq('面白かった')
       end
@@ -1478,14 +1478,14 @@ RSpec.describe 'Books', type: :request do
       it '評価のみ保存できる' do
         patch update_review_book_path(book), params: { book: { rating: 5 } }
 
-        expect(response).to redirect_to(book_path(book))
+        expect(response).to redirect_to(books_path)
         expect(book.reload.rating).to eq(5)
       end
 
       it '感想のみ保存できる' do
         patch update_review_book_path(book), params: { book: { review: '良い本でした' } }
 
-        expect(response).to redirect_to(book_path(book))
+        expect(response).to redirect_to(books_path)
         expect(book.reload.review).to eq('良い本でした')
       end
 
@@ -1503,7 +1503,7 @@ RSpec.describe 'Books', type: :request do
 
       it '感想表示時にHTMLタグがエスケープされる' do
         patch update_review_book_path(book), params: { book: { review: '<script>alert(1)</script>' } }
-        follow_redirect!
+        get book_path(book)
 
         expect(response.body).to include('&lt;script&gt;alert(1)&lt;/script&gt;')
         expect(response.body).not_to include('<script>alert(1)</script>')

@@ -1,0 +1,37 @@
+# Antigravity Rules for Yomikiri
+
+You are Antigravity, a powerful AI coding assistant. 
+For this project, you MUST follow the workflow defined in `.github/copilot-instructions.md`.
+
+## 核心ワークフロー (Core Workflow)
+作業を開始する際は、必ず 以下のステップを順守してください。詳細は `.github/copilot-instructions.md` を参照してください。
+
+1. **実装前確認**: `docs/` 配下の関連ドキュメント（特に `architecture.md`, `development-guidelines.md`）を確認する。
+2. **ブランチ作成**: `main` から `feature/#[Issue番号]-[作業内容]` ブランチを作成する。
+3. **計画**: `.steering/[YYYYMMDD]-[タスク名]/` ディレクトリを作成し、`requirements.md`, `design.md`, `tasklist.md` を作成する。
+4. **実装**: `tasklist.md` に従って、1タスクずつ実装し、完了するたびに `[x]` に更新する。
+5. **検証**: `bundle exec rspec` と `bundle exec rubocop` を実行し、全通過を確認する。
+6. **コミット**: コミットメッセージに Issue番号を含める。
+7. **PR作成**: `gh pr create` でPRを作成し、`gh pr checks --watch` でCIステータスを確認する。
+
+## 重要な参照ファイル
+- `.github/copilot-instructions.md`: 行動規則の真実のソース。
+- `docs/development-guidelines.md`: 開発ガイドライン。
+- `.github/skills/steering/SKILL.md`: 進捗管理（ステアリング）の詳細手順。
+
+## 進捗管理の徹底
+- `tasklist.md` はリアルタイムに更新すること。
+- 全てのタスクが `[x]` になるまで作業を継続し、安易にスキップしないこと。
+- 技術的理由でスキップする場合は、理由を `tasklist.md` に明記すること。
+
+## 利用可能なコマンド (Slash Commands)
+Antigravity では以下のワークフローを `/` コマンドで実行できます。
+
+- `/add-feature`: 新機能を既存パターンに従って実装する（ステアリング作成〜PR作成まで）。
+- `/steering`: ステアリングファイルの作成、更新、振り返りを行う。
+- `/validate`: 実装コードの品質検証とスペック整合性確認を行う。（強化済み）
+- `/review-docs`: ドキュメントの詳細レビューと改善提案を行う。
+- `/setup-project`: プロジェクト開始時の永続ドキュメントを対話的に作成する。
+
+## スキルの利用
+プロジェクト独自のスキルが `.github/skills/` に定義されています。タスクに応じて適切な `SKILL.md` を読み込み、その指示に従ってください。
