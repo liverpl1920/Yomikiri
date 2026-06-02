@@ -236,10 +236,19 @@ class BooksController < ApplicationController
                         .group(:read_at)
                         .sum(:pages_read)
 
+    # 期間前の累積ページ数
+    # initial_offset: 登録時のページ数（手動編集分を含む）
+    # logs_before: 表示期間より前の読書ログの合計
+    initial_offset = @book.current_page - @book.reading_logs.sum(:pages_read)
+    logs_before = @book.reading_logs.where("read_at < ?", start_date).sum(:pages_read)
+    current_cumulative = initial_offset + logs_before
+
     @progress_chart_data = (start_date..end_date).map do |date|
-      { date: date, pages_read: logs_by_date.fetch(date, 0) }
+      pages_read = logs_by_date.fetch(date, 0)
+      current_cumulative += pages_read
+      { date: date, pages_read: pages_read, cumulative_pages: current_cumulative }
     end
-    @progress_chart_max_pages = @progress_chart_data.map { |row| row[:pages_read] }.max.to_i
+    @progress_chart_max_pages = @progress_chart_data.map { |row| row[:cumulative_pages] }.max.to_i
   end
 
   def progress_chart_end_date
