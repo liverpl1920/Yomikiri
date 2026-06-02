@@ -42,9 +42,9 @@
       <section class="book-show__review-section" aria-label="書籍の評価と感想">
         <div class="book-show__review-header">
           <h2 class="book-show__review-title">あなたの評価・感想</h2>
-          <% if @book.rating.present? %>
+          <% if @book.rating.present? && @book.rating.to_i.between?(1, 5) %>
             <div class="book-show__rating-stars" aria-label="評価: <%= @book.rating %> / 5">
-              <%= "★" * @book.rating %><%= "☆" * (5 - @book.rating) %>
+              <%= "★" * @book.rating.to_i %><%= "☆" * (5 - @book.rating.to_i) %>
             </div>
           <% end %>
         </div>
