@@ -806,13 +806,13 @@ RSpec.describe 'Books', type: :request do
 
       it '読書進捗グラフが表示される（ログあり）' do
         travel_to(Date.new(2026, 5, 12)) do
-          book = create(:book, user: user)
+          book = create(:book, user: user, current_page: 20)
           create(:reading_log, book: book, read_at: Date.new(2026, 5, 10), pages_read: 20)
 
           get book_path(book)
 
           expect(response.body).to include('読書進捗グラフ')
-          expect(response.body).to include('横軸: 日付 / 縦軸: ページ数')
+          expect(response.body).to include('横軸: 日付 / 縦軸: 累積ページ数')
           expect(response.body).to include('book-show__chart-line')
           expect(response.body).to include('data-date="2026-05-10"')
           expect(response.body).to include('data-pages="20"')
@@ -832,21 +832,22 @@ RSpec.describe 'Books', type: :request do
         end
       end
 
-      it '記録がない日は 0 ページとして表示される' do
+      it '記録がない日は累計ページ数が前日の値を引き継ぐ' do
         travel_to(Date.new(2026, 5, 12)) do
-          book = create(:book, user: user)
+          book = create(:book, user: user, current_page: 12)
           create(:reading_log, book: book, read_at: Date.new(2026, 5, 10), pages_read: 12)
 
           get book_path(book)
 
           expect(response.body).to include('data-date="2026-05-11"')
           expect(response.body).to include('data-pages="0"')
+          expect(response.body).to include('data-cumulative="12"')
         end
       end
 
       it '読了済み本は読了日までをグラフ表示期間にする' do
         travel_to(Date.new(2026, 5, 20)) do
-          book = create(:book, user: user, status: :completed, completed_at: Time.zone.parse('2026-05-14 10:00:00'))
+          book = create(:book, user: user, status: :completed, completed_at: Time.zone.parse('2026-05-14 10:00:00'), current_page: 27)
           create(:reading_log, book: book, read_at: Date.new(2026, 5, 13), pages_read: 18)
           create(:reading_log, book: book, read_at: Date.new(2026, 5, 16), pages_read: 9)
 

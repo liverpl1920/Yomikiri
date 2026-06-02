@@ -159,9 +159,9 @@
     <section class="book-show__chart" aria-label="読書進捗グラフ">
       <div class="book-show__chart-header">
         <h2 class="book-show__chart-title">読書進捗グラフ</h2>
-        <p class="book-show__chart-note">記録がない日は 0 ページとして表示します。</p>
+         <p class="book-show__chart-note">記録がない日は前日の累積ページ数を引き継いで表示します。</p>
       </div>
-      <p class="book-show__chart-axes">横軸: 日付 / 縦軸: ページ数</p>
+      <p class="book-show__chart-axes">横軸: 日付 / 縦軸: 累積ページ数</p>
 
       <% if @progress_chart_data.any? { |row| row[:pages_read].positive? } %>
         <% chart_rows = @progress_chart_data %>
@@ -183,7 +183,7 @@
 
         <% point_strings = chart_rows.each_with_index.map do |row, index|
              x = x_positions[index]
-             y = chart_padding[:top] + plot_height - (row[:pages_read].to_f / max_pages * plot_height)
+             y = chart_padding[:top] + plot_height - (row[:cumulative_pages].to_f / max_pages * plot_height)
              "#{x.round(2)},#{y.round(2)}"
            end %>
 
@@ -217,7 +217,7 @@
 
             <% chart_rows.each_with_index do |row, index| %>
               <% x = x_positions[index] %>
-              <% y = chart_padding[:top] + plot_height - (row[:pages_read].to_f / max_pages * plot_height) %>
+              <% y = chart_padding[:top] + plot_height - (row[:cumulative_pages].to_f / max_pages * plot_height) %>
               <circle
                 cx="<%= x.round(2) %>"
                 cy="<%= y.round(2) %>"
@@ -238,14 +238,16 @@
             <thead>
               <tr>
                 <th scope="col">日付</th>
-                <th scope="col">ページ数</th>
+                <th scope="col">累計ページ数</th>
+                <th scope="col">当日読了</th>
               </tr>
             </thead>
             <tbody>
               <% chart_rows.each do |row| %>
-                <tr data-date="<%= row[:date] %>" data-pages="<%= row[:pages_read] %>">
+                <tr data-date="<%= row[:date] %>" data-pages="<%= row[:pages_read] %>" data-cumulative="<%= row[:cumulative_pages] %>">
                   <td><%= l(row[:date], format: :default) %></td>
-                  <td><%= row[:pages_read] %> ページ</td>
+                  <td><%= row[:cumulative_pages] %> ページ</td>
+                  <td><%= row[:pages_read] > 0 ? "+#{row[:pages_read]}" : "-" %></td>
                 </tr>
               <% end %>
             </tbody>
