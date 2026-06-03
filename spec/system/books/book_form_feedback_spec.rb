@@ -73,6 +73,10 @@ RSpec.describe '積読登録画面でのタイトル検索結果フィードバ�
 
   # 各テストの後にも stub をクリアして干渉を防ぐ
   after do
+    if page.driver.respond_to?(:browser)
+      logs = page.driver.browser.logs.get(:browser)
+      puts "BROWSER LOGS: #{logs.map(&:message).join("\n")}"
+    end
     WebMock.reset!
   end
 
@@ -80,14 +84,12 @@ RSpec.describe '積読登録画面でのタイトル検索結果フィードバ�
     page.execute_script(<<~JS)
       var el = document.getElementById('book_title');
       el.value = #{title.to_json};
-      el.dispatchEvent(new Event('input', { bubbles: true }));
     JS
     click_button '情報取得'
   end
 
   describe '全項目取得成功' do
     before do
-      WebMock.reset!
       stub_request(:get, /www\.googleapis\.com\/books\/v1\/volumes/)
         .to_return(status: 200, body: google_books_full_response,
                    headers: { 'Content-Type' => 'application/json' })
@@ -129,6 +131,8 @@ RSpec.describe '積読登録画面でのタイトル検索結果フィードバ�
     it '書影プレビューは表示されない' do
       fetch_by_button('ISBN なし本')
 
+      expect(page).to have_css('[data-book-form-target="titleStatus"]',
+                               text: '書籍情報を取得しましたが、書影は取得できませんでした。', wait: 20)
       expect(page).not_to have_css('[data-book-form-target="coverPreview"] img', wait: 15)
     end
   end
