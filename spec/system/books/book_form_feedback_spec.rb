@@ -71,8 +71,14 @@ RSpec.describe '積読登録画面でのタイトル検索結果フィードバ�
     wait_for_stimulus(identifier: 'book-form')
   end
 
+  # 各テストの後にも stub をクリアして干渉を防ぐ
+  after do
+    WebMock.reset!
+  end
+
   describe '全項目取得成功' do
     before do
+      WebMock.reset!
       stub_request(:get, /www\.googleapis\.com\/books\/v1\/volumes/)
         .to_return(status: 200, body: google_books_full_response,
                    headers: { 'Content-Type' => 'application/json' })
