@@ -128,8 +128,9 @@
 
   <%# 読了期限 %>
   <%# モデルの deadline_optional? と同じ判定: new_record? かつ current_page > 0 の場合も必須表示 %>
+  <% past_reading_for_form = ActiveModel::Type::Boolean.new.cast(book.is_past_reading) %>
   <% will_transition_to_reading_on_create = book.new_record? && book.unread? && book.current_page.to_i > 0 %>
-  <% deadline_optional_for_form = (book.unread? && !will_transition_to_reading_on_create) || book.completed? %>
+  <% deadline_optional_for_form = past_reading_for_form || (book.unread? && !will_transition_to_reading_on_create) || book.completed? %>
   <div class="form-field">
     <%= f.label :deadline, '読了期限', class: 'form-field__label' %>
     <% if deadline_optional_for_form %>

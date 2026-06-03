@@ -1,4 +1,12 @@
 <% content_for :title, "積読一覧 | Yomikiri" %>
+<% content_for :head do %>
+  <meta name="turbo-cache-control" content="no-cache">
+  <script>
+    window.addEventListener('pageshow', function (event) {
+      if (event.persisted) window.location.reload()
+    })
+  </script>
+<% end %>
 
 <section class="books-index">
   <div class="container">

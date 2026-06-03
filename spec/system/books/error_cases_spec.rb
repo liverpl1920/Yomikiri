@@ -14,19 +14,9 @@ RSpec.describe '書籍詳細の異常系', type: :system, js: true do
   end
 
   describe '進捗更新の異常系' do
-    it 'pages_readが0だとエラー表示される' do
-      page.execute_script("document.getElementById('pages_read').removeAttribute('min')")
-      page.execute_script("document.getElementById('pages_read').value = 0")
-      progress_form = first('form[action="' + update_progress_book_path(book) + '"]', visible: :all)
-      page.execute_script('arguments[0].noValidate = true; arguments[0].submit();', progress_form)
-
-      expect(page).to have_text('ページ数が無効です')
-      expect(book.reload.current_page).to eq(10)
-    end
-
-    it 'pages_readが負値だとエラー表示される' do
-      page.execute_script("document.getElementById('pages_read').removeAttribute('min')")
-      page.execute_script("document.getElementById('pages_read').value = -1")
+    it 'direct_pageが負値だとエラー表示される' do
+      page.execute_script("document.getElementById('direct_page').removeAttribute('min')")
+      page.execute_script("document.getElementById('direct_page').value = -1")
       progress_form = first('form[action="' + update_progress_book_path(book) + '"]', visible: :all)
       page.execute_script('arguments[0].noValidate = true; arguments[0].submit();', progress_form)
 
@@ -35,12 +25,9 @@ RSpec.describe '書籍詳細の異常系', type: :system, js: true do
     end
 
     it 'direct_pageがtarget_pagesを超えるとエラー表示される' do
-      page.execute_script("document.querySelector('[data-action~=\"click->progress-update#toggleAdvanced\"]').click()")
-      expect(page).to have_css('#direct-input-section:not([hidden])')
-
       page.execute_script("document.getElementById('direct_page').removeAttribute('max')")
       page.execute_script("document.getElementById('direct_page').value = 150")
-      direct_form = find('#direct-input-section form', visible: :all)
+      direct_form = first('form[action="' + update_progress_book_path(book) + '"]', visible: :all)
       page.execute_script('arguments[0].noValidate = true; arguments[0].submit();', direct_form)
 
       expect(page).to have_text('ページ数が無効です')

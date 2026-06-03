@@ -63,8 +63,7 @@
     <% end %>
     <% if !@book.completed? && remaining_pages > 0 && !(@book.unread? && @book.deadline.nil?) %>
       <%# 進捗更新フォーム %>
-       <div class="book-show__progress-update"
-         data-controller="progress-update">
+      <div class="book-show__progress-update">
 
         <%# バリデーションエラー表示 %>
         <% if @book.errors.any? %>
@@ -79,52 +78,22 @@
 
         <h2 class="book-show__progress-update-title">今日の進捗を記録する</h2>
 
-        <%# 今日読んだページ数フォーム（デフォルト） %>
+        <%# 現在ページを直接入力 %>
         <%= form_with url: update_progress_book_path(@book), method: :patch,
               data: { turbo: false } do |f| %>
           <div class="progress-update__field">
-            <label class="progress-update__label" for="pages_read">今日読んだページ数</label>
-            <div class="progress-update__input-group">
-              <input type="number" id="pages_read" name="pages_read"
+            <label class="progress-update__label" for="direct_page">現在ページ</label>
+            <div class="progress-update__input-row">
+              <input type="number" id="direct_page" name="direct_page"
                      class="progress-update__input"
-                     value="1" min="1"
-                     max="<%= @book.target_pages - @book.current_page %>"
-                     aria-label="今日読んだページ数">
+                     value="<%= @book.current_page %>" min="0"
+                     max="<%= @book.target_pages %>"
+                     aria-label="現在ページ">
+              <span class="progress-update__unit">/ <%= @book.target_pages %> ページ</span>
             </div>
           </div>
           <%= f.submit "更新する", class: "btn btn--primary" %>
         <% end %>
-
-        <%# 現在ページを直接入力（折りたたみ） %>
-        <div class="progress-update__advanced">
-          <button type="button" class="progress-update__toggle"
-                  aria-expanded="false"
-                  aria-controls="direct-input-section"
-                  data-action="click->progress-update#toggleAdvanced">
-            <span class="progress-update__toggle-icon" aria-hidden="true">▶</span>
-            現在ページを直接入力
-          </button>
-          <div id="direct-input-section"
-               class="progress-update__advanced-section"
-               hidden
-               data-progress-update-target="advancedSection">
-            <%= form_with url: update_progress_book_path(@book), method: :patch,
-                  data: { turbo: false } do |f| %>
-              <div class="progress-update__field">
-                <label class="progress-update__label" for="direct_page">現在ページ</label>
-                <div class="progress-update__input-row">
-                  <input type="number" id="direct_page" name="direct_page"
-                         class="progress-update__input"
-                         value="<%= @book.current_page %>" min="0"
-                         max="<%= @book.target_pages %>"
-                         aria-label="現在ページ">
-                  <span class="progress-update__unit">/ <%= @book.target_pages %> ページ</span>
-                </div>
-              </div>
-              <%= f.submit "更新する", class: "btn btn--primary" %>
-            <% end %>
-          </div>
-        </div>
       </div>
     <% end %>
 
