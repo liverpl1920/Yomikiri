@@ -77,6 +77,7 @@ RSpec.describe '積読登録画面でのタイトル検索結果フィードバ�
       logs = page.driver.browser.logs.get(:browser)
       puts "BROWSER LOGS: #{logs.map(&:message).join("\n")}"
     end
+    visit 'about:blank'
     WebMock.reset!
   end
 
@@ -84,8 +85,9 @@ RSpec.describe '積読登録画面でのタイトル検索結果フィードバ�
     page.execute_script(<<~JS)
       var el = document.getElementById('book_title');
       el.value = #{title.to_json};
+      var btn = document.querySelector('button[data-action*="book-form#fetchByTitle"]');
+      if (btn) { btn.click(); }
     JS
-    click_button '情報取得'
   end
 
   describe '全項目取得成功' do
