@@ -61,6 +61,22 @@ RSpec.describe 'BookMemos', type: :request do
         end
       end
 
+      context '読書ログがある状態で無効なパラメータ（contentが空）の場合' do
+        before do
+          create(:reading_log, book: book, read_at: Date.current - 1, pages_read: 10)
+        end
+
+        it '422を返し、グラフデータが正しく設定される' do
+          post book_book_memos_path(book), params: { book_memo: { content: '' } }
+
+          expect(response).to have_http_status(:unprocessable_entity)
+          chart_data = controller.instance_variable_get(:@progress_chart_data)
+          expect(chart_data).to be_present
+          expect(chart_data.first).to include(:cumulative_pages)
+          expect(controller.instance_variable_get(:@progress_chart_max_pages)).to eq(book.pages)
+        end
+      end
+
       context '他ユーザーの書籍へのアクセス' do
         let(:other_book) { create(:book, user: other_user) }
 

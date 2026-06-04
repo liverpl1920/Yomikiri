@@ -766,7 +766,7 @@ RSpec.describe 'Books', type: :request do
 
       it '読書進捗グラフが表示される（ログあり）' do
         travel_to(Date.new(2026, 5, 12)) do
-          book = create(:book, user: user, current_page: 20)
+          book = create(:book, user: user, current_page: 20, pages: 350)
           create(:reading_log, book: book, read_at: Date.new(2026, 5, 10), pages_read: 20)
 
           get book_path(book)
@@ -776,6 +776,8 @@ RSpec.describe 'Books', type: :request do
           expect(response.body).to include('book-show__chart-line')
           expect(response.body).to include('data-date="2026-05-10"')
           expect(response.body).to include('data-pages="20"')
+          expect(controller.instance_variable_get(:@progress_chart_max_pages)).to eq(350)
+          expect(response.body).to include('<text x="40" y="20.0" class="book-show__chart-y-label">350</text>')
         end
       end
 
