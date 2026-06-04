@@ -1,4 +1,7 @@
 <% content_for :title, "#{@book.title} | Yomikiri" %>
+<% content_for :head do %>
+  <meta name="turbo-cache-control" content="no-cache">
+<% end %>
 
 <div class="container" data-controller="modal">
   <div class="book-show">
@@ -632,6 +635,7 @@
           </div>
         </dl>
         <%= form_with model: @book, url: update_review_book_path(@book), method: :patch, class: 'celebration-modal__review-form', data: { turbo: false } do |f| %>
+          <%= hidden_field_tag :redirect_to, 'index' %>
           <div class="celebration-modal__field">
             <label class="celebration-modal__form-label">評価</label>
             <div class="rating-input">

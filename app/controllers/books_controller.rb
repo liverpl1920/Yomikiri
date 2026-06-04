@@ -116,7 +116,8 @@ class BooksController < ApplicationController
 
   def update_review
     if @book.update(review_params)
-      redirect_to books_path, notice: "評価・感想を保存しました。"
+      redirect_target = params[:redirect_to] == "index" ? books_path : book_path(@book)
+      redirect_to redirect_target, notice: "評価・感想を保存しました。", status: :see_other
     else
       prepare_show_vars
       render :show, status: :unprocessable_entity

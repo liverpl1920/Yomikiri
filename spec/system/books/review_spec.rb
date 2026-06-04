@@ -44,7 +44,7 @@ RSpec.describe '読了後の評価・感想', type: :system do
     end
   end
 
-  describe '詳細画面での表示' do
+  describe '詳細画面での表示と更新' do
     context '既に評価・感想がある場合' do
       let!(:completed_book) do
         create(:book, user: user, status: :completed, rating: 4, review: '読みやすかった', current_page: 300, pages: 300)
@@ -55,6 +55,23 @@ RSpec.describe '読了後の評価・感想', type: :system do
         expect(page).to have_content('あなたの評価・感想')
         expect(page).to have_content('★★★★☆')
         expect(page).to have_content('読みやすかった')
+      end
+
+      it '詳細画面のフォームから評価と感想を更新し、即座に画面に反映される', js: true do
+        visit book_path(completed_book)
+        expect(page).to have_content('★★★★☆')
+        expect(page).to have_content('読みやすかった')
+
+        within('.book-show__review') do
+          find('label.book-show__star-label', text: '5点').click
+          fill_in '感想', with: '何回読んでも最高！'
+          click_button '評価・感想を保存する'
+        end
+
+        expect(page).to have_current_path(book_path(completed_book))
+        expect(page).to have_content('評価・感想を保存しました。')
+        expect(page).to have_content('★★★★★')
+        expect(page).to have_content('何回読んでも最高！')
       end
     end
   end
