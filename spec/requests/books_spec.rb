@@ -1390,7 +1390,7 @@ RSpec.describe 'Books', type: :request do
       it '評価と感想を保存できる' do
         patch update_review_book_path(book), params: { book: { rating: 4, review: '面白かった' } }
 
-        expect(response).to redirect_to(books_path)
+        expect(response).to redirect_to(book_path(book))
         expect(book.reload.rating).to eq(4)
         expect(book.reload.review).to eq('面白かった')
       end
@@ -1398,15 +1398,23 @@ RSpec.describe 'Books', type: :request do
       it '評価のみ保存できる' do
         patch update_review_book_path(book), params: { book: { rating: 5 } }
 
-        expect(response).to redirect_to(books_path)
+        expect(response).to redirect_to(book_path(book))
         expect(book.reload.rating).to eq(5)
       end
 
       it '感想のみ保存できる' do
         patch update_review_book_path(book), params: { book: { review: '良い本でした' } }
 
-        expect(response).to redirect_to(books_path)
+        expect(response).to redirect_to(book_path(book))
         expect(book.reload.review).to eq('良い本でした')
+      end
+
+      it 'redirect_to: index パラメータがある場合は一覧画面にリダイレクトされる' do
+        patch update_review_book_path(book), params: { book: { rating: 4, review: '面白かった' }, redirect_to: 'index' }
+
+        expect(response).to redirect_to(books_path)
+        expect(book.reload.rating).to eq(4)
+        expect(book.reload.review).to eq('面白かった')
       end
 
       it 'ratingが6の場合は422になる' do
