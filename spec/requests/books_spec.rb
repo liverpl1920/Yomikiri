@@ -1076,75 +1076,24 @@ RSpec.describe 'Books', type: :request do
     context '認証済みユーザーの場合' do
       before { sign_in user }
 
-      context '今日読んだページ数（pages_read）で更新する場合' do
-        it 'current_page が pages_read 分加算される' do
-          book = create(:book, user: user, current_page: 10, target_pages: 100)
-          patch update_progress_book_path(book), params: { pages_read: 20 }
-          expect(book.reload.current_page).to eq(30)
-        end
-
-        it '読書ログが記録される' do
-          book = create(:book, user: user, current_page: 10, target_pages: 100)
-
-          expect do
-            patch update_progress_book_path(book), params: { pages_read: 20 }
-          end.to change(ReadingLog, :count).by(1)
-
-          log = ReadingLog.last
-          expect(log.book).to eq(book)
-          expect(log.pages_read).to eq(20)
-          expect(log.read_at).to eq(Date.current)
-          expect(log.start_page).to eq(11)
-          expect(log.end_page).to eq(30)
-        end
-
-        it '更新後、書籍詳細画面へリダイレクトされる' do
-          book = create(:book, user: user, current_page: 0, target_pages: 100)
-          patch update_progress_book_path(book), params: { pages_read: 10 }
-          expect(response).to redirect_to(book_path(book))
-        end
-
-        it 'フラッシュメッセージが表示される' do
-          book = create(:book, user: user, current_page: 0, target_pages: 100)
-          patch update_progress_book_path(book), params: { pages_read: 10 }
-          follow_redirect!
-          expect(response.body).to include('進捗を更新しました。')
-        end
-
-        it 'current_page が target_pages を超える場合はバリデーションエラーになる' do
-          book = create(:book, user: user, current_page: 90, target_pages: 100)
-          patch update_progress_book_path(book), params: { pages_read: 20 }
-          expect(response).to have_http_status(:unprocessable_entity)
-          expect(book.reload.current_page).to eq(90)
-        end
-
-        it 'pages_read が負の値の場合はバリデーションエラーになり current_page が変わらない' do
-          book = create(:book, user: user, current_page: 50, target_pages: 100)
-          patch update_progress_book_path(book), params: { pages_read: -1 }
-          expect(response).to have_http_status(:unprocessable_entity)
-          expect(book.reload.current_page).to eq(50)
-        end
-
-        it 'pages_read が非数値の場合はバリデーションエラーになり current_page が変わらない' do
-          book = create(:book, user: user, current_page: 50, target_pages: 100)
-          patch update_progress_book_path(book), params: { pages_read: 'abc' }
-          expect(response).to have_http_status(:unprocessable_entity)
-          expect(book.reload.current_page).to eq(50)
-        end
-
-        it 'pages_read が 0 の場合はバリデーションエラーになり current_page が変わらない' do
-          book = create(:book, user: user, current_page: 50, target_pages: 100)
-          patch update_progress_book_path(book), params: { pages_read: 0 }
-          expect(response).to have_http_status(:unprocessable_entity)
-          expect(book.reload.current_page).to eq(50)
-        end
-      end
-
       context '現在ページを直接入力（direct_page）で更新する場合' do
         it 'current_page が指定した値に更新される' do
           book = create(:book, user: user, current_page: 10, target_pages: 200)
           patch update_progress_book_path(book), params: { direct_page: 50 }
           expect(book.reload.current_page).to eq(50)
+        end
+
+        it '更新後、書籍詳細画面へリダイレクトされる' do
+          book = create(:book, user: user, current_page: 0, target_pages: 100)
+          patch update_progress_book_path(book), params: { direct_page: 10 }
+          expect(response).to redirect_to(book_path(book))
+        end
+
+        it 'フラッシュメッセージが表示される' do
+          book = create(:book, user: user, current_page: 0, target_pages: 100)
+          patch update_progress_book_path(book), params: { direct_page: 10 }
+          follow_redirect!
+          expect(response.body).to include('進捗を更新しました。')
         end
 
         it '増分がある場合は読書ログが記録される' do
@@ -1157,13 +1106,16 @@ RSpec.describe 'Books', type: :request do
           expect(ReadingLog.last.pages_read).to eq(40)
         end
 
-        it 'direct_page と pages_read が同時に送信されても増分で読書ログを記録する' do
+        it '読書ログに開始ページと終了ページが記録される' do
           book = create(:book, user: user, current_page: 10, target_pages: 200)
 
-          patch update_progress_book_path(book), params: { direct_page: 50, pages_read: 5 }
+          patch update_progress_book_path(book), params: { direct_page: 50 }
 
-          expect(book.reload.current_page).to eq(50)
-          expect(ReadingLog.last.pages_read).to eq(40)
+          log = ReadingLog.last
+          expect(log.book).to eq(book)
+          expect(log.read_at).to eq(Date.current)
+          expect(log.start_page).to eq(11)
+          expect(log.end_page).to eq(50)
         end
 
         it '増分がない場合は読書ログを記録しない' do
@@ -1180,11 +1132,18 @@ RSpec.describe 'Books', type: :request do
           expect(response).to have_http_status(:unprocessable_entity)
           expect(book.reload.current_page).to eq(10)
         end
+
+        it 'direct_page が未指定の場合はバリデーションエラーになる' do
+          book = create(:book, user: user, current_page: 10, target_pages: 100)
+          patch update_progress_book_path(book), params: { pages_read: 20 }
+          expect(response).to have_http_status(:unprocessable_entity)
+          expect(book.reload.current_page).to eq(10)
+        end
       end
 
       it '他ユーザーの書籍は更新できない（404）' do
         other_book = create(:book, user: other_user, current_page: 0, target_pages: 100)
-        patch update_progress_book_path(other_book), params: { pages_read: 10 }
+        patch update_progress_book_path(other_book), params: { direct_page: 10 }
         expect(response).to have_http_status(:not_found)
         expect(other_book.reload.current_page).to eq(0)
       end
@@ -1193,7 +1152,7 @@ RSpec.describe 'Books', type: :request do
     context '未認証ユーザーの場合' do
       it 'ログインページへリダイレクトされる' do
         book = create(:book, user: user, current_page: 0, target_pages: 100)
-        patch update_progress_book_path(book), params: { pages_read: 10 }
+        patch update_progress_book_path(book), params: { direct_page: 10 }
         expect(response).to redirect_to(new_user_session_path)
       end
     end

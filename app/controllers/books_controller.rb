@@ -265,17 +265,10 @@ class BooksController < ApplicationController
   end
 
   def calculate_new_page
-    if params[:direct_page].present?
-      direct_page = Integer(params[:direct_page], exception: false)
-      return nil if direct_page.nil? || direct_page.negative? || direct_page > @book.target_pages
+    direct_page = Integer(params[:direct_page], exception: false)
+    return nil if direct_page.nil? || direct_page.negative? || direct_page > @book.target_pages
 
-      direct_page
-    else
-      pages_read = Integer(params[:pages_read], exception: false)
-      return nil if pages_read.nil? || pages_read <= 0
-
-      @book.current_page + pages_read
-    end
+    direct_page
   end
 
   def persist_progress_with_log(new_page)

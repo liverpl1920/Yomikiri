@@ -806,13 +806,6 @@
   color: var(--color-text-muted);
 }
 
-/* ±ボタン付き入力グループ */
-.progress-update__input-group {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-sm);
-}
-
 .progress-update__input {
   width: 80px;
   text-align: center;
@@ -825,26 +818,6 @@
   background-color: var(--color-bg);
 }
 
-.progress-update__step-btn {
-  width: 36px;
-  height: 36px;
-  border: 1px solid var(--color-border);
-  border-radius: var(--border-radius);
-  background-color: var(--color-bg);
-  color: var(--color-text);
-  font-size: var(--font-size-lg);
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  line-height: 1;
-  transition: background-color 0.15s;
-}
-
-.progress-update__step-btn:hover {
-  background-color: var(--color-bg-surface);
-}
-
 /* 直接入力行（単位付き） */
 .progress-update__input-row {
   display: flex;
@@ -855,43 +828,6 @@
 .progress-update__unit {
   font-size: var(--font-size-sm);
   color: var(--color-text-muted);
-}
-
-/* ---- 折りたたみ（上級者向け） ---- */
-.progress-update__advanced {
-  border-top: 1px solid var(--color-border);
-  padding-top: var(--spacing-md);
-}
-
-.progress-update__toggle {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-xs);
-  background: none;
-  border: none;
-  padding: 0;
-  font-size: var(--font-size-sm);
-  color: var(--color-text-muted);
-  cursor: pointer;
-}
-
-.progress-update__toggle:hover {
-  color: var(--color-text);
-}
-
-.progress-update__toggle-icon {
-  font-size: 0.6rem;
-}
-
-.progress-update__advanced-section {
-  margin-top: var(--spacing-md);
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-md);
-}
-
-.progress-update__advanced-section[hidden] {
-  display: none;
 }
 
 /* ========================

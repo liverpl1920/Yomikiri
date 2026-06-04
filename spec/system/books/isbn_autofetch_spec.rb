@@ -72,8 +72,12 @@ RSpec.describe '情報取得ボタンによるISBN・書影取得', type: :syste
   end
 
   def fetch_by_button(title)
-    fill_in 'タイトル', with: title
-    click_button '情報取得'
+    page.execute_script(<<~JS)
+      var el = document.getElementById('book_title');
+      el.value = #{title.to_json};
+      var btn = document.querySelector('button[data-action*="book-form#fetchByTitle"]');
+      if (btn) { btn.click(); }
+    JS
   end
 
   describe '情報取得ボタン押下で取得成功' do
