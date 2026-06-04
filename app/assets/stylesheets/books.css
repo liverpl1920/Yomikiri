@@ -27,6 +27,16 @@
   white-space: nowrap;
 }
 
+.books-index__header-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.books-index__search--hidden {
+  display: none !important;
+}
+
 .books-index__search {
   margin-bottom: var(--spacing-xl);
   padding: var(--spacing-md);
@@ -354,6 +364,11 @@
   .books-index__header {
     flex-direction: column;
     align-items: flex-start;
+  }
+
+  .books-index__header-actions {
+    width: 100%;
+    justify-content: space-between;
   }
 
   .books-index__search {
