@@ -285,8 +285,7 @@ RSpec.describe 'Books', type: :request do
               title: 'リーダブルコード',
               author: 'Dustin Boswell',
               genre: 'プログラミング',
-              total_pages: 260,
-              target_pages: 260,
+              pages: 260,
               current_page: 0,
               deadline: Date.current + 14
             }
@@ -341,8 +340,7 @@ RSpec.describe 'Books', type: :request do
           {
             book: {
               title: '書影付きの本',
-              total_pages: 200,
-              target_pages: 200,
+              pages: 200,
               current_page: 0,
               deadline: Date.current + 14,
               cover_image_url: 'https://cover.openbd.jp/9784873115658.jpg'
@@ -361,8 +359,7 @@ RSpec.describe 'Books', type: :request do
           {
             book: {
               title: 'ISBNありの本',
-              total_pages: 200,
-              target_pages: 200,
+              pages: 200,
               current_page: 0,
               deadline: Date.current + 14,
               isbn: '9784873115658'
@@ -383,8 +380,7 @@ RSpec.describe 'Books', type: :request do
           {
             book: {
               title: '不正URL書影の本',
-              total_pages: 200,
-              target_pages: 200,
+              pages: 200,
               current_page: 0,
               deadline: Date.current + 14,
               cover_image_url: 'not-a-url'
@@ -409,8 +405,7 @@ RSpec.describe 'Books', type: :request do
           {
             book: {
               title: '',
-              total_pages: 260,
-              target_pages: 260,
+              pages: 260,
               current_page: 0,
               deadline: Date.current + 14
             }
@@ -435,8 +430,7 @@ RSpec.describe 'Books', type: :request do
             book: {
               title: 'テスト本',
               genre: 'あ' * 101,
-              total_pages: 260,
-              target_pages: 260,
+              pages: 260,
               current_page: 0,
               deadline: Date.current + 14
             }
@@ -461,8 +455,7 @@ RSpec.describe 'Books', type: :request do
           {
             book: {
               title: 'テスト本',
-              total_pages: 100,
-              target_pages: 100,
+              pages: 100,
               current_page: 0,
               deadline: Date.current - 1
             }
@@ -486,8 +479,7 @@ RSpec.describe 'Books', type: :request do
           {
             book: {
               title: 'テスト本',
-              total_pages: 300,
-              target_pages: 250,
+              pages: 250,
               current_page: -1,
               deadline: Date.current + 14
             }
@@ -513,13 +505,12 @@ RSpec.describe 'Books', type: :request do
         end
       end
 
-      context '無効なパラメータ（現在ページが読了対象ページ数を超過）の場合' do
+      context '無効なパラメータ（現在ページがページ数を超過）の場合' do
         let(:over_target_params) do
           {
             book: {
               title: 'テスト本',
-              total_pages: 300,
-              target_pages: 250,
+              pages: 250,
               current_page: 251,
               deadline: Date.current + 14
             }
@@ -532,38 +523,11 @@ RSpec.describe 'Books', type: :request do
           }.not_to change(Book, :count)
         end
 
-        it 'フォームに読了対象ページ数超過エラーが表示される' do
+        it 'フォームにページ数超過エラーが表示される' do
           post books_path, params: over_target_params
 
           expect(response).to have_http_status(:unprocessable_entity)
-          expect(response.body).to include('現在ページは読了対象ページ数（250ページ）以下にしてください')
-        end
-      end
-
-      context '無効なパラメータ（現在ページが総ページ数を超過）の場合' do
-        let(:over_total_params) do
-          {
-            book: {
-              title: 'テスト本',
-              total_pages: 250,
-              target_pages: 250,
-              current_page: 251,
-              deadline: Date.current + 14
-            }
-          }
-        end
-
-        it '書籍が作成されない' do
-          expect {
-            post books_path, params: over_total_params
-          }.not_to change(Book, :count)
-        end
-
-        it 'フォームに総ページ数超過エラーが表示される' do
-          post books_path, params: over_total_params
-
-          expect(response).to have_http_status(:unprocessable_entity)
-          expect(response.body).to include('現在ページは総ページ数（250ページ）以下にしてください')
+          expect(response.body).to include('現在ページはページ数（250ページ）以下にしてください')
         end
       end
 
@@ -572,8 +536,7 @@ RSpec.describe 'Books', type: :request do
           {
             book: {
               title: '過去に読んだ本',
-              total_pages: 300,
-              target_pages: 300,
+              pages: 300,
               current_page: 0,
               deadline: Date.current + 14,
               is_past_reading: 'true',
@@ -594,7 +557,7 @@ RSpec.describe 'Books', type: :request do
           expect(book.status).to eq('completed')
         end
 
-        it '現在ページが target_pages で設定される' do
+        it '現在ページが pages で設定される' do
           post books_path, params: past_reading_with_date_params
           book = Book.last
           expect(book.current_page).to eq(300)
@@ -618,8 +581,7 @@ RSpec.describe 'Books', type: :request do
           {
             book: {
               title: '過去に読んだ本（日付なし）',
-              total_pages: 200,
-              target_pages: 200,
+              pages: 200,
               current_page: 0,
               deadline: Date.current + 14,
               is_past_reading: 'true',
@@ -640,7 +602,7 @@ RSpec.describe 'Books', type: :request do
           expect(book.status).to eq('completed')
         end
 
-        it '現在ページが target_pages で設定される' do
+        it '現在ページが pages で設定される' do
           post books_path, params: past_reading_without_date_params
           book = Book.last
           expect(book.current_page).to eq(200)
@@ -660,8 +622,7 @@ RSpec.describe 'Books', type: :request do
           {
             book: {
               title: '不正な日付の本',
-              total_pages: 250,
-              target_pages: 250,
+              pages: 250,
               current_page: 0,
               deadline: Date.current + 14,
               is_past_reading: 'true',
@@ -687,8 +648,7 @@ RSpec.describe 'Books', type: :request do
           {
             book: {
               title: '未来日の本',
-              total_pages: 250,
-              target_pages: 250,
+              pages: 250,
               current_page: 0,
               deadline: Date.current + 14,
               is_past_reading: 'true',
@@ -759,7 +719,7 @@ RSpec.describe 'Books', type: :request do
       end
 
       it '今日のノルマが表示される（未了本）' do
-        book = create(:book, user: user, current_page: 0, target_pages: 100,
+        book = create(:book, user: user, current_page: 0, pages: 100,
                              deadline: Date.current + 9, status: :unread)
         get book_path(book)
         expect(response.body).to include('今日のノルマ')
@@ -770,7 +730,7 @@ RSpec.describe 'Books', type: :request do
 
       it '読了済みの場合はノルマ欄に「読了済み」が表示される' do
         book = create(:book, user: user, status: :completed, current_page: 100,
-                             target_pages: 100, deadline: Date.current + 5)
+                             pages: 100, deadline: Date.current + 5)
         get book_path(book)
         expect(response.body).to include('読了済み')
       end
@@ -778,14 +738,14 @@ RSpec.describe 'Books', type: :request do
       it '期限超過の場合はノルマ欄に「期限超過」が表示される' do
         overdue_book = travel_to(10.days.ago) do
           create(:book, user: user, deadline: Date.current + 5, status: :unread,
-                        current_page: 0, target_pages: 100)
+                        current_page: 0, pages: 100)
         end
         get book_path(overdue_book)
         expect(response.body).to include('期限超過')
       end
 
       it '詳細画面に残りページ数が表示される' do
-        book = create(:book, user: user, current_page: 50, target_pages: 200,
+        book = create(:book, user: user, current_page: 50, pages: 200,
                              deadline: Date.current + 5)
         get book_path(book)
         expect(response.body).to include('150 ページ')
@@ -799,7 +759,7 @@ RSpec.describe 'Books', type: :request do
       end
 
       it '進捗プログレスバーが表示される' do
-        book = create(:book, user: user, current_page: 50, target_pages: 100)
+        book = create(:book, user: user, current_page: 50, pages: 100)
         get book_path(book)
         expect(response.body).to include('book-show__progress-bar')
       end
@@ -903,7 +863,7 @@ RSpec.describe 'Books', type: :request do
 
       it '読了済みの場合は urgency クラスが表示されない' do
         book = create(:book, user: user, status: :completed, current_page: 300,
-                             target_pages: 300, deadline: Date.current)
+                             pages: 300, deadline: Date.current)
         get book_path(book)
         expect(response.body).not_to include('book-card__cover--urgent-high')
         expect(response.body).not_to include('book-show__urgency-badge')
@@ -1013,20 +973,20 @@ RSpec.describe 'Books', type: :request do
       context '有効なパラメータの場合' do
         it '書籍情報が更新される' do
           book = create(:book, user: user, title: '旧タイトル', author: '旧著者')
-          patch book_path(book), params: { book: { title: '新タイトル', author: '新著者', genre: book.genre, total_pages: book.total_pages, target_pages: book.target_pages, deadline: book.deadline } }
+          patch book_path(book), params: { book: { title: '新タイトル', author: '新著者', genre: book.genre, pages: book.pages, deadline: book.deadline } }
           expect(book.reload.title).to eq('新タイトル')
           expect(book.reload.author).to eq('新著者')
         end
 
         it '更新後、書籍詳細画面へリダイレクトされる' do
           book = create(:book, user: user)
-          patch book_path(book), params: { book: { title: book.title, author: book.author, genre: book.genre, total_pages: book.total_pages, target_pages: book.target_pages, deadline: book.deadline } }
+          patch book_path(book), params: { book: { title: book.title, author: book.author, genre: book.genre, pages: book.pages, deadline: book.deadline } }
           expect(response).to redirect_to(book_path(book))
         end
 
         it 'フラッシュメッセージが表示される' do
           book = create(:book, user: user)
-          patch book_path(book), params: { book: { title: book.title, author: book.author, genre: book.genre, total_pages: book.total_pages, target_pages: book.target_pages, deadline: book.deadline } }
+          patch book_path(book), params: { book: { title: book.title, author: book.author, genre: book.genre, pages: book.pages, deadline: book.deadline } }
           follow_redirect!
           expect(response.body).to include('情報を更新しました。')
         end
@@ -1035,13 +995,13 @@ RSpec.describe 'Books', type: :request do
       context '無効なパラメータ（タイトルなし）の場合' do
         it '422 Unprocessable Entity を返す' do
           book = create(:book, user: user)
-          patch book_path(book), params: { book: { title: '', total_pages: book.total_pages, target_pages: book.target_pages, deadline: book.deadline } }
+          patch book_path(book), params: { book: { title: '', pages: book.pages, deadline: book.deadline } }
           expect(response).to have_http_status(:unprocessable_entity)
         end
 
         it '書籍情報は更新されない' do
           book = create(:book, user: user, title: '元のタイトル')
-          patch book_path(book), params: { book: { title: '', total_pages: book.total_pages, target_pages: book.target_pages, deadline: book.deadline } }
+          patch book_path(book), params: { book: { title: '', pages: book.pages, deadline: book.deadline } }
           expect(book.reload.title).to eq('元のタイトル')
         end
       end
@@ -1050,7 +1010,7 @@ RSpec.describe 'Books', type: :request do
         it '過去日の読了期限に更新できる' do
           book = create(:book, user: user, status: :completed, deadline: Date.current + 1)
           past_deadline = Date.current - 10
-          patch book_path(book), params: { book: { title: book.title, author: book.author, genre: book.genre, total_pages: book.total_pages, target_pages: book.target_pages, deadline: past_deadline } }
+          patch book_path(book), params: { book: { title: book.title, author: book.author, genre: book.genre, pages: book.pages, deadline: past_deadline } }
           expect(response).to redirect_to(book_path(book))
           expect(book.reload.deadline).to eq(past_deadline)
         end
@@ -1078,26 +1038,26 @@ RSpec.describe 'Books', type: :request do
 
       context '現在ページを直接入力（direct_page）で更新する場合' do
         it 'current_page が指定した値に更新される' do
-          book = create(:book, user: user, current_page: 10, target_pages: 200)
+          book = create(:book, user: user, current_page: 10, pages: 200)
           patch update_progress_book_path(book), params: { direct_page: 50 }
           expect(book.reload.current_page).to eq(50)
         end
 
         it '更新後、書籍詳細画面へリダイレクトされる' do
-          book = create(:book, user: user, current_page: 0, target_pages: 100)
+          book = create(:book, user: user, current_page: 0, pages: 100)
           patch update_progress_book_path(book), params: { direct_page: 10 }
           expect(response).to redirect_to(book_path(book))
         end
 
         it 'フラッシュメッセージが表示される' do
-          book = create(:book, user: user, current_page: 0, target_pages: 100)
+          book = create(:book, user: user, current_page: 0, pages: 100)
           patch update_progress_book_path(book), params: { direct_page: 10 }
           follow_redirect!
           expect(response.body).to include('進捗を更新しました。')
         end
 
         it '増分がある場合は読書ログが記録される' do
-          book = create(:book, user: user, current_page: 10, target_pages: 200)
+          book = create(:book, user: user, current_page: 10, pages: 200)
 
           expect do
             patch update_progress_book_path(book), params: { direct_page: 50 }
@@ -1107,7 +1067,7 @@ RSpec.describe 'Books', type: :request do
         end
 
         it '読書ログに開始ページと終了ページが記録される' do
-          book = create(:book, user: user, current_page: 10, target_pages: 200)
+          book = create(:book, user: user, current_page: 10, pages: 200)
 
           patch update_progress_book_path(book), params: { direct_page: 50 }
 
@@ -1119,22 +1079,22 @@ RSpec.describe 'Books', type: :request do
         end
 
         it '増分がない場合は読書ログを記録しない' do
-          book = create(:book, user: user, current_page: 10, target_pages: 200)
+          book = create(:book, user: user, current_page: 10, pages: 200)
 
           expect do
             patch update_progress_book_path(book), params: { direct_page: 10 }
           end.not_to change(ReadingLog, :count)
         end
 
-        it 'direct_page が target_pages を超える場合はバリデーションエラーになる' do
-          book = create(:book, user: user, current_page: 10, target_pages: 100)
+        it 'direct_page が pages を超える場合はバリデーションエラーになる' do
+          book = create(:book, user: user, current_page: 10, pages: 100)
           patch update_progress_book_path(book), params: { direct_page: 150 }
           expect(response).to have_http_status(:unprocessable_entity)
           expect(book.reload.current_page).to eq(10)
         end
 
         it 'direct_page が未指定の場合はバリデーションエラーになる' do
-          book = create(:book, user: user, current_page: 10, target_pages: 100)
+          book = create(:book, user: user, current_page: 10, pages: 100)
           patch update_progress_book_path(book), params: { pages_read: 20 }
           expect(response).to have_http_status(:unprocessable_entity)
           expect(book.reload.current_page).to eq(10)
@@ -1142,7 +1102,7 @@ RSpec.describe 'Books', type: :request do
       end
 
       it '他ユーザーの書籍は更新できない（404）' do
-        other_book = create(:book, user: other_user, current_page: 0, target_pages: 100)
+        other_book = create(:book, user: other_user, current_page: 0, pages: 100)
         patch update_progress_book_path(other_book), params: { direct_page: 10 }
         expect(response).to have_http_status(:not_found)
         expect(other_book.reload.current_page).to eq(0)
@@ -1151,7 +1111,7 @@ RSpec.describe 'Books', type: :request do
 
     context '未認証ユーザーの場合' do
       it 'ログインページへリダイレクトされる' do
-        book = create(:book, user: user, current_page: 0, target_pages: 100)
+        book = create(:book, user: user, current_page: 0, pages: 100)
         patch update_progress_book_path(book), params: { direct_page: 10 }
         expect(response).to redirect_to(new_user_session_path)
       end
@@ -1231,7 +1191,7 @@ RSpec.describe 'Books', type: :request do
       before { sign_in user }
 
       context '正常な読了処理' do
-        let!(:book) { create(:book, user: user, current_page: 100, target_pages: 100, status: :reading) }
+        let!(:book) { create(:book, user: user, current_page: 100, pages: 100, status: :reading) }
 
         it 'status が completed になる' do
           patch complete_book_path(book)
@@ -1245,14 +1205,14 @@ RSpec.describe 'Books', type: :request do
           end
         end
 
-        it 'current_page が target_pages に揃えられる' do
-          reading_book = create(:book, user: user, current_page: 80, target_pages: 100, status: :reading)
+        it 'current_page が pages に揃えられる' do
+          reading_book = create(:book, user: user, current_page: 80, pages: 100, status: :reading)
           patch complete_book_path(reading_book)
           expect(reading_book.reload.current_page).to eq(100)
         end
 
         it '未記録ページ分のReadingLogが作成される' do
-          reading_book = create(:book, user: user, current_page: 80, target_pages: 100, status: :reading)
+          reading_book = create(:book, user: user, current_page: 80, pages: 100, status: :reading)
 
           expect {
             patch complete_book_path(reading_book)
@@ -1272,7 +1232,7 @@ RSpec.describe 'Books', type: :request do
         end
 
         it 'ReadingLogの作成に失敗した場合は読了更新をロールバックする' do
-          reading_book = create(:book, user: user, current_page: 80, target_pages: 100, status: :reading, completed_at: nil)
+          reading_book = create(:book, user: user, current_page: 80, pages: 100, status: :reading, completed_at: nil)
           allow_any_instance_of(BooksController).to receive(:create_reading_log_for_completion!).and_raise(
             ActiveRecord::RecordInvalid.new(ReadingLog.new)
           )
@@ -1310,7 +1270,7 @@ RSpec.describe 'Books', type: :request do
         it 'completed_at が上書きされない' do
           original_time = 3.days.ago
           already_done = create(:book, user: user, status: :completed,
-                                       current_page: 100, target_pages: 100,
+                                       current_page: 100, pages: 100,
                                        completed_at: original_time)
           patch complete_book_path(already_done)
           expect(already_done.reload.completed_at).to be_within(1.second).of(original_time)
@@ -1318,7 +1278,7 @@ RSpec.describe 'Books', type: :request do
       end
 
       it '他ユーザーの書籍は読了にできない（404）' do
-        other_book = create(:book, user: other_user, current_page: 100, target_pages: 100, deadline: Date.current + 7)
+        other_book = create(:book, user: other_user, current_page: 100, pages: 100, deadline: Date.current + 7)
         patch complete_book_path(other_book)
         expect(response).to have_http_status(:not_found)
         expect(other_book.reload.status).to eq('reading')
@@ -1327,7 +1287,7 @@ RSpec.describe 'Books', type: :request do
 
     context '未認証ユーザーの場合' do
       it 'ログインページへリダイレクトされる' do
-        book = create(:book, user: user, current_page: 100, target_pages: 100)
+        book = create(:book, user: user, current_page: 100, pages: 100)
         patch complete_book_path(book)
         expect(response).to redirect_to(new_user_session_path)
       end
@@ -1422,7 +1382,7 @@ RSpec.describe 'Books', type: :request do
   end
 
   describe 'PATCH /books/:id/update_review' do
-    let!(:book) { create(:book, user: user, status: :completed, current_page: 100, target_pages: 100) }
+    let!(:book) { create(:book, user: user, status: :completed, current_page: 100, pages: 100) }
 
     context '認証済みユーザーの場合' do
       before { sign_in user }
@@ -1489,7 +1449,7 @@ RSpec.describe 'Books', type: :request do
       before { sign_in user }
 
       it '404を返す' do
-        other_book = create(:book, user: other_user, status: :completed, current_page: 100, target_pages: 100)
+        other_book = create(:book, user: other_user, status: :completed, current_page: 100, pages: 100)
 
         patch update_review_book_path(other_book), params: { book: { rating: 5 } }
 
@@ -1731,6 +1691,17 @@ RSpec.describe 'Books', type: :request do
           expect(response).to have_http_status(:ok)
           expect(json['suggestions']).to include('プログラミング')
           expect(json['suggestions']).not_to include('自己啓発')
+        end
+      end
+
+      context 'field=publisher の場合' do
+        it '出版社の候補を返す' do
+          book1.update!(publisher: 'オライリー・ジャパン')
+          get suggestions_books_path, params: { field: 'publisher', q: 'オライリー' }
+
+          json = JSON.parse(response.body)
+          expect(response).to have_http_status(:ok)
+          expect(json['suggestions']).to include('オライリー・ジャパン')
         end
       end
 

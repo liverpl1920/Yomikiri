@@ -20,15 +20,12 @@ class Book < ApplicationRecord
   validates :cover_image_url, length: { maximum: 2048 }, allow_blank: true
   validates :isbn, length: { maximum: 13 }, format: { with: /\A(?:\d{13}|\d{9}[\dX])\z/, message: :invalid }, allow_blank: true
   validates :genre, length: { maximum: 100 }, allow_blank: true
-  validates :total_pages, presence: true, numericality: { only_integer: true, greater_than: 0 }
-  validates :target_pages, presence: true, numericality: { only_integer: true, greater_than: 0 }
+  validates :pages, presence: true, numericality: { only_integer: true, greater_than: 0 }
   validates :current_page, presence: true, numericality: { only_integer: true, greater_than_or_equal_to: 0 }
   validates :deadline, presence: true, unless: :deadline_optional?
   validates :status, presence: true
 
-  validate :target_pages_not_exceed_total_pages
-  validate :current_page_not_exceed_target_pages
-  validate :current_page_not_exceed_total_pages
+  validate :current_page_not_exceed_pages
   validate :deadline_cannot_be_in_the_past, if: -> { new_record? || (!completed? && will_save_change_to_deadline?) }
   validate :cover_image_url_must_be_valid_url, if: -> { cover_image_url.present? }
   validate :completed_at_must_be_valid_date, if: -> { past_reading_checked? && completed_at_input.present? }
@@ -49,7 +46,15 @@ class Book < ApplicationRecord
   end
 
   def remaining_pages
-    target_pages - current_page
+    pages - current_page
+  end
+
+  def authors
+    author.to_s.split(/[,，]/).map(&:strip).reject(&:blank?)
+  end
+
+  def translators
+    translator.to_s.split(/[,，]/).map(&:strip).reject(&:blank?)
   end
 
   # 積読一覧用ソートスコープ：未了本を期限順 → 読了本を期限順
@@ -63,6 +68,7 @@ class Book < ApplicationRecord
   scope :title_like, ->(query) { where("title ILIKE ?", "%#{sanitize_sql_like(query)}%") }
   scope :author_like, ->(query) { where("author ILIKE ?", "%#{sanitize_sql_like(query)}%") }
   scope :genre_like, ->(query) { where("genre ILIKE ?", "%#{sanitize_sql_like(query)}%") }
+  scope :publisher_like, ->(query) { where("publisher ILIKE ?", "%#{sanitize_sql_like(query)}%") }
   scope :completed_from, ->(from_date) { where("completed_at >= ?", from_date.beginning_of_day) }
   scope :completed_to, ->(to_date) { where("completed_at <= ?", to_date.end_of_day) }
 
@@ -71,6 +77,7 @@ class Book < ApplicationRecord
     relation = relation.title_like(params[:title]) if params[:title].present?
     relation = relation.author_like(params[:author]) if params[:author].present?
     relation = relation.genre_like(params[:genre]) if params[:genre].present?
+    relation = relation.publisher_like(params[:publisher]) if params[:publisher].present?
     relation = relation.completed_from(params[:completed_from]) if params[:completed_from].present?
     relation = relation.completed_to(params[:completed_to]) if params[:completed_to].present?
     relation
@@ -81,7 +88,7 @@ class Book < ApplicationRecord
   def daily_quota
     return 0 if completed? || deadline.nil?
 
-    remaining = target_pages - current_page
+    remaining = pages - current_page
     return 0 if remaining <= 0
 
     days = overdue? ? 1 : days_remaining
@@ -91,9 +98,9 @@ class Book < ApplicationRecord
   # 進捗率（%）
   def progress_percentage
     return 100 if completed?
-    return 0 if target_pages.zero?
+    return 0 if pages.zero?
 
-    ((current_page.to_f / target_pages) * 100).round
+    ((current_page.to_f / pages) * 100).round
   end
 
   # 残り日数（今日を含む／期限当日は D=1）
@@ -153,7 +160,7 @@ class Book < ApplicationRecord
     return unless past_reading_checked?
 
     self.status = :completed
-    self.current_page = target_pages
+    self.current_page = pages
 
     if completed_at_input.present?
       self.completed_at = Time.zone.parse(completed_at_input.to_s)
@@ -166,23 +173,10 @@ class Book < ApplicationRecord
     ActiveModel::Type::Boolean.new.cast(is_past_reading)
   end
 
-  def target_pages_not_exceed_total_pages
-    return if target_pages.blank? || total_pages.blank?
+  def current_page_not_exceed_pages
+    return if current_page.blank? || pages.blank?
 
-    errors.add(:target_pages, :less_than_or_equal_to, count: total_pages) if target_pages > total_pages
-  end
-
-  def current_page_not_exceed_target_pages
-    return if current_page.blank? || target_pages.blank?
-    return if total_pages.present? && current_page > total_pages
-
-    errors.add(:current_page, :less_than_or_equal_to, count: target_pages) if current_page > target_pages
-  end
-
-  def current_page_not_exceed_total_pages
-    return if current_page.blank? || total_pages.blank?
-
-    errors.add(:current_page, :less_than_or_equal_to_total_pages, count: total_pages) if current_page > total_pages
+    errors.add(:current_page, :less_than_or_equal_to, count: pages) if current_page > pages
   end
 
   def deadline_optional?

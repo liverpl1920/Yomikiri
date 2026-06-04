@@ -89,7 +89,7 @@ class BooksController < ApplicationController
     success = false
 
     Book.transaction do
-      success = @book.update(status: :completed, current_page: @book.target_pages, completed_at: completed_at)
+      success = @book.update(status: :completed, current_page: @book.pages, completed_at: completed_at)
       raise ActiveRecord::Rollback unless success
 
       create_reading_log_for_completion!(previous_page)
@@ -135,7 +135,7 @@ class BooksController < ApplicationController
     render json: { books: [], error: "検索中にエラーが発生しました" }
   end
 
-  SUGGESTION_FIELDS = %w[author genre].freeze
+  SUGGESTION_FIELDS = %w[author genre publisher].freeze
 
   def suggestions
     field = params[:field].to_s
@@ -266,7 +266,7 @@ class BooksController < ApplicationController
 
   def calculate_new_page
     direct_page = Integer(params[:direct_page], exception: false)
-    return nil if direct_page.nil? || direct_page.negative? || direct_page > @book.target_pages
+    return nil if direct_page.nil? || direct_page.negative? || direct_page > @book.pages
 
     direct_page
   end
@@ -314,13 +314,13 @@ class BooksController < ApplicationController
   end
 
   def book_params
-    permitted = params.require(:book).permit(:title, :author, :genre, :total_pages, :target_pages, :current_page, :deadline, :status, :cover_image_url, :cover_image, :isbn, :memo, :is_past_reading, :completed_at_input)
+    permitted = params.require(:book).permit(:title, :author, :genre, :pages, :current_page, :deadline, :status, :cover_image_url, :cover_image, :isbn, :memo, :is_past_reading, :completed_at_input, :translator, :publisher)
     permitted[:current_page] = 0 if permitted[:current_page].blank?
       permitted
   end
 
   def edit_book_params
-    params.require(:book).permit(:title, :author, :genre, :total_pages, :target_pages, :deadline, :cover_image_url, :cover_image, :isbn)
+    params.require(:book).permit(:title, :author, :genre, :pages, :deadline, :cover_image_url, :cover_image, :isbn, :translator, :publisher)
   end
 
   def memo_params
@@ -332,10 +332,11 @@ class BooksController < ApplicationController
   end
 
   def normalized_index_search_params
-    permitted = params.permit(:title, :author, :genre, :completed_from, :completed_to)
+    permitted = params.permit(:title, :author, :genre, :publisher, :completed_from, :completed_to)
     title = permitted[:title].to_s.strip
     author = permitted[:author].to_s.strip
     genre = permitted[:genre].to_s.strip
+    publisher = permitted[:publisher].to_s.strip
     completed_from = parse_iso_date(permitted[:completed_from])
     completed_to = parse_iso_date(permitted[:completed_to])
 
@@ -347,6 +348,7 @@ class BooksController < ApplicationController
       title: title.presence,
       author: author.presence,
       genre: genre.presence,
+      publisher: publisher.presence,
       completed_from: completed_from,
       completed_to: completed_to
     }
@@ -376,11 +378,20 @@ class BooksController < ApplicationController
     total_pages = extract_pages_from_onix(book["onix"])
     openbd_url = book.dig("summary", "cover").to_s.presence || ""
     cover_image_url = resolve_cover_url(openbd_url, isbn, nil, isbn_search: true)
+
+    onix = book["onix"]
+    authors = extract_authors_from_onix(onix)
+    authors = book.dig("summary", "author").to_s if authors.blank?
+    translators = extract_translators_from_onix(onix)
+    publisher = book.dig("summary", "publisher").to_s
+
     [ {
       title: book.dig("summary", "title").to_s,
-      author: book.dig("summary", "author").to_s,
+      author: authors,
+      translator: translators,
+      publisher: publisher,
       genre: extract_openbd_genre(book),
-      total_pages: total_pages,
+      pages: total_pages,
       cover_image_url: cover_image_url,
       isbn: isbn
     } ]
@@ -403,11 +414,20 @@ class BooksController < ApplicationController
       google_cover_url = best_google_image_url(info["imageLinks"])
       genre = extract_google_books_genre(info)
       genre = extract_openbd_genre(openbd_book) if genre.blank?
+
+      translators = extract_translators_from_onix(openbd_book&.dig("onix"))
+      authors = extract_authors_from_onix(openbd_book&.dig("onix"))
+      authors = Array(info["authors"]).join(", ") if authors.blank?
+      publisher = info["publisher"].to_s
+      publisher = openbd_book&.dig("summary", "publisher").to_s if publisher.blank?
+
       {
         title: info["title"].to_s,
-        author: Array(info["authors"]).join(", "),
+        author: authors,
+        translator: translators,
+        publisher: publisher,
         genre: genre,
-        total_pages: info["pageCount"],
+        pages: info["pageCount"],
         cover_image_url: resolve_cover_url(openbd_url, isbn, google_cover_url),
         isbn: isbn.to_s.presence || ""
       }
@@ -543,5 +563,21 @@ class BooksController < ApplicationController
       return url.sub(/\Ahttp:/, "https:") if url
     end
     ""
+  end
+
+  def extract_authors_from_onix(onix)
+    return nil if onix.blank?
+
+    contributors = Array(onix.dig("DescriptiveDetail", "Contributor"))
+    authors = contributors.select { |c| Array(c["ContributorRole"]).include?("A01") }
+    authors.map { |a| a.dig("PersonName", "content") || a["PersonName"] }.compact.join(", ")
+  end
+
+  def extract_translators_from_onix(onix)
+    return nil if onix.blank?
+
+    contributors = Array(onix.dig("DescriptiveDetail", "Contributor"))
+    translators = contributors.select { |c| Array(c["ContributorRole"]).include?("B06") }
+    translators.map { |t| t.dig("PersonName", "content") || t["PersonName"] }.compact.join(", ")
   end
 end

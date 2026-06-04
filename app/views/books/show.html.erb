@@ -33,6 +33,9 @@
       <% if @book.author.present? %>
         <p class="book-show__author"><%= @book.author %></p>
       <% end %>
+      <% if @book.translator.present? %>
+        <p class="book-show__translator">翻訳: <%= @book.translator %></p>
+      <% end %>
       <span class="book-show__status book-show__status--<%= @book.status %>">
         <%= t("book.status.#{@book.status}") %>
       </span>
@@ -58,7 +61,7 @@
       <div class="book-show__progress-header">
         <span class="book-show__progress-label">進捗</span>
         <span class="book-show__progress-text">
-          <%= @book.current_page %> / <%= @book.target_pages %> ページ（<%= @book.progress_percentage %>%）
+          <%= @book.current_page %> / <%= @book.pages %> ページ（<%= @book.progress_percentage %>%）
         </span>
       </div>
       <div class="book-show__progress-bar-wrapper" role="progressbar"
@@ -69,7 +72,7 @@
       </div>
     </div>
 
-    <% remaining_pages = @book.target_pages - @book.current_page %>
+    <% remaining_pages = @book.pages - @book.current_page %>
     <%# 積読かつ読了期限未設定の場合は案内を表示 %>
     <% if @book.unread? && @book.deadline.nil? %>
       <div class="book-show__deadline-notice" role="alert">
@@ -103,9 +106,9 @@
               <input type="number" id="direct_page" name="direct_page"
                      class="progress-update__input"
                      value="<%= @book.current_page %>" min="0"
-                     max="<%= @book.target_pages %>"
+                     max="<%= @book.pages %>"
                      aria-label="現在ページ">
-              <span class="progress-update__unit">/ <%= @book.target_pages %> ページ</span>
+              <span class="progress-update__unit">/ <%= @book.pages %> ページ</span>
             </div>
           </div>
           <%= f.submit "更新する", class: "btn btn--primary" %>
@@ -236,6 +239,20 @@
         </dd>
       </div>
 
+      <% if @book.translator.present? %>
+        <div class="book-show__detail-item">
+          <dt class="book-show__detail-label">翻訳者</dt>
+          <dd class="book-show__detail-value"><%= @book.translator %></dd>
+        </div>
+      <% end %>
+
+      <% if @book.publisher.present? %>
+        <div class="book-show__detail-item">
+          <dt class="book-show__detail-label">出版社</dt>
+          <dd class="book-show__detail-value"><%= @book.publisher %></dd>
+        </div>
+      <% end %>
+
       <div class="book-show__detail-item">
         <dt class="book-show__detail-label">読了期限</dt>
         <dd class="book-show__detail-value">
@@ -261,7 +278,7 @@
                    style="width: <%= @book.progress_percentage %>%;"></div>
             </div>
             <span class="book-card__progress-text">
-              <%= @book.current_page %> / <%= @book.target_pages %> ページ
+              <%= @book.current_page %> / <%= @book.pages %> ページ
               （<%= @book.progress_percentage %>%）
             </span>
           </div>
@@ -289,8 +306,8 @@
       </div>
 
       <div class="book-show__detail-item">
-        <dt class="book-show__detail-label">総ページ数</dt>
-        <dd class="book-show__detail-value"><%= @book.total_pages %> ページ</dd>
+        <dt class="book-show__detail-label">ページ数</dt>
+        <dd class="book-show__detail-value"><%= @book.pages %> ページ</dd>
       </div>
 
       <div class="book-show__detail-item">

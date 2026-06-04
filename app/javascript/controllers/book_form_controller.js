@@ -1,7 +1,7 @@
 import { Controller } from '@hotwired/stimulus'
 
 export default class extends Controller {
-  static targets = ['totalPages', 'targetPages', 'deadline', 'quotaDisplay',
+  static targets = ['pages', 'deadline', 'quotaDisplay',
     'title', 'titleStatus', 'coverPreview', 'currentPage']
 
   connect () {
@@ -87,12 +87,13 @@ export default class extends Controller {
     }
   }
 
-  _fillFormFromSearch ({ title, author, genre, total_pages: totalPages, cover_image_url: coverUrl, isbn }, { fillTitle = false } = {}) {
+  _fillFormFromSearch ({ title, author, translator, publisher, genre, pages, total_pages: totalPages, cover_image_url: coverUrl, isbn }, { fillTitle = false } = {}) {
     const titleInput = this.hasTitleTarget ? this.titleTarget : null
     const authorInput = document.getElementById('book_author')
+    const translatorInput = document.getElementById('book_translator')
+    const publisherInput = document.getElementById('book_publisher')
     const genreInput = document.getElementById('book_genre')
-    const totalPagesInput = document.getElementById('book_total_pages')
-    const targetPagesInput = document.getElementById('book_target_pages')
+    const pagesInput = document.getElementById('book_pages')
     const currentPageInput = document.getElementById('book_current_page')
     const coverUrlInput = document.getElementById('book_cover_image_url')
     const isbnInput = document.getElementById('book_isbn')
@@ -110,18 +111,31 @@ export default class extends Controller {
       missing.push('著者')
     }
 
+    if (translatorInput && translator) {
+      if (!translatorInput.value.trim()) {
+        translatorInput.value = translator
+      }
+    }
+
+    if (publisherInput && publisher) {
+      if (!publisherInput.value.trim()) {
+        publisherInput.value = publisher
+      }
+    }
+
     if (genreInput && genre) {
       if (!genreInput.value.trim()) {
         genreInput.value = genre
       }
     }
 
-    if (totalPagesInput && totalPages) {
-      if (!totalPagesInput.value.trim()) {
-        totalPagesInput.value = totalPages
-        totalPagesInput.dispatchEvent(new Event('input'))
-      } else if (targetPagesInput && currentPageInput) {
-        // 入力済みの target/current を尊重しつつノルマ表示だけ再計算する。
+    const finalPages = pages || totalPages
+    if (pagesInput && finalPages) {
+      if (!pagesInput.value.trim()) {
+        pagesInput.value = finalPages
+        pagesInput.dispatchEvent(new Event('input'))
+      } else if (currentPageInput) {
+        // 入力済みの pages/current を尊重しつつノルマ表示だけ再計算する。
         this.calculateQuota()
       }
     } else {
@@ -172,26 +186,13 @@ export default class extends Controller {
     }
   }
 
-  syncTargetPages () {
-    const total = parseInt(this.totalPagesTarget.value, 10)
-    if (!isNaN(total) && total > 0) {
-      const current = parseInt(this.targetPagesTarget.value, 10)
-      // target_pages が未入力、または total_pages と同じ値だった場合のみ自動入力
-      if (isNaN(current) || current <= 0 || current === this._previousTotal) {
-        this.targetPagesTarget.value = total
-      }
-      this._previousTotal = total
-    }
-    this.calculateQuota()
-  }
-
   calculateQuota () {
-    const targetPages = parseInt(this.targetPagesTarget.value, 10)
+    const pages = parseInt(this.pagesTarget.value, 10)
     const currentPage = parseInt(this.currentPageTarget.value, 10)
     const deadlineValue = this.deadlineTarget.value
     const display = this.quotaDisplayTarget
 
-    if (isNaN(targetPages) || targetPages <= 0 || !deadlineValue) {
+    if (isNaN(pages) || pages <= 0 || !deadlineValue) {
       this._showPlaceholder(display)
       return
     }
@@ -201,8 +202,8 @@ export default class extends Controller {
       return
     }
 
-    if (!isNaN(currentPage) && currentPage > targetPages) {
-      this._showError(display, '既に読んだページ数は読了対象ページ数以下を入力してください')
+    if (!isNaN(currentPage) && currentPage > pages) {
+      this._showError(display, '既に読んだページ数はページ数以下を入力してください')
       return
     }
 
@@ -217,7 +218,7 @@ export default class extends Controller {
     }
 
     const normalizedCurrentPage = isNaN(currentPage) ? 0 : currentPage
-    const remainingPages = Math.max(targetPages - normalizedCurrentPage, 0)
+    const remainingPages = Math.max(pages - normalizedCurrentPage, 0)
     const remainingDays = Math.floor((deadline - today) / (1000 * 60 * 60 * 24)) + 1
     const quota = Math.ceil(remainingPages / remainingDays)
 

@@ -136,7 +136,7 @@ RSpec.describe 'タイトル入力中オートコンプリート機能', type: :
 
       expect(page).to have_field('タイトル', with: 'リーダブルコード', wait: 5)
       expect(page).to have_field('著者', with: 'Dustin Boswell', wait: 5)
-      expect(page).to have_field('総ページ数', with: '260', wait: 5)
+      expect(page).to have_field('ページ数', with: '260', wait: 5, exact: true)
     end
 
     it '候補選択後にドロップダウンが閉じる' do

@@ -80,21 +80,26 @@ export default class extends Controller {
     ul.classList.remove('book-search__results--hidden')
   }
 
-  _fillForm ({ title, author, total_pages: totalPages, cover_image_url: coverUrl, isbn }) {
+  _fillForm ({ title, author, translator, publisher, pages, total_pages: totalPages, cover_image_url: coverUrl, isbn }) {
     const titleInput = document.getElementById('book_title')
     const authorInput = document.getElementById('book_author')
-    const totalPagesInput = document.getElementById('book_total_pages')
+    const translatorInput = document.getElementById('book_translator')
+    const publisherInput = document.getElementById('book_publisher')
+    const pagesInput = document.getElementById('book_pages')
     const coverUrlInput = document.getElementById('book_cover_image_url')
     const isbnInput = document.getElementById('book_isbn')
 
     if (titleInput) titleInput.value = title || ''
     if (authorInput) authorInput.value = author || ''
+    if (translatorInput) translatorInput.value = translator || ''
+    if (publisherInput) publisherInput.value = publisher || ''
     if (coverUrlInput) coverUrlInput.value = coverUrl || ''
     if (isbnInput) isbnInput.value = isbn || ''
 
-    if (totalPagesInput) {
-      totalPagesInput.value = totalPages ?? ''
-      totalPagesInput.dispatchEvent(new Event('input'))
+    const finalPages = pages || totalPages
+    if (pagesInput) {
+      pagesInput.value = finalPages ?? ''
+      pagesInput.dispatchEvent(new Event('input'))
     }
   }
 

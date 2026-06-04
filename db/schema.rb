@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2026_05_25_220315) do
+ActiveRecord::Schema[7.2].define(version: 2026_06_04_225636) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -55,8 +55,7 @@ ActiveRecord::Schema[7.2].define(version: 2026_05_25_220315) do
     t.bigint "user_id", null: false
     t.string "title", null: false
     t.string "author"
-    t.integer "total_pages", null: false
-    t.integer "target_pages", null: false
+    t.integer "pages", null: false
     t.integer "current_page", default: 0, null: false
     t.date "deadline"
     t.integer "status", default: 0, null: false
@@ -71,6 +70,8 @@ ActiveRecord::Schema[7.2].define(version: 2026_05_25_220315) do
     t.text "review"
     t.datetime "memo_updated_at"
     t.string "isbn"
+    t.string "translator"
+    t.string "publisher"
     t.index ["user_id"], name: "index_books_on_user_id"
   end
 

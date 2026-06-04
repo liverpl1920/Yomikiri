@@ -160,20 +160,25 @@ export default class extends Controller {
   _fillForm (book) {
     const titleInput = document.getElementById('book_title')
     const authorInput = document.getElementById('book_author')
-    const totalPagesInput = document.getElementById('book_total_pages')
+    const translatorInput = document.getElementById('book_translator')
+    const publisherInput = document.getElementById('book_publisher')
+    const pagesInput = document.getElementById('book_pages')
     const coverUrlInput = document.getElementById('book_cover_image_url')
 
     if (titleInput) titleInput.value = book.title || ''
     if (authorInput) authorInput.value = book.author || ''
+    if (translatorInput) translatorInput.value = book.translator || ''
+    if (publisherInput) publisherInput.value = book.publisher || ''
     if (coverUrlInput) coverUrlInput.value = book.cover_image_url || ''
 
-    if (totalPagesInput) {
-      const parsedTotalPages = Number.parseInt(book.total_pages, 10)
-      if (Number.isNaN(parsedTotalPages) || parsedTotalPages <= 0) {
-        totalPagesInput.value = ''
+    if (pagesInput) {
+      const finalPages = book.pages || book.total_pages
+      const parsedPages = Number.parseInt(finalPages, 10)
+      if (Number.isNaN(parsedPages) || parsedPages <= 0) {
+        pagesInput.value = ''
       } else {
-        totalPagesInput.value = String(parsedTotalPages)
-        totalPagesInput.dispatchEvent(new Event('input'))
+        pagesInput.value = String(parsedPages)
+        pagesInput.dispatchEvent(new Event('input'))
       }
     }
   }

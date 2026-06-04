@@ -63,6 +63,26 @@
         </div>
 
         <div class="books-index__search-field">
+          <%= label_tag :publisher, "出版社", class: "books-index__search-label" %>
+          <div class="search-filter-autocomplete"
+               data-controller="search-filter-autocomplete"
+               data-search-filter-autocomplete-field-value="publisher">
+            <%= text_field_tag :publisher, @search_params[:publisher],
+                  class: "books-index__search-input",
+                  placeholder: "例: オライリー",
+                  autocomplete: "off",
+                  data: {
+                    "search-filter-autocomplete-target": "input",
+                    action: "input->search-filter-autocomplete#onInput keydown->search-filter-autocomplete#onKeydown"
+                  } %>
+            <ul class="search-filter-autocomplete__list search-filter-autocomplete__list--hidden"
+                role="listbox"
+                aria-expanded="false"
+                data-search-filter-autocomplete-target="list"></ul>
+          </div>
+        </div>
+
+        <div class="books-index__search-field">
           <%= label_tag :completed_from, "読了日(開始)", class: "books-index__search-label" %>
           <%= date_field_tag :completed_from, @search_params[:completed_from], class: "books-index__search-input" %>
         </div>
@@ -187,7 +207,7 @@
                          style="width: <%= book.progress_percentage %>%;"></div>
                   </div>
                   <span class="book-card__progress-text">
-                    <%= book.current_page %> / <%= book.target_pages %> ページ
+                    <%= book.current_page %> / <%= book.pages %> ページ
                     （<%= book.progress_percentage %>%）
                   </span>
                 </div>

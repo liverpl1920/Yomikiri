@@ -49,10 +49,10 @@ RSpec.describe User, type: :model do
   describe '#completed_pages_total' do
     let(:user) { create(:user) }
 
-    it '読了した本の target_pages 合計を返す' do
-      create(:book, user: user, status: :completed, target_pages: 200, total_pages: 300)
-      create(:book, user: user, status: :completed, target_pages: 150, total_pages: 200)
-      create(:book, user: user, status: :reading, target_pages: 100, total_pages: 100)
+    it '読了した本の pages 合計を返す' do
+      create(:book, user: user, status: :completed, pages: 200)
+      create(:book, user: user, status: :completed, pages: 150)
+      create(:book, user: user, status: :reading, pages: 100)
 
       expect(user.completed_pages_total).to eq(350)
     end
