@@ -8,14 +8,28 @@
   </script>
 <% end %>
 
-<section class="books-index">
+<section class="books-index" data-controller="search-toggle" data-search-toggle-active-value="<%= @search_active ? 'true' : 'false' %>">
   <div class="container">
     <div class="books-index__header">
       <h1 class="books-index__title">積読一覧</h1>
-      <%= link_to "+ 本を追加する", new_book_path, class: "btn btn--primary books-index__add-btn" %>
+      <div class="books-index__header-actions">
+        <button type="button"
+                class="btn btn--secondary books-index__search-toggle-btn"
+                data-action="click->search-toggle#toggle"
+                data-search-toggle-target="button"
+                aria-expanded="false"
+                aria-controls="books-search-form">
+          検索
+        </button>
+        <%= link_to "+ 本を追加する", new_book_path, class: "btn btn--primary books-index__add-btn" %>
+      </div>
     </div>
 
-    <%= form_with url: books_path, method: :get, local: true, class: "books-index__search" do %>
+    <%= form_with url: books_path, method: :get, local: true,
+                  id: "books-search-form",
+                  class: "books-index__search",
+                  data: { "search-toggle-target": "form" },
+                  aria: { hidden: "true" } do %>
       <div class="books-index__search-fields">
         <div class="books-index__search-field">
           <%= label_tag :title, "書籍名", class: "books-index__search-label" %>

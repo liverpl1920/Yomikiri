@@ -48,6 +48,8 @@ RSpec.describe '検索フィルターオートコンプリート機能', type: :
     sign_in_via_form(user)
     visit books_path
     wait_for_stimulus
+    find('.books-index__search-toggle-btn').click
+    wait_for_stimulus
     wait_for_search_filter_autocomplete_controller
   end
 
