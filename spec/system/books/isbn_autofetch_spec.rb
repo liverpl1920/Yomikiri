@@ -102,7 +102,7 @@ RSpec.describe '情報取得ボタンによるISBN・書影取得', type: :syste
       expect(page).to have_css('[data-book-form-target="titleStatus"]',
                                text: 'タイトル・著者・ページ数・書影をすべて取得しました。', wait: 20)
       expect(page).to have_field('著者', with: 'Dustin Boswell', wait: 5)
-      expect(page).to have_field('総ページ数', with: '260', wait: 5)
+      expect(page).to have_field('ページ数', with: '260', wait: 5, exact: true)
     end
 
     it 'タイトル入力してblurしても情報取得は実行されない' do
@@ -137,18 +137,25 @@ RSpec.describe '情報取得ボタンによるISBN・書影取得', type: :syste
       expect(page).to have_field('既に読んだページ数', with: '42')
     end
 
-    it '読了対象ページ数は手動入力済みなら手動取得後も保持される' do
-      fill_in '読了対象ページ数', with: '123'
+    it 'ページ数は手動入力済みなら手動取得後も保持される' do
+      page.execute_script(<<~JS)
+        var pagesEl = document.querySelector('[data-book-form-target~="pages"]');
+        if (pagesEl) {
+          pagesEl.value = '123';
+          pagesEl.dispatchEvent(new Event('input', { bubbles: true }));
+        }
+      JS
+      expect(page).to have_field('ページ数', with: '123', exact: true)
 
       fetch_by_button('リーダブルコード')
 
       expect(page).to have_css('[data-book-form-target="titleStatus"]',
                                text: 'タイトル・著者・ページ数・書影をすべて取得しました。', wait: 20)
-      expect(page).to have_field('読了対象ページ数', with: '123')
+      expect(page).to have_field('ページ数', with: '123', exact: true)
     end
 
     it '既に読んだページ数を考慮してノルマプレビューを表示する' do
-      fill_in '読了対象ページ数', with: '260'
+      fill_in 'ページ数', with: '260', exact: true
       deadline = (Date.today + 9.days).strftime('%Y-%m-%d')
       page.execute_script("document.getElementById('book_deadline').value = '#{deadline}'")
       page.execute_script("document.getElementById('book_deadline').dispatchEvent(new Event('change'))")
@@ -190,8 +197,7 @@ RSpec.describe '情報取得ボタンによるISBN・書影取得', type: :syste
       expect(page).to have_css('[data-book-form-target="titleStatus"]',
                                text: 'タイトル・著者・ページ数・書影をすべて取得しました。', wait: 5)
 
-      fill_in '総ページ数', with: '260'
-      fill_in '読了対象ページ数', with: '260'
+      fill_in 'ページ数', with: '260', exact: true
       deadline = (Date.current + 30.days).strftime('%Y-%m-%d')
       page.execute_script("document.getElementById('book_deadline').value = '#{deadline}'")
       page.execute_script("document.getElementById('book_deadline').dispatchEvent(new Event('change'))")

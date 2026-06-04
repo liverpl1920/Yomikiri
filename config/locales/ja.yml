@@ -23,8 +23,9 @@ ja:
         memo: "コメント・メモ"
         cover_image_url: "書影URL"
         cover_image: "書影画像"
-        total_pages: "総ページ数"
-        target_pages: "読了対象ページ数"
+        pages: "ページ数"
+        translator: "翻訳者"
+        publisher: "出版社"
         current_page: "現在ページ"
         completed_at_input: "読了日"
         deadline: "読了期限"
@@ -41,11 +42,8 @@ ja:
             deadline:
               past_date: "は過去の日付にできません"
               must_be_after_current_deadline: "は現在の期限より後の日付を指定してください"
-            target_pages:
-              less_than_or_equal_to: "は総ページ数（%{count}ページ）以下にしてください"
             current_page:
-              less_than_or_equal_to: "は読了対象ページ数（%{count}ページ）以下にしてください"
-              less_than_or_equal_to_total_pages: "は総ページ数（%{count}ページ）以下にしてください"
+              less_than_or_equal_to: "はページ数（%{count}ページ）以下にしてください"
             cover_image_url:
               invalid_url: "は有効なURL（http://またはhttps://）を入力してください"
             cover_image:

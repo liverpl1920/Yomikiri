@@ -9,7 +9,7 @@ RSpec.describe '読了フロー', type: :system do
 
   describe '読了にする！ボタン' do
     context '未完了の書籍の場合' do
-      let!(:book) { create(:book, user: user, title: '読了テスト本', target_pages: 100, current_page: 0) }
+      let!(:book) { create(:book, user: user, title: '読了テスト本', pages: 100, current_page: 0) }
 
       it '「読了にする！」ボタンが表示される' do
         visit book_path(book)
@@ -51,7 +51,7 @@ RSpec.describe '読了フロー', type: :system do
     context '既に読了済みの書籍の場合' do
       let!(:completed_book) do
         create(:book, user: user, title: '読了済み本',
-                      target_pages: 100, current_page: 100,
+                      pages: 100, current_page: 100,
                       completed_at: 1.day.ago, status: :completed)
       end
 

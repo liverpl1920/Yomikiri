@@ -2,7 +2,7 @@ require 'rails_helper'
 
 RSpec.describe '読了後の評価・感想', type: :system do
   let!(:user) { create(:user) }
-  let!(:book) { create(:book, user: user, title: '読了レビューテスト本', target_pages: 100, current_page: 0) }
+  let!(:book) { create(:book, user: user, title: '読了レビューテスト本', pages: 100, current_page: 0) }
 
   before do
     login_as(user, scope: :user)
@@ -47,7 +47,7 @@ RSpec.describe '読了後の評価・感想', type: :system do
   describe '詳細画面での表示' do
     context '既に評価・感想がある場合' do
       let!(:completed_book) do
-        create(:book, user: user, status: :completed, rating: 4, review: '読みやすかった', current_page: 300, target_pages: 300)
+        create(:book, user: user, status: :completed, rating: 4, review: '読みやすかった', current_page: 300, pages: 300)
       end
 
       it '詳細画面に評価と感想が表示される' do

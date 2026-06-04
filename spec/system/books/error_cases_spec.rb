@@ -4,7 +4,7 @@ require 'rails_helper'
 
 RSpec.describe '書籍詳細の異常系', type: :system, js: true do
   let!(:user) { create(:user) }
-  let!(:book) { create(:book, user: user, title: '異常系テスト本', target_pages: 100, current_page: 10, deadline: Date.current + 7) }
+  let!(:book) { create(:book, user: user, title: '異常系テスト本', pages: 100, current_page: 10, deadline: Date.current + 7) }
 
   before do
     Warden.test_reset!
@@ -24,7 +24,7 @@ RSpec.describe '書籍詳細の異常系', type: :system, js: true do
       expect(book.reload.current_page).to eq(10)
     end
 
-    it 'direct_pageがtarget_pagesを超えるとエラー表示される' do
+    it 'direct_pageがpagesを超えるとエラー表示される' do
       page.execute_script("document.getElementById('direct_page').removeAttribute('max')")
       page.execute_script("document.getElementById('direct_page').value = 150")
       direct_form = first('form[action="' + update_progress_book_path(book) + '"]', visible: :all)

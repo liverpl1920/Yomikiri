@@ -22,39 +22,21 @@ RSpec.describe Book, type: :model do
       end
     end
 
-    describe 'total_pages' do
-      it '総ページ数がない場合は無効' do
-        expect(build(:book, total_pages: nil)).not_to be_valid
+    describe 'pages' do
+      it 'ページ数がない場合は無効' do
+        expect(build(:book, pages: nil)).not_to be_valid
       end
 
-      it '総ページ数が0の場合は無効' do
-        expect(build(:book, total_pages: 0)).not_to be_valid
+      it 'ページ数が0の場合は無効' do
+        expect(build(:book, pages: 0)).not_to be_valid
       end
 
-      it '総ページ数が1以上であれば有効' do
-        expect(build(:book, total_pages: 1, target_pages: 1)).to be_valid
+      it 'ページ数が1以上であれば有効' do
+        expect(build(:book, pages: 1)).to be_valid
       end
 
-      it '総ページ数が小数の場合は無効' do
-        expect(build(:book, total_pages: 1.5)).not_to be_valid
-      end
-    end
-
-    describe 'target_pages' do
-      it '読了対象ページ数がない場合は無効' do
-        expect(build(:book, target_pages: nil)).not_to be_valid
-      end
-
-      it '読了対象ページ数が0の場合は無効' do
-        expect(build(:book, target_pages: 0)).not_to be_valid
-      end
-
-      it '読了対象ページ数が総ページ数以下であれば有効' do
-        expect(build(:book, total_pages: 300, target_pages: 250)).to be_valid
-      end
-
-      it '読了対象ページ数が総ページ数を超える場合は無効' do
-        expect(build(:book, total_pages: 300, target_pages: 301)).not_to be_valid
+      it 'ページ数が小数の場合は無効' do
+        expect(build(:book, pages: 1.5)).not_to be_valid
       end
     end
 
@@ -67,32 +49,16 @@ RSpec.describe Book, type: :model do
         expect(build(:book, current_page: 0)).to be_valid
       end
 
-      it '現在ページが読了対象ページ数以下であれば有効' do
-        expect(build(:book, target_pages: 300, current_page: 300)).to be_valid
+      it '現在ページがページ数以下であれば有効' do
+        expect(build(:book, pages: 300, current_page: 300)).to be_valid
       end
 
-      it '現在ページが読了対象ページ数を超える場合は無効' do
-        expect(build(:book, target_pages: 300, current_page: 301)).not_to be_valid
+      it '現在ページがページ数を超える場合は無効' do
+        expect(build(:book, pages: 300, current_page: 301)).not_to be_valid
       end
 
       it '現在ページが負の値の場合は無効' do
         expect(build(:book, current_page: -1)).not_to be_valid
-      end
-
-      it '現在ページが総ページ数以下であれば有効' do
-        expect(build(:book, total_pages: 300, target_pages: 300, current_page: 300)).to be_valid
-      end
-
-      it '現在ページが総ページ数を超える場合は無効' do
-        expect(build(:book, total_pages: 300, target_pages: 300, current_page: 301)).not_to be_valid
-      end
-
-      it '現在ページが総ページ数を超える場合に専用エラーキーが付与される' do
-        book = build(:book, total_pages: 200, target_pages: 200, current_page: 201)
-
-        book.validate
-
-        expect(book.errors.details[:current_page]).to include(include(error: :less_than_or_equal_to_total_pages, count: 200))
       end
     end
 
@@ -405,14 +371,14 @@ RSpec.describe Book, type: :model do
   describe '#daily_quota' do
     context '読了済みの場合' do
       it '0を返す' do
-        book = build(:book, status: :completed, current_page: 300, target_pages: 300)
+        book = build(:book, status: :completed, current_page: 300, pages: 300)
         expect(book.daily_quota).to eq(0)
       end
     end
 
-    context '読了対象ページ数に到達している場合' do
+    context 'ページ数に到達している場合' do
       it '0を返す' do
-        book = build(:book, current_page: 300, target_pages: 300, deadline: Date.current + 10)
+        book = build(:book, current_page: 300, pages: 300, deadline: Date.current + 10)
         expect(book.daily_quota).to eq(0)
       end
     end
@@ -420,13 +386,13 @@ RSpec.describe Book, type: :model do
     context '通常の場合（残ページ / 残日数、切り上げ）' do
       it '切り上げされたノルマを返す' do
         # 残ページ: 300 - 0 = 300, 残日数: 10日（今日含む）, ノルマ: ceil(300/10) = 30
-        book = build(:book, current_page: 0, target_pages: 300, deadline: Date.current + 9)
+        book = build(:book, current_page: 0, pages: 300, deadline: Date.current + 9)
         expect(book.daily_quota).to eq(30)
       end
 
       it '割り切れない場合は切り上げを返す' do
         # 残ページ: 100, 残日数: 3日（今日含む）, ノルマ: ceil(100/3) = 34
-        book = build(:book, current_page: 0, target_pages: 100, deadline: Date.current + 2)
+        book = build(:book, current_page: 0, pages: 100, deadline: Date.current + 2)
         expect(book.daily_quota).to eq(34)
       end
     end
@@ -434,12 +400,12 @@ RSpec.describe Book, type: :model do
     context '期限超過の場合（期限翌日以降）' do
       it '残日数を1日として計算する' do
         # 残ページ: 100, days_remaining = 0（期限の翌日）→ D=1 として計算
-        book = build(:book, current_page: 0, target_pages: 100, deadline: Date.current - 1)
+        book = build(:book, current_page: 0, pages: 100, deadline: Date.current - 1)
         expect(book.daily_quota).to eq(100)
       end
 
       it '期限を5日過ぎた場合も1日として計算する' do
-        book = build(:book, current_page: 0, target_pages: 50, deadline: Date.current - 5)
+        book = build(:book, current_page: 0, pages: 50, deadline: Date.current - 5)
         expect(book.daily_quota).to eq(50)
       end
     end
@@ -452,17 +418,17 @@ RSpec.describe Book, type: :model do
     end
 
     it '現在ページ0の場合は0を返す' do
-      book = build(:book, current_page: 0, target_pages: 300)
+      book = build(:book, current_page: 0, pages: 300)
       expect(book.progress_percentage).to eq(0)
     end
 
     it '正しい進捗率を返す（四捨五入）' do
-      book = build(:book, current_page: 150, target_pages: 300)
+      book = build(:book, current_page: 150, pages: 300)
       expect(book.progress_percentage).to eq(50)
     end
 
     it '端数は四捨五入される' do
-      book = build(:book, current_page: 1, target_pages: 3)
+      book = build(:book, current_page: 1, pages: 3)
       # (1/3 * 100).round = 33
       expect(book.progress_percentage).to eq(33)
     end
@@ -646,7 +612,7 @@ RSpec.describe Book, type: :model do
 
       context 'ステータスが completed の場合' do
         it 'current_page を変更してもステータスは completed のまま' do
-          book = create(:book, status: :completed, current_page: 300, target_pages: 300)
+          book = create(:book, status: :completed, current_page: 300, pages: 300)
           book.update!(current_page: 200)
           expect(book.reload).to be_completed
         end
@@ -670,20 +636,20 @@ RSpec.describe Book, type: :model do
 
   describe 'ビジネスロジック' do
     describe '#remaining_pages' do
-      it '読了対象ページ数から現在ページを引いた値を返す' do
-        book = build(:book, target_pages: 300, current_page: 100)
+      it 'ページ数から現在ページを引いた値を返す' do
+        book = build(:book, pages: 300, current_page: 100)
         expect(book.remaining_pages).to eq(200)
       end
     end
 
     describe '#progress_percentage' do
       it '進捗率を返す' do
-        book = build(:book, target_pages: 200, current_page: 100)
+        book = build(:book, pages: 200, current_page: 100)
         expect(book.progress_percentage).to eq(50)
       end
 
       it '未読の場合は0を返す' do
-        book = build(:book, target_pages: 200, current_page: 0)
+        book = build(:book, pages: 200, current_page: 0)
         expect(book.progress_percentage).to eq(0)
       end
     end

@@ -13,7 +13,7 @@ class User < ApplicationRecord
   end
 
   def completed_pages_total
-    books.completed.sum(:target_pages)
+    books.completed.sum(:pages)
   end
 
   def consecutive_reading_days

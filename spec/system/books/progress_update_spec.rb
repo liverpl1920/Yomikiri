@@ -4,7 +4,7 @@ require 'rails_helper'
 
 RSpec.describe '進捗更新', type: :system do
   let!(:user) { create(:user) }
-  let!(:book) { create(:book, user: user, title: '進捗テスト本', total_pages: 200, target_pages: 200, current_page: 0) }
+  let!(:book) { create(:book, user: user, title: '進捗テスト本', pages: 200, current_page: 0) }
 
   describe '現在ページ入力フォーム（非JS）' do
     before { login_as(user, scope: :user) }

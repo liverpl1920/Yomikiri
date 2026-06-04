@@ -45,7 +45,7 @@ RSpec.describe '書籍詳細のUI状態', type: :system do
     end
 
     it '読了済みでは警告クラスが表示されない' do
-      book = create(:book, user: user, title: 'done本', status: :completed, current_page: 100, target_pages: 100, deadline: Date.current)
+      book = create(:book, user: user, title: 'done本', status: :completed, current_page: 100, pages: 100, deadline: Date.current)
 
       visit book_path(book)
 

@@ -12,8 +12,7 @@ RSpec.describe '書籍管理', type: :system do
 
       fill_in 'タイトル', with: 'テスト駆動開発'
       fill_in '著者', with: 'Kent Beck'
-      fill_in '総ページ数', with: '280'
-      fill_in '読了対象ページ数', with: '280'
+      fill_in 'ページ数', with: '280', exact: true
       fill_in '読了期限', with: (Date.current + 14).strftime('%Y-%m-%d')
       click_button '登録する'
 
@@ -26,8 +25,7 @@ RSpec.describe '書籍管理', type: :system do
       visit new_book_path
 
       fill_in 'タイトル', with: ''
-      fill_in '総ページ数', with: '100'
-      fill_in '読了対象ページ数', with: '100'
+      fill_in 'ページ数', with: '100', exact: true
       fill_in '読了期限', with: (Date.current + 14).strftime('%Y-%m-%d')
       click_button '登録する'
 

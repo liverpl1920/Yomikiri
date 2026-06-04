@@ -11,6 +11,7 @@ RSpec.describe 'Books Search', type: :request do
         'isbn' => '9784873115658',
         'title' => 'リーダブルコード',
         'author' => 'Dustin Boswell',
+        'publisher' => 'オライリー・ジャパン',
         'cover' => 'https://cover.openbd.jp/9784873115658.jpg'
       },
       'onix' => {
@@ -32,6 +33,7 @@ RSpec.describe 'Books Search', type: :request do
           'volumeInfo' => {
             'title' => 'リーダブルコード',
             'authors' => [ 'Dustin Boswell', 'Trevor Foucher' ],
+            'publisher' => 'オライリー・ジャパン',
             'pageCount' => 260,
             'industryIdentifiers' => [
               { 'type' => 'ISBN_13', 'identifier' => '9784873115658' }
@@ -95,7 +97,8 @@ RSpec.describe 'Books Search', type: :request do
           book = json['books'].first
           expect(book['title']).to eq('リーダブルコード')
           expect(book['author']).to eq('Dustin Boswell')
-          expect(book['total_pages']).to eq(260)
+          expect(book['pages']).to eq(260)
+          expect(book['publisher']).to eq('オライリー・ジャパン')
           expect(book['cover_image_url']).to eq('https://cover.openbd.jp/9784873115658.jpg')
         end
 
@@ -186,7 +189,8 @@ RSpec.describe 'Books Search', type: :request do
           book = json['books'].first
           expect(book['title']).to eq('リーダブルコード')
           expect(book['author']).to eq('Dustin Boswell, Trevor Foucher')
-          expect(book['total_pages']).to eq(260)
+          expect(book['pages']).to eq(260)
+          expect(book['publisher']).to eq('オライリー・ジャパン')
           expect(book['cover_image_url']).to eq('https://cover.openbd.jp/9784873115658.jpg')
         end
 

@@ -53,7 +53,17 @@
     <span class="form-field__optional">任意</span>
     <%= f.text_field :author,
           class: 'form-field__input',
-          placeholder: '例: Dustin Boswell',
+          placeholder: '例: Dustin Boswell (複数いる場合はカンマ区切り)',
+          autocomplete: 'off' %>
+  </div>
+
+  <%# 翻訳者 %>
+  <div class="form-field">
+    <%= f.label :translator, '翻訳者', class: 'form-field__label' %>
+    <span class="form-field__optional">任意</span>
+    <%= f.text_field :translator,
+          class: 'form-field__input',
+          placeholder: '例: 角征典 (複数いる場合はカンマ区切り)',
           autocomplete: 'off' %>
   </div>
 
@@ -67,6 +77,19 @@
           autocomplete: 'off' %>
     <% if book.errors[:genre].any? %>
       <span class="form-field__error"><%= book.errors[:genre].first %></span>
+    <% end %>
+  </div>
+
+  <%# 出版社 %>
+  <div class="form-field">
+    <%= f.label :publisher, '出版社', class: 'form-field__label' %>
+    <span class="form-field__optional">任意</span>
+    <%= f.text_field :publisher,
+          class: "form-field__input #{'form-field__input--error' if book.errors[:publisher].any?}",
+          placeholder: '例: オライリー・ジャパン',
+          autocomplete: 'off' %>
+    <% if book.errors[:publisher].any? %>
+      <span class="form-field__error"><%= book.errors[:publisher].first %></span>
     <% end %>
   </div>
 
@@ -93,40 +116,21 @@
     <% end %>
   </div>
 
-  <%# 総ページ数 %>
+  <%# ページ数 %>
   <div class="form-field">
-    <%= f.label :total_pages, '総ページ数', class: 'form-field__label' %>
+    <%= f.label :pages, 'ページ数', class: 'form-field__label' %>
     <span class="form-field__required" aria-hidden="true">必須</span>
-    <%= f.number_field :total_pages,
-          class: "form-field__input form-field__input--narrow #{'form-field__input--error' if book.errors[:total_pages].any?}",
+    <%= f.number_field :pages,
+          class: "form-field__input form-field__input--narrow #{'form-field__input--error' if book.errors[:pages].any?}",
           min: 1,
           placeholder: '例: 260',
           data: {
-            'book-form-target': 'totalPages',
-            action: 'input->book-form#syncTargetPages input->book-form#calculateQuota'
-          } %>
-    <span class="form-field__unit">ページ</span>
-    <% if book.errors[:total_pages].any? %>
-      <span class="form-field__error"><%= book.errors[:total_pages].first %></span>
-    <% end %>
-  </div>
-
-  <%# 読了対象ページ数 %>
-  <div class="form-field">
-    <%= f.label :target_pages, '読了対象ページ数', class: 'form-field__label' %>
-    <span class="form-field__required" aria-hidden="true">必須</span>
-    <%= f.number_field :target_pages,
-          class: "form-field__input form-field__input--narrow #{'form-field__input--error' if book.errors[:target_pages].any?}",
-          min: 1,
-          placeholder: '例: 260',
-          data: {
-            'book-form-target': 'targetPages',
+            'book-form-target': 'pages',
             action: 'input->book-form#calculateQuota'
           } %>
     <span class="form-field__unit">ページ</span>
-    <small class="form-field__hint">索引や付録を除く場合のみ変更してください</small>
-    <% if book.errors[:target_pages].any? %>
-      <span class="form-field__error"><%= book.errors[:target_pages].first %></span>
+    <% if book.errors[:pages].any? %>
+      <span class="form-field__error"><%= book.errors[:pages].first %></span>
     <% end %>
   </div>
 
