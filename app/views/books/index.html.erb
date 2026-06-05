@@ -97,6 +97,26 @@
         </div>
 
         <div class="books-index__search-field">
+          <%= label_tag :translator, "翻訳者", class: "books-index__search-label" %>
+          <div class="search-filter-autocomplete"
+               data-controller="search-filter-autocomplete"
+               data-search-filter-autocomplete-field-value="translator">
+            <%= text_field_tag :translator, @search_params[:translator],
+                  class: "books-index__search-input",
+                  placeholder: "例: 訳者名",
+                  autocomplete: "off",
+                  data: {
+                    "search-filter-autocomplete-target": "input",
+                    action: "input->search-filter-autocomplete#onInput keydown->search-filter-autocomplete#onKeydown"
+                  } %>
+            <ul class="search-filter-autocomplete__list search-filter-autocomplete__list--hidden"
+                role="listbox"
+                aria-expanded="false"
+                data-search-filter-autocomplete-target="list"></ul>
+          </div>
+        </div>
+
+        <div class="books-index__search-field">
           <%= label_tag :completed_from, "読了日(開始)", class: "books-index__search-label" %>
           <%= date_field_tag :completed_from, @search_params[:completed_from], class: "books-index__search-input" %>
         </div>

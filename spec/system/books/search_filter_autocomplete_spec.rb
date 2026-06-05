@@ -148,4 +148,82 @@ RSpec.describe '検索フィルターオートコンプリート機能', type: :
       expect(page).to have_field('ジャンル', with: 'プログラミング', wait: 5)
     end
   end
+
+  describe '出版社フィールドのオートコンプリート' do
+    let!(:book_oreilly) do
+      create(:book, user: user, publisher: 'オライリー・ジャパン',
+                    deadline: Date.current + 5)
+    end
+
+    before do
+      visit books_path
+      wait_for_stimulus
+      find('.books-index__search-toggle-btn').click
+      wait_for_stimulus
+      wait_for_search_filter_autocomplete_controller
+    end
+
+    it '入力すると候補ドロップダウンが表示される' do
+      type_in_field('#publisher', 'オライリー')
+
+      expect(page).to have_css(
+        '.search-filter-autocomplete__list:not(.search-filter-autocomplete__list--hidden)',
+        wait: 5
+      )
+    end
+
+    it '候補に出版社名が含まれる' do
+      type_in_field('#publisher', 'オライリー')
+
+      expect(page).to have_css('.search-filter-autocomplete__button', text: 'オライリー・ジャパン', wait: 5)
+    end
+
+    it '候補をクリックすると入力フィールドに値がセットされる' do
+      type_in_field('#publisher', 'オライリー')
+
+      expect(page).to have_css('.search-filter-autocomplete__button', text: 'オライリー・ジャパン', wait: 5)
+      find('.search-filter-autocomplete__button', text: 'オライリー・ジャパン').click
+
+      expect(page).to have_field('出版社', with: 'オライリー・ジャパン', wait: 5)
+    end
+  end
+
+  describe '翻訳者フィールドのオートコンプリート' do
+    let!(:book_translated) do
+      create(:book, user: user, translator: '田中太郎',
+                    deadline: Date.current + 5)
+    end
+
+    before do
+      visit books_path
+      wait_for_stimulus
+      find('.books-index__search-toggle-btn').click
+      wait_for_stimulus
+      wait_for_search_filter_autocomplete_controller
+    end
+
+    it '入力すると候補ドロップダウンが表示される' do
+      type_in_field('#translator', '田中')
+
+      expect(page).to have_css(
+        '.search-filter-autocomplete__list:not(.search-filter-autocomplete__list--hidden)',
+        wait: 5
+      )
+    end
+
+    it '候補に翻訳者名が含まれる' do
+      type_in_field('#translator', '田中')
+
+      expect(page).to have_css('.search-filter-autocomplete__button', text: '田中太郎', wait: 5)
+    end
+
+    it '候補をクリックすると入力フィールドに値がセットされる' do
+      type_in_field('#translator', '田中')
+
+      expect(page).to have_css('.search-filter-autocomplete__button', text: '田中太郎', wait: 5)
+      find('.search-filter-autocomplete__button', text: '田中太郎').click
+
+      expect(page).to have_field('翻訳者', with: '田中太郎', wait: 5)
+    end
+  end
 end
