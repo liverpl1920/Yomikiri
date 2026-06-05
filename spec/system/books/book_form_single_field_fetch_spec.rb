@@ -108,6 +108,17 @@ RSpec.describe '積読登録画面での書籍情報個別取得', type: :system
         expect(page).to have_field('ページ数', with: '')
       end
 
+      it 'キャッシュなし状態で個別補完を実行しても、対象外の項目は自動入力されない（#305修正確認）' do
+        # キャッシュがない状態で翻訳者を個別補完する
+        click_complement_button('author')
+
+        # 著者が自動入力される
+        expect(page).to have_field('著者', with: 'Dustin Boswell', wait: 10)
+
+        # 他の項目（ページ数）は自動入力されないこと（バグでは補完されてしまっていた）
+        expect(page).to have_field('ページ数', with: '')
+      end
+
       it 'キャッシュ機能により、2つ目の項目補完時はAPIリクエストが再送されない' do
         # 1. 著者補完（APIリクエストが発生）
         click_complement_button('author')
