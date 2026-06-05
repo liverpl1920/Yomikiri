@@ -51,30 +51,54 @@
   <div class="form-field">
     <%= f.label :author, '著者', class: 'form-field__label' %>
     <span class="form-field__optional">任意</span>
-    <%= f.text_field :author,
-          class: 'form-field__input',
-          placeholder: '例: Dustin Boswell (複数いる場合はカンマ区切り)',
-          autocomplete: 'off' %>
+    <div class="form-field__input-row">
+      <%= f.text_field :author,
+            class: 'form-field__input',
+            placeholder: '例: Dustin Boswell (複数いる場合はカンマ区切り)',
+            autocomplete: 'off' %>
+      <button type="button"
+              class="btn btn--outline btn--sm"
+              data-action="click->book-form#fetchSingleField"
+              data-field="author">
+        補完
+      </button>
+    </div>
   </div>
 
   <%# 翻訳者 %>
   <div class="form-field">
     <%= f.label :translator, '翻訳者', class: 'form-field__label' %>
     <span class="form-field__optional">任意</span>
-    <%= f.text_field :translator,
-          class: 'form-field__input',
-          placeholder: '例: 角征典 (複数いる場合はカンマ区切り)',
-          autocomplete: 'off' %>
+    <div class="form-field__input-row">
+      <%= f.text_field :translator,
+            class: 'form-field__input',
+            placeholder: '例: 角征典 (複数いる場合はカンマ区切り)',
+            autocomplete: 'off' %>
+      <button type="button"
+              class="btn btn--outline btn--sm"
+              data-action="click->book-form#fetchSingleField"
+              data-field="translator">
+        補完
+      </button>
+    </div>
   </div>
 
   <%# ジャンル %>
   <div class="form-field">
     <%= f.label :genre, 'ジャンル', class: 'form-field__label' %>
     <span class="form-field__optional">任意</span>
-    <%= f.text_field :genre,
-          class: "form-field__input #{'form-field__input--error' if book.errors[:genre].any?}",
-          placeholder: '例: プログラミング',
-          autocomplete: 'off' %>
+    <div class="form-field__input-row">
+      <%= f.text_field :genre,
+            class: "form-field__input #{'form-field__input--error' if book.errors[:genre].any?}",
+            placeholder: '例: プログラミング',
+            autocomplete: 'off' %>
+      <button type="button"
+              class="btn btn--outline btn--sm"
+              data-action="click->book-form#fetchSingleField"
+              data-field="genre">
+        補完
+      </button>
+    </div>
     <% if book.errors[:genre].any? %>
       <span class="form-field__error"><%= book.errors[:genre].first %></span>
     <% end %>
@@ -84,10 +108,18 @@
   <div class="form-field">
     <%= f.label :publisher, '出版社', class: 'form-field__label' %>
     <span class="form-field__optional">任意</span>
-    <%= f.text_field :publisher,
-          class: "form-field__input #{'form-field__input--error' if book.errors[:publisher].any?}",
-          placeholder: '例: オライリー・ジャパン',
-          autocomplete: 'off' %>
+    <div class="form-field__input-row">
+      <%= f.text_field :publisher,
+            class: "form-field__input #{'form-field__input--error' if book.errors[:publisher].any?}",
+            placeholder: '例: オライリー・ジャパン',
+            autocomplete: 'off' %>
+      <button type="button"
+              class="btn btn--outline btn--sm"
+              data-action="click->book-form#fetchSingleField"
+              data-field="publisher">
+        補完
+      </button>
+    </div>
     <% if book.errors[:publisher].any? %>
       <span class="form-field__error"><%= book.errors[:publisher].first %></span>
     <% end %>
@@ -106,10 +138,18 @@
         <span class="form-field__hint">現在の書影。変更する場合は新しい画像を選択してください。</span>
       </div>
     <% end %>
-    <%= f.file_field :cover_image,
-          class: "form-field__file #{'form-field__input--error' if book.errors[:cover_image].any?}",
-          accept: 'image/jpeg,image/png,image/webp',
-          data: { action: 'change->book-form#clearCoverImageUrl' } %>
+    <div class="form-field__input-row">
+      <%= f.file_field :cover_image,
+            class: "form-field__file #{'form-field__input--error' if book.errors[:cover_image].any?}",
+            accept: 'image/jpeg,image/png,image/webp',
+            data: { action: 'change->book-form#clearCoverImageUrl' } %>
+      <button type="button"
+              class="btn btn--outline btn--sm"
+              data-action="click->book-form#fetchSingleField"
+              data-field="cover">
+        補完
+      </button>
+    </div>
     <small class="form-field__hint">JPEG・PNG・WebP形式、5MB以内。情報取得で見つかった書影は未設定時のみ自動設定されます。</small>
     <% if book.errors[:cover_image].any? %>
       <span class="form-field__error"><%= book.errors[:cover_image].first %></span>
@@ -120,15 +160,23 @@
   <div class="form-field">
     <%= f.label :pages, 'ページ数', class: 'form-field__label' %>
     <span class="form-field__required" aria-hidden="true">必須</span>
-    <%= f.number_field :pages,
-          class: "form-field__input form-field__input--narrow #{'form-field__input--error' if book.errors[:pages].any?}",
-          min: 1,
-          placeholder: '例: 260',
-          data: {
-            'book-form-target': 'pages',
-            action: 'input->book-form#calculateQuota'
-          } %>
-    <span class="form-field__unit">ページ</span>
+    <div class="form-field__input-row">
+      <%= f.number_field :pages,
+            class: "form-field__input form-field__input--narrow #{'form-field__input--error' if book.errors[:pages].any?}",
+            min: 1,
+            placeholder: '例: 260',
+            data: {
+              'book-form-target': 'pages',
+              action: 'input->book-form#calculateQuota'
+            } %>
+      <span class="form-field__unit">ページ</span>
+      <button type="button"
+              class="btn btn--outline btn--sm"
+              data-action="click->book-form#fetchSingleField"
+              data-field="pages">
+        補完
+      </button>
+    </div>
     <% if book.errors[:pages].any? %>
       <span class="form-field__error"><%= book.errors[:pages].first %></span>
     <% end %>

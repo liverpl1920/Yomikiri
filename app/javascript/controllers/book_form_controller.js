@@ -8,6 +8,7 @@ export default class extends Controller {
     this.calculateQuota()
     this.fetchingTitle = null
     this.fetchPromise = null
+    this.cachedBook = null
     this.syncCompletedAtFieldVisibility()
   }
 
@@ -74,6 +75,7 @@ export default class extends Controller {
       }
 
       const book = books[0]
+      this.cachedBook = book
       const missing = this._fillFormFromSearch(book)
       const coverUrlInput = document.getElementById('book_cover_image_url')
       this._updateCoverPreview(coverUrlInput ? coverUrlInput.value : '')
@@ -273,5 +275,84 @@ export default class extends Controller {
     const field = document.getElementById('completed_at_field')
     if (!field) return
     field.hidden = !visible
+  }
+
+  async fetchSingleField (event) {
+    const field = event.currentTarget.dataset.field
+    const title = this.hasTitleTarget ? this.titleTarget.value.trim() : ''
+    if (!title) {
+      this._setTitleStatus('タイトルを入力してください。')
+      return
+    }
+
+    let book = this.cachedBook
+    if (!book || this.fetchingTitle !== title) {
+      const success = await this._fetchBookByTitle(title)
+      if (!success) return
+      book = this.cachedBook
+    }
+
+    if (!book) {
+      this._setTitleStatus('書籍情報を取得できませんでした。')
+      return
+    }
+
+    this._fillSingleField(field, book)
+  }
+
+  _fillSingleField (field, book) {
+    let value = null
+    let input = null
+    let fieldNameJapanese = ''
+
+    switch (field) {
+      case 'author':
+        value = book.author
+        input = document.getElementById('book_author')
+        fieldNameJapanese = '著者'
+        break
+      case 'translator':
+        value = book.translator
+        input = document.getElementById('book_translator')
+        fieldNameJapanese = '翻訳者'
+        break
+      case 'publisher':
+        value = book.publisher
+        input = document.getElementById('book_publisher')
+        fieldNameJapanese = '出版社'
+        break
+      case 'genre':
+        value = book.genre
+        input = document.getElementById('book_genre')
+        fieldNameJapanese = 'ジャンル'
+        break
+      case 'pages':
+        value = book.pages || book.total_pages
+        input = document.getElementById('book_pages')
+        fieldNameJapanese = 'ページ数'
+        break
+      case 'cover':
+        value = book.cover_image_url
+        input = document.getElementById('book_cover_image_url')
+        fieldNameJapanese = '書影'
+        break
+    }
+
+    if (input) {
+      if (value) {
+        input.value = value
+        if (field === 'pages') {
+          input.dispatchEvent(new Event('input'))
+        }
+        if (field === 'cover') {
+          this._updateCoverPreview(value)
+          const fileInput = document.getElementById('book_cover_image')
+          if (fileInput) fileInput.value = ''
+        }
+        this._setTitleStatus(`${fieldNameJapanese}を取得しました。`)
+      } else {
+        this._setTitleStatus(`${fieldNameJapanese}の情報は見つかりませんでした。`)
+      }
+    }
   }
 }

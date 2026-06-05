@@ -1755,3 +1755,25 @@
   white-space: nowrap;
   border-width: 0;
 }
+
+/* ---- 項目ごとの個別取得（補完）用レイアウト ---- */
+.form-field__input-row {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.form-field__input-row .form-field__input {
+  flex: 1;
+}
+
+.form-field__input-row .form-field__input--narrow {
+  flex: initial;
+}
+
+.btn--sm {
+  padding: 0.5rem 1rem;
+  font-size: var(--font-size-sm);
+  flex-shrink: 0;
+}
+
