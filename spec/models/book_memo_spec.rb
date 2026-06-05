@@ -61,7 +61,28 @@ RSpec.describe BookMemo, type: :model do
         expect(book.book_memos.latest_first).to eq([ new_memo, old_memo ])
       end
     end
+
+    describe '.content_like' do
+      let(:book) { create(:book) }
+      let!(:matching_memo) { create(:book_memo, book: book, content: '重要なポイントはここです') }
+      let!(:other_memo) { create(:book_memo, book: book, content: '別の内容') }
+
+      it '部分一致するメモを返す' do
+        expect(BookMemo.content_like('重要')).to include(matching_memo)
+        expect(BookMemo.content_like('重要')).not_to include(other_memo)
+      end
+
+      it '大文字小文字を区別しない' do
+        memo = create(:book_memo, book: book, content: 'Ruby on Rails')
+        expect(BookMemo.content_like('ruby')).to include(memo)
+      end
+
+      it 'キーワードに一致しない場合は空を返す' do
+        expect(BookMemo.content_like('存在しないキーワード')).to be_empty
+      end
+    end
   end
+
 
   describe 'インスタンスメソッド' do
     describe '#edited?' do

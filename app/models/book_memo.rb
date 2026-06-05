@@ -8,6 +8,7 @@ class BookMemo < ApplicationRecord
   validates :page_number, length: { maximum: PAGE_NUMBER_MAX_LENGTH }, allow_blank: true
 
   scope :latest_first, -> { order(created_at: :desc) }
+  scope :content_like, ->(query) { where("content ILIKE ?", "%#{sanitize_sql_like(query)}%") }
 
   def edited?
     (updated_at - created_at) > 1.second

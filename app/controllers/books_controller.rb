@@ -16,7 +16,19 @@ class BooksController < ApplicationController
   def index
     @search_params = normalized_index_search_params
     @search_active = @search_params.values.any?(&:present?)
-    @books = current_user.books.with_attached_cover_image.filtered_for_index(@search_params)
+    @memo_keyword = params[:memo_keyword].presence
+    @memo_search_active = @memo_keyword.present?
+
+    if @memo_search_active
+      @memos = BookMemo.where(book_id: current_user.books.ids)
+                       .content_like(@memo_keyword)
+                       .includes(:book)
+                       .order(created_at: :desc)
+      @books = current_user.books.none
+    else
+      @memos = []
+      @books = current_user.books.with_attached_cover_image.filtered_for_index(@search_params)
+    end
   end
 
   def new

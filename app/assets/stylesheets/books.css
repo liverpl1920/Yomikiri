@@ -1777,3 +1777,140 @@
   flex-shrink: 0;
 }
 
+/* ---- メモ検索フォーム ---- */
+.books-index__memo-search {
+  margin-top: var(--spacing-lg);
+  padding: var(--spacing-md) var(--spacing-lg);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+}
+
+.books-index__memo-search-fields {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  flex-wrap: wrap;
+}
+
+.books-index__memo-search-input {
+  flex: 1;
+  min-width: 180px;
+}
+
+/* ---- メモ検索結果 ---- */
+.memo-search-results {
+  margin-top: var(--spacing-lg);
+}
+
+.memo-search-results__summary {
+  margin-bottom: var(--spacing-md);
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+}
+
+.memo-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.memo-list__item {
+  display: block;
+}
+
+.memo-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-md) var(--spacing-lg);
+  transition: box-shadow 0.2s ease;
+}
+
+.memo-card:hover {
+  box-shadow: var(--shadow-md);
+}
+
+.memo-card__header {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-sm);
+  flex-wrap: wrap;
+}
+
+.memo-card__book-link {
+  text-decoration: none;
+  color: inherit;
+}
+
+.memo-card__book-link:hover .memo-card__book-title {
+  text-decoration: underline;
+  color: var(--color-primary);
+}
+
+.memo-card__book-title {
+  font-weight: 600;
+  font-size: var(--font-size-sm);
+  color: var(--color-text);
+}
+
+.memo-card__page-number {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: 0.1rem 0.4rem;
+}
+
+.memo-card__content {
+  font-size: var(--font-size-sm);
+  color: var(--color-text);
+  line-height: 1.7;
+  margin-bottom: var(--spacing-sm);
+}
+
+.memo-card__content p {
+  margin: 0 0 0.5rem;
+}
+
+.memo-card__content p:last-child {
+  margin-bottom: 0;
+}
+
+.memo-card__meta {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.memo-card__date {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+}
+
+.memo-card__edited {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+}
+
+@media (max-width: 640px) {
+  .books-index__memo-search {
+    padding: var(--spacing-md);
+  }
+
+  .books-index__memo-search-fields {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .memo-card {
+    padding: var(--spacing-md);
+  }
+}
+
+
