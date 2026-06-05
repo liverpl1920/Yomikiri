@@ -443,7 +443,7 @@
           <div class="book-show__review-rating">
             <label class="book-show__review-label">評価</label>
             <div class="book-show__stars" role="group" aria-label="評価を選択（1〜5）">
-              <% (1..5).each do |star| %>
+              <% (1..5).reverse_each do |star| %>
                 <label class="book-show__star-label">
                   <%= f.radio_button :rating, star,
                         class: 'book-show__star-input',
