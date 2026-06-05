@@ -37,14 +37,14 @@ export default class extends Controller {
     return this._fetchBookByTitle(title)
   }
 
-  async _fetchBookByTitle (title) {
+  async _fetchBookByTitle (title, { fillForm = true } = {}) {
     if (this.fetchPromise && this.fetchingTitle === title) {
       await this.fetchPromise
       return true
     }
 
     this.fetchingTitle = title
-    this.fetchPromise = this._performFetchByTitle(title)
+    this.fetchPromise = this._performFetchByTitle(title, { fillForm })
 
     try {
       return await this.fetchPromise
@@ -53,7 +53,7 @@ export default class extends Controller {
     }
   }
 
-  async _performFetchByTitle (title) {
+  async _performFetchByTitle (title, { fillForm = true } = {}) {
     this._setTitleStatus('書影を取得中...')
 
     try {
@@ -76,10 +76,14 @@ export default class extends Controller {
 
       const book = books[0]
       this.cachedBook = book
-      const missing = this._fillFormFromSearch(book)
-      const coverUrlInput = document.getElementById('book_cover_image_url')
-      this._updateCoverPreview(coverUrlInput ? coverUrlInput.value : '')
-      this._setTitleStatus(this._buildFetchResultMessage(missing))
+
+      if (fillForm) {
+        const missing = this._fillFormFromSearch(book)
+        const coverUrlInput = document.getElementById('book_cover_image_url')
+        this._updateCoverPreview(coverUrlInput ? coverUrlInput.value : '')
+        this._setTitleStatus(this._buildFetchResultMessage(missing))
+      }
+
       return true
     } catch (_e) {
       this._setTitleStatus('取得中にエラーが発生しました。')
@@ -287,7 +291,7 @@ export default class extends Controller {
 
     let book = this.cachedBook
     if (!book || this.fetchingTitle !== title) {
-      const success = await this._fetchBookByTitle(title)
+      const success = await this._fetchBookByTitle(title, { fillForm: false })
       if (!success) return
       book = this.cachedBook
     }
