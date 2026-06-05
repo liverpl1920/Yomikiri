@@ -138,7 +138,7 @@ class BooksController < ApplicationController
     render json: { books: [], error: "検索中にエラーが発生しました" }
   end
 
-  SUGGESTION_FIELDS = %w[author genre publisher].freeze
+  SUGGESTION_FIELDS = %w[author genre publisher translator].freeze
 
   def suggestions
     field = params[:field].to_s
@@ -295,11 +295,12 @@ class BooksController < ApplicationController
   end
 
   def normalized_index_search_params
-    permitted = params.permit(:title, :author, :genre, :publisher, :completed_from, :completed_to)
+    permitted = params.permit(:title, :author, :genre, :publisher, :translator, :completed_from, :completed_to)
     title = permitted[:title].to_s.strip
     author = permitted[:author].to_s.strip
     genre = permitted[:genre].to_s.strip
     publisher = permitted[:publisher].to_s.strip
+    translator = permitted[:translator].to_s.strip
     completed_from = parse_iso_date(permitted[:completed_from])
     completed_to = parse_iso_date(permitted[:completed_to])
 
@@ -312,6 +313,7 @@ class BooksController < ApplicationController
       author: author.presence,
       genre: genre.presence,
       publisher: publisher.presence,
+      translator: translator.presence,
       completed_from: completed_from,
       completed_to: completed_to
     }

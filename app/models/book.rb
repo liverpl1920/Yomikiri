@@ -69,6 +69,7 @@ class Book < ApplicationRecord
   scope :author_like, ->(query) { where("author ILIKE ?", "%#{sanitize_sql_like(query)}%") }
   scope :genre_like, ->(query) { where("genre ILIKE ?", "%#{sanitize_sql_like(query)}%") }
   scope :publisher_like, ->(query) { where("publisher ILIKE ?", "%#{sanitize_sql_like(query)}%") }
+  scope :translator_like, ->(query) { where("translator ILIKE ?", "%#{sanitize_sql_like(query)}%") }
   scope :completed_from, ->(from_date) { where("completed_at >= ?", from_date.beginning_of_day) }
   scope :completed_to, ->(to_date) { where("completed_at <= ?", to_date.end_of_day) }
 
@@ -78,6 +79,7 @@ class Book < ApplicationRecord
     relation = relation.author_like(params[:author]) if params[:author].present?
     relation = relation.genre_like(params[:genre]) if params[:genre].present?
     relation = relation.publisher_like(params[:publisher]) if params[:publisher].present?
+    relation = relation.translator_like(params[:translator]) if params[:translator].present?
     relation = relation.completed_from(params[:completed_from]) if params[:completed_from].present?
     relation = relation.completed_to(params[:completed_to]) if params[:completed_to].present?
     relation

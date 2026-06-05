@@ -571,6 +571,40 @@ RSpec.describe Book, type: :model do
       expect(result).to include(programming)
       expect(result).not_to include(business)
     end
+
+    context '出版社検索' do
+      let!(:oreilly_book) { create(:book, user: user, publisher: 'オライリー・ジャパン', status: :unread) }
+      let!(:other_book)   { create(:book, user: user, publisher: '講談社', status: :unread) }
+
+      it '出版社で部分一致検索できる' do
+        result = user.books.filtered_for_index(publisher: 'オライリー')
+        expect(result).to include(oreilly_book)
+        expect(result).not_to include(other_book)
+      end
+
+      it '出版社が空の場合は絞り込まない' do
+        result = user.books.filtered_for_index(publisher: nil)
+        expect(result).to include(oreilly_book)
+        expect(result).to include(other_book)
+      end
+    end
+
+    context '翻訳者検索' do
+      let!(:translated_book) { create(:book, user: user, translator: '田中太郎', status: :unread) }
+      let!(:no_translator)   { create(:book, user: user, translator: nil, status: :unread) }
+
+      it '翻訳者で部分一致検索できる' do
+        result = user.books.filtered_for_index(translator: '田中')
+        expect(result).to include(translated_book)
+        expect(result).not_to include(no_translator)
+      end
+
+      it '翻訳者が空の場合は絞り込まない' do
+        result = user.books.filtered_for_index(translator: nil)
+        expect(result).to include(translated_book)
+        expect(result).to include(no_translator)
+      end
+    end
   end
 
   describe 'コールバック' do
