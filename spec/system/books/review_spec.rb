@@ -73,6 +73,13 @@ RSpec.describe '読了後の評価・感想', type: :system do
         expect(page).to have_content('★★★★★')
         expect(page).to have_content('何回読んでも最高！')
       end
+
+      it '評価フォームの星の選択肢がHTML上で降順（5から1）に並んでいることを確認する' do
+        visit book_path(completed_book)
+        star_inputs = all('.book-show__star-input', visible: false)
+        values = star_inputs.map { |input| input.value.to_i }
+        expect(values).to eq([ 5, 4, 3, 2, 1 ])
+      end
     end
   end
 end
