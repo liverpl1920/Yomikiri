@@ -1,0 +1,35 @@
+<li class="memo-timeline__item" id="<%= dom_id(book_memo) %>">
+  <div class="memo-timeline__header">
+    <div class="memo-timeline__timestamps">
+      <time class="memo-timeline__date" datetime="<%= book_memo.created_at.iso8601 %>">
+        作成：<%= l(book_memo.created_at, format: :default) %>
+      </time>
+      <% if book_memo.edited? %>
+        <time class="memo-timeline__date memo-timeline__date--edited" datetime="<%= book_memo.updated_at.iso8601 %>">
+          更新：<%= l(book_memo.updated_at, format: :default) %>
+        </time>
+      <% end %>
+    </div>
+    <div class="memo-timeline__actions">
+      <%= link_to '編集',
+            edit_book_book_memo_path(book, book_memo),
+            class: 'memo-timeline__edit-btn btn btn--secondary btn--sm',
+            'aria-label': "#{l(book_memo.created_at, format: :default)}のメモを編集" %>
+      <%= button_to '削除',
+            book_book_memo_path(book, book_memo),
+            method: :delete,
+            class: 'memo-timeline__delete-btn btn btn--danger btn--sm',
+            'aria-label': "#{l(book_memo.created_at, format: :default)}のメモを削除",
+            form: { data: { turbo: false } } %>
+    </div>
+  </div>
+  <% if book_memo.page_number.present? %>
+    <div class="memo-timeline__page">
+      <span class="memo-timeline__page-label">対象ページ：</span>
+      <span class="memo-timeline__page-value"><%= book_memo.page_number %></span>
+    </div>
+  <% end %>
+  <div class="memo-timeline__body">
+    <%= render_book_memo_content(book_memo.content) %>
+  </div>
+</li>
