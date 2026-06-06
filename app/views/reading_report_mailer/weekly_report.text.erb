@@ -14,4 +14,13 @@
 <% end %>
 <% end %>
 
+今週記録したメモ:
+<% if @summary[:memo_details].empty? %>
+- 該当なし
+<% else %>
+<% @summary[:memo_details].each do |memo| %>
+- <%= memo[:book_title] %><%= memo[:page_number].present? ? "（p.#{memo[:page_number]}）" : "" %>: <%= memo[:content].truncate(80) %>
+<% end %>
+<% end %>
+
 次の1週間も積読消化を進めていきましょう。

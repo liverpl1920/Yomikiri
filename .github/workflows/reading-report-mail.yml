@@ -2,7 +2,7 @@ name: reading-report-mail
 
 on:
   schedule:
-    - cron: "5 15 * * *"
+    - cron: "0 23 * * 5"  # JST 土曜 08:00 (UTC 金曜 23:00)
   workflow_dispatch:
 
 permissions:
@@ -25,5 +25,5 @@ jobs:
           ruby-version: .ruby-version
           bundler-cache: true
 
-      - name: Run reading report task
-        run: bundle exec rake reading_reports:dispatch
+      - name: Run weekly reading report task
+        run: bundle exec rake reading_reports:weekly

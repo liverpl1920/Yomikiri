@@ -105,5 +105,46 @@ RSpec.describe ReadingReportSummaryService do
         described_class.call(user: user, period_type: :daily)
       }.to raise_error(ArgumentError, 'Unsupported period type: daily')
     end
+
+    describe 'memo_details' do
+      it '週次期間内のメモをユーザー単位で返す' do
+        reference_date = Date.new(2026, 5, 17) # 土曜
+
+        # 期間内のメモ (2026-05-11〜05-17)
+        memo_in  = create(:book_memo, book: book_a, content: '期間内メモ',
+                          created_at: Time.zone.local(2026, 5, 15, 10, 0, 0))
+        # 期間外のメモ (2026-05-10 23:59 は範囲外)
+        _memo_out = create(:book_memo, book: book_a, content: '期間外メモ',
+                           created_at: Time.zone.local(2026, 5, 10, 23, 59, 59))
+        # 他ユーザーのメモは除外される
+        _other_memo = create(:book_memo, book: other_book, content: '他ユーザーメモ',
+                             created_at: Time.zone.local(2026, 5, 14, 10, 0, 0))
+
+        summary = described_class.call(user: user, period_type: :weekly, reference_date: reference_date)
+
+        memos = summary[:memo_details]
+        expect(memos.size).to eq(1)
+        expect(memos.first[:book_title]).to eq('リファクタリング')
+        expect(memos.first[:content]).to eq('期間内メモ')
+        expect(memos.first[:created_at]).to eq(Date.new(2026, 5, 15))
+      end
+
+      it 'page_number があるメモは page_number を返す' do
+        reference_date = Date.new(2026, 5, 17)
+        create(:book_memo, :with_page_number, book: book_a, content: 'ページ番号付きメモ',
+               created_at: Time.zone.local(2026, 5, 12, 9, 0, 0))
+
+        summary = described_class.call(user: user, period_type: :weekly, reference_date: reference_date)
+
+        expect(summary[:memo_details].first[:page_number]).to eq('100-120')
+      end
+
+      it 'メモがない場合は空配列を返す' do
+        summary = described_class.call(user: user, period_type: :weekly,
+                                       reference_date: Date.new(2026, 5, 17))
+
+        expect(summary[:memo_details]).to eq([])
+      end
+    end
   end
 end
