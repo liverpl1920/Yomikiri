@@ -10,7 +10,11 @@ class BookMemosController < ApplicationController
   def create
     @book_memo = @book.book_memos.build(book_memo_params)
     if @book_memo.save
-      redirect_to @book, notice: "メモを追加しました。"
+      @new_book_memo = @book.book_memos.build
+      respond_to do |format|
+        format.turbo_stream
+        format.html { redirect_to @book, notice: "メモを追加しました。" }
+      end
     else
       @book_memos = @book.book_memos.latest_first
       @new_book_memo = @book_memo

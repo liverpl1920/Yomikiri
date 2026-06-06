@@ -20,7 +20,23 @@ RSpec.describe 'BookMemos', type: :request do
       before { sign_in user }
 
       context '有効なパラメータの場合' do
-        it '302リダイレクトを返す' do
+        it 'turbo_streamリクエスト時に200を返す' do
+          post book_book_memos_path(book),
+               params: { book_memo: { content: 'テストメモ' } },
+               headers: { 'Accept' => 'text/vnd.turbo-stream.html, text/html' }
+
+          expect(response).to have_http_status(:ok)
+        end
+
+        it 'turbo_streamリクエスト時にturbo-streamコンテントタイプでレスポンスする' do
+          post book_book_memos_path(book),
+               params: { book_memo: { content: 'テストメモ' } },
+               headers: { 'Accept' => 'text/vnd.turbo-stream.html, text/html' }
+
+          expect(response.content_type).to include('text/vnd.turbo-stream.html')
+        end
+
+        it 'HTMLリクエスト時に302リダイレクトを返す' do
           post book_book_memos_path(book), params: { book_memo: { content: 'テストメモ' } }
 
           expect(response).to redirect_to(book_path(book))
