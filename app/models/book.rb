@@ -92,6 +92,12 @@ class Book < ApplicationRecord
     relation = relation.translator_like(params[:translator]) if params[:translator].present?
     relation = relation.completed_from(params[:completed_from]) if params[:completed_from].present?
     relation = relation.completed_to(params[:completed_to]) if params[:completed_to].present?
+    if params[:memo_keyword].present?
+      memo_book_ids = BookMemo.where(book_id: relation.select(:id))
+                              .content_like(params[:memo_keyword])
+                              .select(:book_id)
+      relation = relation.where(id: memo_book_ids)
+    end
     relation
   end
 

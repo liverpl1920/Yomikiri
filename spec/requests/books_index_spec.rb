@@ -172,11 +172,12 @@ RSpec.describe 'Books index search', type: :request do
     end
   end
 
-  describe 'GET /books?memo_keyword=xxx （メモ検索）' do
+  describe 'GET /books?memo_keyword=xxx （メモ統合検索）' do
     let(:user) { create(:user) }
     let(:other_user) { create(:user) }
     let(:book) { create(:book, user: user, title: 'テスト書籍', status: :reading, deadline: Date.current + 5) }
     let(:other_book) { create(:book, user: other_user, title: '他ユーザーの本', status: :reading) }
+    let(:no_memo_book) { create(:book, user: user, title: 'メモなし書籍', status: :unread, deadline: Date.current + 10) }
 
     context '未ログインの場合' do
       it 'ログイン画面へリダイレクトされる' do
@@ -199,48 +200,57 @@ RSpec.describe 'Books index search', type: :request do
         expect(response).to have_http_status(:ok)
       end
 
-      it 'キーワードに一致するメモ内容が表示される' do
+      it 'キーワードに一致するメモを持つ本のタイトルが表示される' do
         get books_path, params: { memo_keyword: '重要' }
 
-        expect(response.body).to include('ここが重要なポイントです')
+        expect(rendered_titles).to include(book.title)
       end
 
-      it 'キーワードに一致しないメモは表示されない' do
+      it 'キーワードに一致しないメモのみを持つ本は表示されない' do
+        book_without_match = create(:book, user: user, title: 'マッチしない本', status: :unread, deadline: Date.current + 3)
+        create(:book_memo, book: book_without_match, content: '関係のない内容')
+
         get books_path, params: { memo_keyword: '重要' }
 
-        expect(response.body).not_to include('別の内容のメモ')
+        expect(rendered_titles).not_to include(book_without_match.title)
       end
 
-      it '他ユーザーのメモは検索対象外になる' do
+      it '他ユーザーのメモにマッチする本は表示されない' do
         get books_path, params: { memo_keyword: '重要' }
 
-        expect(response.body).not_to include('重要な他ユーザーメモ')
+        expect(rendered_titles).not_to include(other_book.title)
       end
 
-      it 'メモに紐づく本のタイトルが表示される' do
-        get books_path, params: { memo_keyword: '重要' }
-
-        expect(response.body).to include(book.title)
-      end
-
-      it '検索結果0件の場合はメモが見つからないメッセージを表示する' do
+      it '検索結果0件の場合は条件に一致する本がないメッセージを表示する' do
         get books_path, params: { memo_keyword: '存在しないキーワード' }
 
-        expect(response.body).to include('メモが見つかりません')
+        expect(response.body).to include('条件に一致する本がありません')
       end
 
       it 'memo_keywordがない場合は本の一覧を表示する' do
+        no_memo_book
+
         get books_path
 
         doc = Nokogiri::HTML.parse(response.body)
         expect(doc.css('.book-card__title')).not_to be_empty
-        expect(response.body).not_to include('メモが見つかりません')
+        expect(response.body).not_to include('条件に一致する本がありません')
       end
 
       it '検索キーワードがフォームに保持される' do
         get books_path, params: { memo_keyword: '重要' }
 
         expect(response.body).to include('value="重要"')
+      end
+
+      it 'memo_keywordとtitleを同時に指定してAND検索できる' do
+        another_book = create(:book, user: user, title: '別の書籍', status: :unread, deadline: Date.current + 7)
+        create(:book_memo, book: another_book, content: '重要なメモ')
+
+        get books_path, params: { memo_keyword: '重要', title: 'テスト' }
+
+        expect(rendered_titles).to include(book.title)
+        expect(rendered_titles).not_to include(another_book.title)
       end
     end
   end
