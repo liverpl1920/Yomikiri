@@ -16,19 +16,7 @@ class BooksController < ApplicationController
   def index
     @search_params = normalized_index_search_params
     @search_active = @search_params.values.any?(&:present?)
-    @memo_keyword = params[:memo_keyword].presence
-    @memo_search_active = @memo_keyword.present?
-
-    if @memo_search_active
-      @memos = BookMemo.where(book_id: current_user.books.ids)
-                       .content_like(@memo_keyword)
-                       .includes(:book)
-                       .order(created_at: :desc)
-      @books = current_user.books.none
-    else
-      @memos = []
-      @books = current_user.books.with_attached_cover_image.filtered_for_index(@search_params)
-    end
+    @books = current_user.books.with_attached_cover_image.filtered_for_index(@search_params)
   end
 
   def new
@@ -307,12 +295,13 @@ class BooksController < ApplicationController
   end
 
   def normalized_index_search_params
-    permitted = params.permit(:title, :author, :genre, :publisher, :translator, :completed_from, :completed_to)
+    permitted = params.permit(:title, :author, :genre, :publisher, :translator, :completed_from, :completed_to, :memo_keyword)
     title = permitted[:title].to_s.strip
     author = permitted[:author].to_s.strip
     genre = permitted[:genre].to_s.strip
     publisher = permitted[:publisher].to_s.strip
     translator = permitted[:translator].to_s.strip
+    memo_keyword = permitted[:memo_keyword].to_s.strip
     completed_from = parse_iso_date(permitted[:completed_from])
     completed_to = parse_iso_date(permitted[:completed_to])
 
@@ -326,6 +315,7 @@ class BooksController < ApplicationController
       genre: genre.presence,
       publisher: publisher.presence,
       translator: translator.presence,
+      memo_keyword: memo_keyword.presence,
       completed_from: completed_from,
       completed_to: completed_to
     }

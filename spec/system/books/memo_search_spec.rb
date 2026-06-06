@@ -14,51 +14,51 @@ RSpec.describe 'メモ検索機能', type: :system do
   end
 
   describe 'メモ検索フォームの表示' do
-    it '一覧画面にメモ検索フォームが表示される' do
+    it '一覧画面の検索フォームにメモ内容フィールドが表示される' do
       visit books_path
 
       expect(page).to have_field('memo_keyword')
-      expect(page).to have_button('メモを検索')
+      expect(page).to have_field('メモ内容')
     end
   end
 
   describe 'メモ検索の実行' do
     let!(:matching_memo) { create(:book_memo, book: book, content: '重要なポイントです') }
-    let!(:other_memo) { create(:book_memo, book: book, content: '別の内容') }
-
-    it 'キーワードで検索するとメモ一覧が表示される' do
-      visit books_path
-
-      fill_in 'memo_keyword', with: '重要'
-      click_button 'メモを検索'
-
-      expect(page).to have_content('重要なポイントです')
-      expect(page).not_to have_content('別の内容')
+    let!(:no_match_book) do
+      create(:book, user: user, title: 'マッチしない本', status: :unread, deadline: Date.current + 10)
     end
 
-    it 'メモ一覧にメモが属する本のタイトルが表示される' do
+    it '検索フォームのメモ内容欄にキーワードを入力して検索するとメモを持つ本が表示される' do
       visit books_path
 
       fill_in 'memo_keyword', with: '重要'
-      click_button 'メモを検索'
+      find('#books-search-submit').click
 
       expect(page).to have_content(book.title)
     end
 
-    it '検索結果が0件の場合は空メッセージが表示される' do
+    it 'メモにマッチしない本は表示されない' do
+      visit books_path
+
+      fill_in 'memo_keyword', with: '重要'
+      find('#books-search-submit').click
+
+      expect(page).not_to have_content(no_match_book.title)
+    end
+
+    it '検索結果が0件の場合は条件に一致する本がないメッセージが表示される' do
       visit books_path
 
       fill_in 'memo_keyword', with: '存在しないキーワード'
-      click_button 'メモを検索'
+      find('#books-search-submit').click
 
-      expect(page).to have_content('メモが見つかりません')
+      expect(page).to have_content('条件に一致する本がありません')
     end
 
     it 'クリアリンクをクリックすると本の一覧に戻る' do
       visit books_path(memo_keyword: '重要')
 
-      expect(page).to have_css('#memo-search-clear')
-      find('#memo-search-clear').click
+      click_link 'クリア'
 
       expect(current_path).to eq(books_path)
       expect(page).to have_content(book.title)
@@ -68,13 +68,13 @@ RSpec.describe 'メモ検索機能', type: :system do
   describe 'アクセス制御' do
     let!(:other_memo) { create(:book_memo, book: other_book, content: '他ユーザーの重要メモ') }
 
-    it '他ユーザーのメモは検索結果に含まれない' do
+    it '他ユーザーのメモにマッチする本は検索結果に含まれない' do
       visit books_path
 
       fill_in 'memo_keyword', with: '重要'
-      click_button 'メモを検索'
+      find('#books-search-submit').click
 
-      expect(page).not_to have_content('他ユーザーの重要メモ')
+      expect(page).not_to have_content(other_book.title)
     end
   end
 end
