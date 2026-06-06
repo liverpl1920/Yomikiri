@@ -541,15 +541,15 @@ RSpec.describe Book, type: :model do
       expect(result.first.id).to eq(book_unread.id)
     end
 
-    it '読了済みの本が複数ある場合も期限順に並ぶ' do
-      book_completed_far  = create(:book, user: user, deadline: Date.current + 20, status: :completed)
-      book_completed_near = create(:book, user: user, deadline: Date.current + 5, status: :completed)
+    it '読了済みの本が複数ある場合は読了日の新しい順に並ぶ' do
+      book_completed_old  = create(:book, user: user, status: :completed, completed_at: 10.days.ago)
+      book_completed_new  = create(:book, user: user, status: :completed, completed_at: 2.days.ago)
       book_unread         = create(:book, user: user, deadline: Date.current + 15, status: :unread)
 
       result = Book.where(user: user).for_index_list
       expect(result.first.id).to eq(book_unread.id)
-      expect(result.second.id).to eq(book_completed_near.id)
-      expect(result.last.id).to eq(book_completed_far.id)
+      expect(result.second.id).to eq(book_completed_new.id)
+      expect(result.last.id).to eq(book_completed_old.id)
     end
   end
 
