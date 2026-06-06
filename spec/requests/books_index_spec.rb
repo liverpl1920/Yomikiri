@@ -171,4 +171,77 @@ RSpec.describe 'Books index search', type: :request do
       end
     end
   end
+
+  describe 'GET /books?memo_keyword=xxx （メモ検索）' do
+    let(:user) { create(:user) }
+    let(:other_user) { create(:user) }
+    let(:book) { create(:book, user: user, title: 'テスト書籍', status: :reading, deadline: Date.current + 5) }
+    let(:other_book) { create(:book, user: other_user, title: '他ユーザーの本', status: :reading) }
+
+    context '未ログインの場合' do
+      it 'ログイン画面へリダイレクトされる' do
+        get books_path, params: { memo_keyword: 'テスト' }
+
+        expect(response).to redirect_to(new_user_session_path)
+      end
+    end
+
+    context 'ログイン済みの場合' do
+      before { sign_in user }
+
+      let!(:matching_memo) { create(:book_memo, book: book, content: 'ここが重要なポイントです') }
+      let!(:other_memo) { create(:book_memo, book: book, content: '別の内容のメモ') }
+      let!(:other_user_memo) { create(:book_memo, book: other_book, content: '重要な他ユーザーメモ') }
+
+      it '200を返す' do
+        get books_path, params: { memo_keyword: '重要' }
+
+        expect(response).to have_http_status(:ok)
+      end
+
+      it 'キーワードに一致するメモ内容が表示される' do
+        get books_path, params: { memo_keyword: '重要' }
+
+        expect(response.body).to include('ここが重要なポイントです')
+      end
+
+      it 'キーワードに一致しないメモは表示されない' do
+        get books_path, params: { memo_keyword: '重要' }
+
+        expect(response.body).not_to include('別の内容のメモ')
+      end
+
+      it '他ユーザーのメモは検索対象外になる' do
+        get books_path, params: { memo_keyword: '重要' }
+
+        expect(response.body).not_to include('重要な他ユーザーメモ')
+      end
+
+      it 'メモに紐づく本のタイトルが表示される' do
+        get books_path, params: { memo_keyword: '重要' }
+
+        expect(response.body).to include(book.title)
+      end
+
+      it '検索結果0件の場合はメモが見つからないメッセージを表示する' do
+        get books_path, params: { memo_keyword: '存在しないキーワード' }
+
+        expect(response.body).to include('メモが見つかりません')
+      end
+
+      it 'memo_keywordがない場合は本の一覧を表示する' do
+        get books_path
+
+        doc = Nokogiri::HTML.parse(response.body)
+        expect(doc.css('.book-card__title')).not_to be_empty
+        expect(response.body).not_to include('メモが見つかりません')
+      end
+
+      it '検索キーワードがフォームに保持される' do
+        get books_path, params: { memo_keyword: '重要' }
+
+        expect(response.body).to include('value="重要"')
+      end
+    end
+  end
 end

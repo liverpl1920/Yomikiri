@@ -133,7 +133,28 @@
       </div>
     <% end %>
 
-    <% if @books.empty? %>
+    <%# メモ検索フォーム %>
+    <%= form_with url: books_path, method: :get, local: true,
+                  id: "memo-search-form",
+                  class: "books-index__memo-search" do %>
+      <div class="books-index__memo-search-fields">
+        <label for="memo_keyword" class="books-index__search-label">メモ検索</label>
+        <%= text_field_tag :memo_keyword, @memo_keyword,
+              id: "memo_keyword",
+              class: "books-index__search-input books-index__memo-search-input",
+              placeholder: "メモ内容のキーワードで検索" %>
+        <%= submit_tag "メモを検索", class: "btn btn--secondary",
+              id: "memo-search-submit" %>
+        <% if @memo_search_active %>
+          <%= link_to "クリア", books_path, class: "btn btn--ghost",
+                id: "memo-search-clear" %>
+        <% end %>
+      </div>
+    <% end %>
+
+    <% if @memo_search_active %>
+      <%= render 'memo_search_results', memos: @memos, memo_keyword: @memo_keyword %>
+    <% elsif @books.empty? %>
       <%# Empty State %>
       <div class="books-empty">
         <div class="books-empty__icon" aria-hidden="true">📚</div>
@@ -151,7 +172,7 @@
           <%= link_to "最初の本を登録して始める", new_book_path, class: "btn btn--primary btn--lg" %>
         <% end %>
       </div>
-    <% else %>
+    <% elsif !@memo_search_active %>
       <ul class="book-list" aria-label="積読一覧">
         <% @books.each do |book| %>
         <li class="book-list__item">
