@@ -27,7 +27,8 @@ class ReadingReportSummaryService
       books:,
       total_pages:,
       daily_pages:,
-      reading_log_details:
+      reading_log_details:,
+      memo_details:
     }
   end
 
@@ -101,6 +102,24 @@ class ReadingReportSummaryService
           start_page: log.start_page,
           end_page: log.end_page,
           pages_read: log.pages_read
+        }
+      end
+  end
+
+  def memo_details
+    start_dt = period_range.begin.beginning_of_day
+    end_dt   = (period_range.end + 1.day).beginning_of_day
+    BookMemo
+      .joins(:book)
+      .where(books: { user_id: user.id }, created_at: start_dt...end_dt)
+      .includes(:book)
+      .order(created_at: :desc)
+      .map do |memo|
+        {
+          book_title:  memo.book.title,
+          page_number: memo.page_number,
+          content:     memo.content,
+          created_at:  memo.created_at.to_date
         }
       end
   end
