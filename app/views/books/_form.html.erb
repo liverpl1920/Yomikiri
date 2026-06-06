@@ -1,5 +1,6 @@
 <%= form_with(model: book,
                multipart: true,
+               html: { autocomplete: 'off' },
                data: {
                  controller: 'book-form'
                }) do |f| %>
