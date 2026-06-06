@@ -57,12 +57,22 @@ class Book < ApplicationRecord
     translator.to_s.split(/[,，]/).map(&:strip).reject(&:blank?)
   end
 
-  # 積読一覧用ソートスコープ：未了本を期限順 → 読了本を期限順
+  # 積読一覧用ソートスコープ：未了本を期限順 → 読了本を読了日の新しい順
   scope :for_index_list, lambda {
     completed_val = statuses[:completed]
     status_col = arel_table[:status]
-    ordering = Arel::Nodes::Case.new.when(status_col.eq(completed_val)).then(1).else(0)
-    order(ordering, :deadline)
+    deadline_col = arel_table[:deadline]
+    completed_at_col = arel_table[:completed_at]
+
+    # 1次ソート：未了本(0) → 読了本(1)
+    group_order = Arel::Nodes::Case.new.when(status_col.eq(completed_val)).then(1).else(0)
+
+    # 2次ソート：未了本は deadline 昇順、読了本は completed_at 降順のキーを CASE で切り替え
+    # 読了本には deadline を NULL 相当に、未了本には completed_at を NULL 相当にする
+    deadline_key = Arel::Nodes::Case.new.when(status_col.eq(completed_val)).then(nil).else(deadline_col)
+    completed_at_desc_key = Arel::Nodes::Case.new.when(status_col.eq(completed_val)).then(completed_at_col).else(nil)
+
+    order(group_order, deadline_key.asc.nulls_last, completed_at_desc_key.desc.nulls_last)
   }
 
   scope :title_like, ->(query) { where("title ILIKE ?", "%#{sanitize_sql_like(query)}%") }
