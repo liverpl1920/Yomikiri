@@ -239,7 +239,7 @@ RSpec.describe 'Books', type: :request do
             user: { email: user.email, password: password }
           }
 
-          expect(response).to redirect_to(books_path)
+          expect(response).to redirect_to(dashboard_path)
         end
       end
     end

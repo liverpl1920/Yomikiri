@@ -43,6 +43,6 @@ RSpec.describe 'パスワード再設定', type: :system do
     fill_in 'パスワード', with: 'newpassword123'
     click_button 'ログインする'
 
-    expect(page).to have_current_path(books_path)
+    expect(page).to have_current_path(dashboard_path)
   end
 end

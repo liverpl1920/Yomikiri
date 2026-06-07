@@ -1,31 +1,30 @@
-# Files in the config/locales directory are used for internationalization and
-# are automatically loaded by Rails. If you want to use locales other than
-# English, add the necessary files in this directory.
-#
-# To use the locales, use `I18n.t`:
-#
-#     I18n.t "hello"
-#
-# In views, this is aliased to just `t`:
-#
-#     <%= t("hello") %>
-#
-# To use a different locale, set it with `I18n.locale`:
-#
-#     I18n.locale = :es
-#
-# This would use the information in config/locales/es.yml.
-#
-# To learn more about the API, please read the Rails Internationalization guide
-# at https://guides.rubyonrails.org/i18n.html.
-#
-# Be aware that YAML interprets the following case-insensitive strings as
-# booleans: `true`, `false`, `on`, `off`, `yes`, `no`. Therefore, these strings
-# must be quoted to be interpreted as strings. For example:
-#
-#     en:
-#       "yes": yup
-#       enabled: "ON"
+# frozen_string_literal: true
 
 en:
   hello: "Hello world"
+  book:
+    book_card:
+      pages: "Pages"
+      daily_quota_label: "Daily Quota"
+      pages_per_day: "Pages/Day"
+      overdue_quota: "Overdue (%{count} Pages)"
+      no_quota_today: "No quota today"
+      overdue: "Overdue"
+      urgent_alert: "%{days} days left"
+  dashboards:
+    show:
+      welcome_back: "Welcome back, %{user}"
+      current_reads: "Current Reads"
+      no_reading_books: "You have no books in progress."
+      stats: "Reading Stats"
+      total_pages: "Total Pages"
+      total_books: "Books Finished"
+      streak: "Reading Streak"
+      reading_goal: "Reading Goal"
+      total_daily_quota: "Today's Quota"
+      yearly_goal: "%{year} Goal"
+      books_count: "books"
+      weekly_activity: "Weekly Activity"
+      recently_finished: "Recently Finished"
+      no_completed_books: "No recently finished books."
+      add_book: "Add Book"

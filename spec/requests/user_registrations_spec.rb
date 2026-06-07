@@ -3,7 +3,7 @@ require 'rails_helper'
 RSpec.describe 'UserRegistrations', type: :request do
   describe 'POST /users' do
     context '正しい情報で新規登録した場合' do
-      it '積読一覧ページへリダイレクトされる' do
+      it 'ダッシュボードページへリダイレクトされる' do
         post user_registration_path, params: {
           user: {
             email: 'newuser@example.com',
@@ -13,7 +13,7 @@ RSpec.describe 'UserRegistrations', type: :request do
           }
         }
 
-        expect(response).to redirect_to(books_path)
+        expect(response).to redirect_to(dashboard_path)
       end
     end
 

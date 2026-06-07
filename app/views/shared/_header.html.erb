@@ -1,10 +1,12 @@
 <header class="site-header">
   <div class="container site-header__inner">
-    <%= link_to 'Yomikiri', user_signed_in? ? books_path : root_path, class: 'site-header__logo' %>
+    <%= link_to 'Yomikiri', user_signed_in? ? dashboard_path : root_path, class: 'site-header__logo' %>
 
     <% if user_signed_in? %>
       <%# ログイン済みヘッダー %>
-      <nav class="site-header__nav" aria-label="ユーザーメニュー">
+      <nav class="site-header__nav" aria-label="メインナビゲーション">
+        <%= link_to 'ダッシュボード', dashboard_path, class: 'site-header__nav-link' %>
+        <%= link_to '積読一覧', books_path, class: 'site-header__nav-link' %>
         <div
           class="dropdown"
           data-controller="dropdown"
@@ -24,6 +26,9 @@
             <span class="dropdown__caret" aria-hidden="true">▾</span>
           </button>
           <ul class="dropdown__menu" data-dropdown-target="menu" role="menu">
+            <li role="none">
+              <%= link_to 'ダッシュボード', dashboard_path, class: 'dropdown__item', role: 'menuitem' %>
+            </li>
             <li role="none">
               <%= link_to 'マイページ', mypage_path, class: 'dropdown__item', role: 'menuitem' %>
             </li>

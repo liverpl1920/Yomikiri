@@ -14,7 +14,7 @@ RSpec.describe 'ログイン・ログアウト', type: :system do
       fill_in 'パスワード', with: password
       click_button 'ログインする'
 
-      expect(page).to have_current_path(books_path)
+      expect(page).to have_current_path(dashboard_path)
     end
 
     it '誤ったパスワードではログインに失敗してエラーメッセージが表示される' do
@@ -41,7 +41,7 @@ RSpec.describe 'ログイン・ログアウト', type: :system do
       login_as(user, scope: :user)
       visit new_user_session_path
 
-      expect(page).to have_current_path(books_path)
+      expect(page).to have_current_path(dashboard_path)
     end
   end
 

@@ -15,7 +15,7 @@ module SystemSpecSignInHelper
     fill_in 'メールアドレス', with: user.email
     fill_in 'パスワード', with: password
     click_button 'ログインする'
-    expect(page).to have_current_path(books_path)
+    expect(page).to have_current_path(dashboard_path)
   end
 
   # rack_test 向けの高速ログイン（Warden::Test::Helpers を経由）

@@ -24,7 +24,7 @@ module Users
     end
 
     def after_sign_up_path_for(resource)
-      books_path
+      dashboard_path
     end
 
     private

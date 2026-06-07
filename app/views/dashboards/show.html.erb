@@ -1,0 +1,209 @@
+<% content_for :title, "ダッシュボード | Yomikiri" %>
+
+<div class="dashboard container">
+  <!-- Welcome ヘッダー -->
+  <header class="dashboard__header">
+    <div class="dashboard__welcome">
+      <h1 class="dashboard__title">
+        <%= t('.welcome_back', user: current_user.display_name) %>
+      </h1>
+      <p class="dashboard__date">
+        <%= l(Date.current, format: :long) %> (<%= %w[日 月 火 水 木 金 土][Date.current.wday] %>)
+      </p>
+    </div>
+  </header>
+
+  <div class="dashboard__grid">
+    <!-- 左カラム: 進行中の書籍 (Current Reads) -->
+    <section class="dashboard__section dashboard__section--main">
+      <h2 class="dashboard__section-title"><%= t('.current_reads') %></h2>
+
+      <% if @reading_books.any? %>
+        <div class="dashboard__book-list">
+          <% @reading_books.each do |book| %>
+            <div class="dashboard__book-card">
+              <!-- 書影 -->
+              <div class="dashboard__book-cover-wrapper">
+                <div class="dashboard__book-cover <%= book.deadline_urgency_class %>">
+                  <% if src = book_cover_src(book) %>
+                    <%= image_tag src, alt: book.title, class: "dashboard__book-cover-image" %>
+                  <% else %>
+                    <span class="dashboard__book-cover-placeholder">📖</span>
+                  <% end %>
+                </div>
+                <% if book.overdue? %>
+                  <span class="dashboard__urgency-badge"><%= t('book.book_card.overdue') %></span>
+                <% elsif book.days_remaining.present? && book.days_remaining <= 3 %>
+                  <span class="dashboard__urgency-badge"><%= t('book.book_card.urgent_alert', days: book.days_remaining) %></span>
+                <% end %>
+              </div>
+
+              <!-- 書籍詳細 -->
+              <div class="dashboard__book-info">
+                <h3 class="dashboard__book-title">
+                  <%= link_to book.title, book_path(book) %>
+                </h3>
+                <p class="dashboard__book-author"><%= book.author %></p>
+
+                <!-- 進捗バー -->
+                <div class="dashboard__progress">
+                  <div class="dashboard__progress-header">
+                    <span class="dashboard__progress-text">
+                      <%= book.current_page %> / <%= book.pages %> <%= t('book.book_card.pages') %>
+                    </span>
+                    <span class="dashboard__progress-percentage"><%= book.progress_percentage %>%</span>
+                  </div>
+                  <div class="dashboard__progress-bar-wrapper">
+                    <div class="dashboard__progress-bar" style="width: <%= book.progress_percentage %>%"></div>
+                  </div>
+                </div>
+
+                <!-- ノルマ表示 (木製プレート風) -->
+                <% if book.daily_quota > 0 %>
+                  <div class="dashboard__quota">
+                    <span class="dashboard__quota-label"><%= t('book.book_card.daily_quota_label') %></span>
+                    <span class="dashboard__quota-value">
+                      <% if book.overdue? %>
+                        <span class="dashboard__quota-value--overdue">
+                          <%= t('book.book_card.overdue_quota', count: book.daily_quota) %>
+                        </span>
+                      <% else %>
+                        <strong><%= book.daily_quota %></strong> <%= t('book.book_card.pages_per_day') %>
+                      <% end %>
+                    </span>
+                  </div>
+                <% else %>
+                  <div class="dashboard__quota dashboard__quota--completed">
+                    <span class="dashboard__quota-label"><%= t('book.book_card.daily_quota_label') %></span>
+                    <span class="dashboard__quota-value"><%= t('book.book_card.no_quota_today') %></span>
+                  </div>
+                <% end %>
+              </div>
+
+              <!-- アクションボタン -->
+              <div class="dashboard__book-actions">
+                <%= link_to t('helpers.submit.update'), book_path(book), class: "btn btn--primary" %>
+              </div>
+            </div>
+          <% end %>
+        </div>
+      <% else %>
+        <div class="dashboard__empty">
+          <p class="dashboard__empty-icon">📚</p>
+          <p class="dashboard__empty-text"><%= t('.no_reading_books') %></p>
+          <%= link_to t('.add_book'), new_book_path, class: "btn btn--primary" %>
+        </div>
+      <% end %>
+    </section>
+
+    <!-- 右カラム: 統計、目標、アクティビティ、最近読了 -->
+    <div class="dashboard__sidebar">
+      <!-- 読書統計 (Stats) -->
+      <section class="dashboard__card dashboard__stats">
+        <h2 class="dashboard__card-title"><%= t('.stats') %></h2>
+        <div class="dashboard__stats-grid">
+          <div class="dashboard__stat-item">
+            <span class="dashboard__stat-number"><%= @total_pages_read %></span>
+            <span class="dashboard__stat-label"><%= t('.total_pages') %></span>
+          </div>
+          <div class="dashboard__stat-item">
+            <span class="dashboard__stat-number"><%= @total_books_read %></span>
+            <span class="dashboard__stat-label"><%= t('.total_books') %></span>
+          </div>
+          <div class="dashboard__stat-item">
+            <span class="dashboard__stat-number"><%= @streak_days %></span>
+            <span class="dashboard__stat-label"><%= t('.streak') %></span>
+          </div>
+        </div>
+      </section>
+
+      <!-- 今日の目標 (Goal Progress) & 今日の総ノルマ -->
+      <section class="dashboard__card dashboard__goals">
+        <h2 class="dashboard__card-title"><%= t('.reading_goal') %></h2>
+        <div class="dashboard__goal-summary">
+          <!-- 今日の総ノルマ -->
+          <div class="dashboard__goal-item">
+            <div class="dashboard__goal-quota">
+              <span class="dashboard__goal-quota-label"><%= t('.total_daily_quota') %></span>
+              <span class="dashboard__goal-quota-value">
+                <strong><%= @total_daily_quota %></strong> <%= t('book.book_card.pages') %>
+              </span>
+            </div>
+          </div>
+
+          <!-- 年間目標 (ダミーベース) -->
+          <div class="dashboard__goal-item">
+            <% yearly_target = 50 %>
+            <% goal_percentage = yearly_target > 0 ? [(@total_books_read.to_f / yearly_target * 100).round, 100].min : 0 %>
+            <div class="dashboard__goal-header">
+              <span class="dashboard__goal-label"><%= t('.yearly_goal', year: Date.current.year) %></span>
+              <span class="dashboard__goal-progress-text">
+                <%= @total_books_read %> / <%= yearly_target %> <%= t('.books_count') %>
+              </span>
+            </div>
+            <div class="dashboard__goal-bar-wrapper">
+              <div class="dashboard__goal-bar" style="width: <%= goal_percentage %>%"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- アクティビティグラフ (Activity Chart) -->
+      <section class="dashboard__card dashboard__activity">
+        <h2 class="dashboard__card-title"><%= t('.weekly_activity') %></h2>
+        <div class="dashboard__activity-chart">
+          <% max_pages = @weekly_activity.map { |_, p| p }.max %>
+          <% max_pages = 10 if max_pages.nil? || max_pages.zero? %>
+          <div class="activity-chart">
+            <% @weekly_activity.each do |date, pages| %>
+              <% height_pct = (pages.to_f / max_pages * 100).round %>
+              <div class="activity-chart__bar-group">
+                <div class="activity-chart__bar-wrapper" title="<%= l(date, format: :short) %>: <%= pages %>ページ">
+                  <div class="activity-chart__bar" style="height: <%= [height_pct, 5].max %>%">
+                    <% if pages > 0 %>
+                      <span class="activity-chart__bar-value"><%= pages %></span>
+                    <% end %>
+                  </div>
+                </div>
+                <span class="activity-chart__day"><%= %w[日 月 火 水 木 金 土][date.wday] %></span>
+              </div>
+            <% end %>
+          </div>
+        </div>
+      </section>
+
+      <!-- 最近読了した本 (Recently Finished) -->
+      <section class="dashboard__card dashboard__completed">
+        <h2 class="dashboard__card-title"><%= t('.recently_finished') %></h2>
+        <% if @recent_completed_books.any? %>
+          <div class="dashboard__completed-list">
+            <% @recent_completed_books.each do |book| %>
+              <%= link_to book_path(book), class: "dashboard__completed-item" do %>
+                <div class="dashboard__completed-cover">
+                  <% if src = book_cover_src(book) %>
+                    <%= image_tag src, alt: book.title, class: "dashboard__completed-cover-image" %>
+                  <% else %>
+                    <span class="dashboard__completed-cover-placeholder">📖</span>
+                  <% end %>
+                </div>
+                <div class="dashboard__completed-info">
+                  <h3 class="dashboard__completed-title"><%= book.title %></h3>
+                  <p class="dashboard__completed-author"><%= book.author %></p>
+                  <% if book.rating.present? %>
+                    <div class="dashboard__completed-rating">
+                      <span class="dashboard__completed-stars">
+                        <%= "★" * book.rating %><%= "☆" * (5 - book.rating) %>
+                      </span>
+                    </div>
+                  <% end %>
+                </div>
+              <% end %>
+            <% end %>
+          </div>
+        <% else %>
+          <p class="dashboard__completed-empty"><%= t('.no_completed_books') %></p>
+        <% end %>
+      </section>
+    </div>
+  </div>
+</div>
