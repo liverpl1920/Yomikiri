@@ -36,6 +36,20 @@ RSpec.describe 'ダッシュボード', type: :system do
         expect(page).to have_text("0 / 12")
       end
 
+      it '過去（前年以前）に読了した本が年間目標の進捗に含まれず、今年読了した本のみが含まれること' do
+        # 前年に読了した本
+        create(:book, user: user, status: :completed, title: '前年の本', completed_at: Time.current.prev_year)
+        # 今年に読了した本
+        create(:book, user: user, status: :completed, title: '今年の本', completed_at: Time.current)
+
+        visit dashboard_path
+
+        # 年間目標（今年読了した本のみが分子）
+        expect(page).to have_text("1 / 50")
+        # 読書統計の累計（全期間の合計）
+        expect(page).to have_text("2")
+      end
+
       it '進行中の本がない場合に空メッセージと登録リンクが表示されること' do
         visit dashboard_path
 
