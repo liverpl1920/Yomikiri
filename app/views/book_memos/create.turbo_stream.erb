@@ -1,4 +1,4 @@
-<%= turbo_stream.append "memo-timeline-list" do %>
+<%= turbo_stream.prepend "memo-timeline-list" do %>
   <%= render partial: 'book_memos/book_memo', locals: { book_memo: @book_memo, book: @book } %>
 <% end %>
 

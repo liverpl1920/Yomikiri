@@ -67,4 +67,36 @@ RSpec.describe '書籍詳細のUI状態', type: :system do
       expect(page).to have_text('MVPでは、Google側での予定の変更・削除はアプリ内に反映されません')
     end
   end
+
+  describe 'メモ機能の表示順と非同期追加' do
+    let!(:book) { create(:book, user: user, title: 'テスト対象書籍') }
+
+    it 'メモが作成日時の降順（最新が上）で初期表示されること' do
+      create(:book_memo, book: book, content: '古いメモ', created_at: 10.minutes.ago)
+      create(:book_memo, book: book, content: '新しいメモ', created_at: 1.minute.ago)
+
+      visit book_path(book)
+
+      items = all('.memo-timeline__item')
+      expect(items[0]).to have_text('新しいメモ')
+      expect(items[1]).to have_text('古いメモ')
+    end
+
+    it '新規メモを追加した際、非同期でリストの先頭に追加されること', js: true do
+      create(:book_memo, book: book, content: '既存のメモ', created_at: 10.minutes.ago)
+
+      visit book_path(book)
+      expect(page).to have_text('既存のメモ')
+
+      fill_in 'book_memo_content', with: '新規追加したメモ'
+      click_button 'メモを追加する'
+
+      # 非同期で追加されるのを待つ
+      expect(page).to have_text('新規追加したメモ')
+
+      items = all('.memo-timeline__item')
+      expect(items[0]).to have_text('新規追加したメモ')
+      expect(items[1]).to have_text('既存のメモ')
+    end
+  end
 end
