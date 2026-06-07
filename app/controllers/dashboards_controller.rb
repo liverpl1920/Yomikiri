@@ -14,6 +14,9 @@ class DashboardsController < ApplicationController
 
     # 読書統計
     @total_books_read = current_user.books.where(status: :completed).count
+    @this_year_books_read = current_user.books.where(status: :completed)
+                                              .where(completed_at: Time.current.all_year)
+                                              .count
     @total_pages_read = ReadingLog.joins(:book).where(books: { user_id: current_user.id }).sum(:pages_read)
 
     # 読書ストリーク計算 (昨日のログ、または今日のログがあればカウント)
