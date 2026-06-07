@@ -605,38 +605,6 @@ RSpec.describe Book, type: :model do
         expect(result).to include(no_translator)
       end
     end
-
-    context 'メモキーワード検索' do
-      let!(:book_with_memo) { create(:book, user: user, title: 'メモ付き書籍', status: :unread) }
-      let!(:book_without_memo) { create(:book, user: user, title: 'メモなし書籍', status: :unread) }
-      let!(:other_user) { create(:user) }
-      let!(:other_user_book) { create(:book, user: other_user, title: '他ユーザーの本', status: :unread) }
-      let!(:matching_memo) { create(:book_memo, book: book_with_memo, content: 'このメモは重要なポイントを含む') }
-      let!(:other_user_memo) { create(:book_memo, book: other_user_book, content: '重要な他ユーザーメモ') }
-
-      it 'メモ内容のキーワードで紐づく本を検索できる' do
-        result = user.books.filtered_for_index(memo_keyword: '重要')
-        expect(result).to include(book_with_memo)
-        expect(result).not_to include(book_without_memo)
-      end
-
-      it '他ユーザーのメモにマッチする本は返さない' do
-        result = user.books.filtered_for_index(memo_keyword: '重要')
-        expect(result).not_to include(other_user_book)
-      end
-
-      it 'memo_keywordが空の場合は絞り込まない' do
-        result = user.books.filtered_for_index(memo_keyword: nil)
-        expect(result).to include(book_with_memo)
-        expect(result).to include(book_without_memo)
-      end
-
-      it 'memo_keywordとtitleを組み合わせてAND検索できる' do
-        result = user.books.filtered_for_index(memo_keyword: '重要', title: 'メモ付き')
-        expect(result).to include(book_with_memo)
-        expect(result).not_to include(book_without_memo)
-      end
-    end
   end
 
 

@@ -16,7 +16,36 @@ class BooksController < ApplicationController
   def index
     @search_params = normalized_index_search_params
     @search_active = @search_params.values.any?(&:present?)
-    @books = current_user.books.with_attached_cover_image.filtered_for_index(@search_params)
+
+    book_search_keys = [ :title, :author, :genre, :publisher, :translator, :completed_from, :completed_to ]
+    book_search_active = @search_params.slice(*book_search_keys).values.any?(&:present?)
+
+    if @search_active
+      if book_search_active
+        @books = current_user.books.with_attached_cover_image.filtered_for_index(@search_params)
+      else
+        @books = Book.none
+      end
+
+      if @search_params[:memo_keyword].present?
+        if book_search_active
+          book_ids = @books.pluck(:id)
+          @memos = current_user.book_memos.includes(:book).joins(:book)
+                               .where(book_id: book_ids)
+                               .content_like(@search_params[:memo_keyword])
+                               .latest_first
+        else
+          @memos = current_user.book_memos.includes(:book).joins(:book)
+                               .content_like(@search_params[:memo_keyword])
+                               .latest_first
+        end
+      else
+        @memos = BookMemo.none
+      end
+    else
+      @books = current_user.books.with_attached_cover_image.filtered_for_index(@search_params)
+      @memos = BookMemo.none
+    end
   end
 
   def new
