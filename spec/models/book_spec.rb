@@ -667,6 +667,28 @@ RSpec.describe Book, type: :model do
         end
       end
     end
+
+    describe '#create_reading_log_for_past_reading (after_create)' do
+      context 'ステータスが completed（読了）で新規作成された場合' do
+        it '全ページ分の読書ログ（ReadingLog）が自動で作成されること' do
+          book = build(:book, pages: 300, is_past_reading: 'true', completed_at_input: '2026-06-01')
+          expect { book.save! }.to change(ReadingLog, :count).by(1)
+
+          log = book.reading_logs.last
+          expect(log.pages_read).to eq(300)
+          expect(log.read_at).to eq(Date.parse('2026-06-01'))
+          expect(log.start_page).to eq(1)
+          expect(log.end_page).to eq(300)
+        end
+      end
+
+      context 'ステータスが completed 以外（unreadなど）で新規作成された場合' do
+        it '読書ログは作成されないこと' do
+          book = build(:book, pages: 300, is_past_reading: 'false', status: :unread)
+          expect { book.save! }.not_to change(ReadingLog, :count)
+        end
+      end
+    end
   end
 
   describe 'ビジネスロジック' do

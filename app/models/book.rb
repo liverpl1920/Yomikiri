@@ -35,6 +35,7 @@ class Book < ApplicationRecord
 
   before_save :auto_set_reading_status
   before_save :apply_past_reading_settings
+  after_create :create_reading_log_for_past_reading, if: :completed?
 
   def extend_deadline!(new_deadline)
     return false if new_deadline.blank?
@@ -238,5 +239,14 @@ class Book < ApplicationRecord
     return if current_page.to_i.zero?
 
     self.status = :reading
+  end
+
+  def create_reading_log_for_past_reading
+    reading_logs.create!(
+      pages_read: pages,
+      read_at: completed_at&.to_date || Date.current,
+      start_page: 1,
+      end_page: pages
+    )
   end
 end
