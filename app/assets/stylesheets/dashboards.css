@@ -565,3 +565,160 @@
     top: -14px;
   }
 }
+
+/* ---- 過去のランダム振り返り (Lookback Card) ---- */
+.lookback-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  background-color: var(--color-bg-surface);
+}
+
+.lookback-card__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-xs);
+}
+
+.lookback-card__title {
+  margin-bottom: 0;
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.lookback-card__shuffle {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--color-text);
+  background-color: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius);
+  padding: 4px 8px;
+  text-decoration: none;
+  transition: background-color 0.2s, border-color 0.2s, color 0.2s;
+  cursor: pointer;
+}
+
+.lookback-card__shuffle:hover {
+  background-color: var(--color-bg-surface);
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+  text-decoration: none;
+}
+
+.lookback-card__shuffle-icon {
+  font-size: 0.9rem;
+}
+
+.lookback-card__book-info {
+  margin-bottom: var(--spacing-xs);
+  padding: var(--spacing-xs) 0;
+}
+
+.lookback-card__book-title {
+  font-size: var(--font-size-base);
+  font-weight: 700;
+  margin-bottom: 2px;
+  line-height: 1.4;
+}
+
+.lookback-card__book-title a {
+  color: var(--color-text);
+  text-decoration: none;
+}
+
+.lookback-card__book-title a:hover {
+  color: var(--color-primary);
+  text-decoration: underline;
+}
+
+.lookback-card__book-author {
+  font-size: 11px;
+  color: var(--color-text-muted);
+}
+
+.lookback-card__section {
+  border-radius: var(--border-radius);
+  padding: var(--spacing-sm) var(--spacing-md);
+  margin-top: var(--spacing-xs);
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.02);
+}
+
+/* 本全体の評価と感想枠 (マクロ視点) */
+.lookback-card__section--review {
+  background-color: var(--color-bg);
+  border: 1px solid var(--color-border);
+}
+
+/* 読書中のメモ枠 (ミクロ視点) */
+.lookback-card__section--memo {
+  background-color: var(--color-bg-surface);
+  border: 1px dashed var(--color-secondary);
+}
+
+.lookback-card__section-title {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--color-secondary);
+  margin-bottom: var(--spacing-xs);
+}
+
+.lookback-card__rating {
+  margin-bottom: var(--spacing-xs);
+}
+
+.lookback-card__stars {
+  color: #d97706;
+  font-size: 12px;
+  letter-spacing: 1px;
+}
+
+.lookback-card__no-rating {
+  font-size: 11px;
+  color: var(--color-text-muted);
+}
+
+.lookback-card__review {
+  font-size: var(--font-size-sm);
+  color: var(--color-text);
+  line-height: 1.6;
+}
+
+.lookback-card__review p {
+  margin-bottom: 0;
+}
+
+.lookback-card__no-review {
+  font-size: 12px;
+  color: var(--color-text-muted);
+  font-style: italic;
+  margin: 0;
+}
+
+.lookback-card__memo-body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.lookback-card__memo-content {
+  font-size: var(--font-size-sm);
+  color: var(--color-text);
+  line-height: 1.6;
+  margin: 0;
+}
+
+.lookback-card__memo-content p {
+  margin-bottom: 0;
+}
+
+.lookback-card__memo-page {
+  font-size: 11px;
+  color: var(--color-text-muted);
+  align-self: flex-end;
+  font-style: normal;
+}

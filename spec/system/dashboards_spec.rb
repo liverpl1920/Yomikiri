@@ -54,6 +54,24 @@ RSpec.describe 'ダッシュボード', type: :system do
         expect(page).to have_text('読了テスト本')
         expect(page).to have_text('★★★★★')
       end
+
+      it '過去の振り返り（ランダム振り返り）セクションが表示され、シャッフル動作が機能すること' do
+        completed_book1 = create(:book, user: user, status: :completed, title: '過去の読了本A', rating: 4, review: 'Aの感想', completed_at: Date.current)
+        create(:book_memo, book: completed_book1, content: 'Aのメモ', page_number: '10')
+
+        completed_book2 = create(:book, user: user, status: :completed, title: '過去の読了本B', rating: 5, review: 'Bの感想', completed_at: Date.current)
+        create(:book_memo, book: completed_book2, content: 'Bのメモ', page_number: '20')
+
+        visit dashboard_path
+
+        expect(page).to have_text(I18n.t('dashboards.lookback.lookback_title'))
+        expect(page).to have_css('.lookback-card')
+        expect(page).to have_link('別の本')
+
+        # シャッフルリンクのクリック
+        click_link '別の本'
+        expect(page).to have_css('.lookback-card')
+      end
     end
   end
 end

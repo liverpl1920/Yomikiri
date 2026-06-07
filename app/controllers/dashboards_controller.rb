@@ -21,6 +21,13 @@ class DashboardsController < ApplicationController
 
     # 週次アクティビティ (過去7日間の日別読了ページ数)
     @weekly_activity = calculate_weekly_activity
+
+    set_random_lookback
+  end
+
+  def lookback
+    set_random_lookback
+    render partial: "dashboards/random_lookback", locals: { random_book: @random_book, random_memo: @random_memo }
   end
 
   private
@@ -61,5 +68,12 @@ class DashboardsController < ApplicationController
                       .group(:read_at)
                       .sum(:pages_read)
     (start_date..Date.current).map { |date| [ date, logs[date] || 0 ] }
+  end
+
+  def set_random_lookback
+    @random_book = current_user.books.completed.order("RANDOM()").first
+    if @random_book
+      @random_memo = @random_book.book_memos.order("RANDOM()").first
+    end
   end
 end

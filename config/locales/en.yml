@@ -28,3 +28,11 @@ en:
       recently_finished: "Recently Finished"
       no_completed_books: "No recently finished books."
       add_book: "Add Book"
+    lookback:
+      lookback_title: "Past Reading Lookback"
+      shuffle_btn: "Shuffle"
+      overall_review: "【Overall Review】"
+      reading_memos: "【Reading Memos】"
+      no_rating: "No Rating"
+      no_review: "(No review written)"
+

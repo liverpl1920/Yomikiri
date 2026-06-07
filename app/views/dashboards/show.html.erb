@@ -172,6 +172,9 @@
         </div>
       </section>
 
+      <!-- 過去の振り返り（ランダムピックアップ） -->
+      <%= render "dashboards/random_lookback", random_book: @random_book, random_memo: @random_memo %>
+
       <!-- 最近読了した本 (Recently Finished) -->
       <section class="dashboard__card dashboard__completed">
         <h2 class="dashboard__card-title"><%= t('.recently_finished') %></h2>
