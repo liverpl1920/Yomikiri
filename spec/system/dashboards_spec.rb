@@ -78,10 +78,10 @@ RSpec.describe 'ダッシュボード', type: :system do
       end
 
       it '過去の振り返り（ランダム振り返り）セクションが表示され、シャッフル動作が機能すること' do
-        completed_book1 = create(:book, user: user, status: :completed, title: '過去の読了本A', rating: 4, review: 'Aの感想', completed_at: Date.current)
+        completed_book1 = create(:book, user: user, status: :completed, title: '過去の読了本A', rating: 4, review: 'Aの感想', completed_at: Date.new(2026, 6, 1))
         create(:book_memo, book: completed_book1, content: 'Aのメモ', page_number: '10')
 
-        completed_book2 = create(:book, user: user, status: :completed, title: '過去の読了本B', rating: 5, review: 'Bの感想', completed_at: Date.current)
+        completed_book2 = create(:book, user: user, status: :completed, title: '過去の読了本B', rating: 5, review: 'Bの感想', completed_at: Date.new(2026, 6, 2))
         create(:book_memo, book: completed_book2, content: 'Bのメモ', page_number: '20')
 
         visit dashboard_path
@@ -90,9 +90,26 @@ RSpec.describe 'ダッシュボード', type: :system do
         expect(page).to have_css('.lookback-card')
         expect(page).to have_link('別の本')
 
+        # 読了日が表示されていることの確認
+        within '.lookback-card' do
+          if page.has_text?('過去の読了本A')
+            expect(page).to have_text("読了日: 2026/06/01")
+          else
+            expect(page).to have_text("読了日: 2026/06/02")
+          end
+        end
+
         # シャッフルリンクのクリック
         click_link '別の本'
         expect(page).to have_css('.lookback-card')
+      end
+
+      it '読了日が設定されていない本（nil）の場合、読了日に「不明」と表示されること' do
+        create(:book, user: user, status: :completed, title: '日付不明の本', completed_at: nil)
+
+        visit dashboard_path
+
+        expect(page).to have_text("読了日: 不明")
       end
 
       context '過去の振り返り（ランダム振り返り）での書影画像表示' do

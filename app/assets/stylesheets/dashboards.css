@@ -650,6 +650,12 @@
   color: var(--color-text-muted);
 }
 
+.lookback-card__completed-at {
+  font-size: 11px;
+  color: var(--color-text-muted);
+  margin-top: 2px;
+}
+
 .lookback-card__section {
   border-radius: var(--border-radius);
   padding: var(--spacing-sm) var(--spacing-md);
