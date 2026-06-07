@@ -5,6 +5,7 @@ class User < ApplicationRecord
          :recoverable, :rememberable, :validatable, :confirmable
 
   has_many :books, dependent: :destroy
+  has_many :book_memos, through: :books
 
   validates :nickname, length: { maximum: 50 }, allow_blank: true
 
