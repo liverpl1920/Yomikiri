@@ -20,6 +20,7 @@ RSpec.describe 'マイページ', type: :system do
       expect(page).to have_text('マイページ')
       expect(page).to have_text(user.email)
       expect(page).to have_text('初期ニックネーム')
+      expect(page).to have_text('50 冊')
     end
 
     it '読了履歴がない場合は空メッセージが表示される' do
@@ -64,19 +65,21 @@ RSpec.describe 'マイページ', type: :system do
     end
   end
 
-  describe 'ニックネーム更新' do
+  describe 'プロフィール更新' do
     before do
       login_as(user, scope: :user)
       visit mypage_path
     end
 
-    it '有効な値で更新できる' do
+    it '有効な値でニックネームと年間目標を更新できる' do
       fill_in 'ニックネーム（最大50文字）', with: '更新後ニックネーム'
+      fill_in '年間目標（目標冊数）', with: '30'
       click_button '更新する'
 
       expect(page).to have_current_path(mypage_path)
-      expect(page).to have_text('ニックネームを更新しました。')
+      expect(page).to have_text('プロフィールを更新しました。')
       expect(user.reload.nickname).to eq('更新後ニックネーム')
+      expect(user.reload.yearly_goal).to eq(30)
     end
 
     it 'ニックネーム入力欄はmaxlength=50が効いている' do
@@ -84,6 +87,14 @@ RSpec.describe 'マイページ', type: :system do
 
       # maxlength=50 が効いていることを確認する
       expect(find('input[name="user[nickname]"]', visible: :all).value.length).to eq(50)
+    end
+
+    it '無効な年間目標（0）は更新できずエラーが表示される' do
+      fill_in '年間目標（目標冊数）', with: '0'
+      click_button '更新する'
+
+      expect(page).to have_text('年間目標')
+      expect(page).to have_text('1以上')
     end
   end
 end

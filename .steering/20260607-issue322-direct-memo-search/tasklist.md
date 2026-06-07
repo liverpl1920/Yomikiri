@@ -13,8 +13,11 @@
 - [x] RSpec: 必要に応じてシステムテスト等他のテストを修正
 - [x] `bundle exec rspec` でテスト実行・確認
 - [x] `bundle exec rubocop` で静的解析実行・確認
-- [ ] コミット & プッシュ & PR 作成
+- [x] コミット & プッシュ & PR 作成
 
 ## 振り返り
 
-(作業完了後に記録)
+- `Book.filtered_for_index` から `memo_keyword` のフィルタリングを除外し、`BooksController#index` で本とメモの検索処理を明確に分離した。
+- 本に関する検索条件がない状態で `memo_keyword` が指定された場合は、本のリスト（`@books`）は空になり、メモの検索結果（`@memos`）だけが表示される挙動を実装した。これにより意図しない全本表示を防止できた。
+- RSpec system spec で `dom_id` の `NoMethodError` が発生したが、`ActionView::RecordIdentifier.dom_id` を明示的に呼ぶことで解決した。
+- PR: https://github.com/liverpl1920/Yomikiri/pull/325
