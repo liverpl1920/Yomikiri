@@ -35,7 +35,7 @@ class Book < ApplicationRecord
 
   before_save :auto_set_reading_status
   before_save :apply_past_reading_settings
-  after_create :create_reading_log_for_past_reading, if: :completed?
+  after_create :create_reading_log_for_past_reading, if: :past_reading_checked?
 
   def extend_deadline!(new_deadline)
     return false if new_deadline.blank?
