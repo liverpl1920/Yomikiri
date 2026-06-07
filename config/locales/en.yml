@@ -35,6 +35,7 @@ en:
       reading_memos: "【Reading Memos】"
       no_rating: "No Rating"
       no_review: "(No review written)"
+      completed_at: "Read on: %{date}"
   activerecord:
     attributes:
       user:

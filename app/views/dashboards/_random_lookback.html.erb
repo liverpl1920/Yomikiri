@@ -40,6 +40,9 @@
             <% if random_book.author.present? %>
               <p class="lookback-card__book-author"><%= random_book.author %></p>
             <% end %>
+            <p class="lookback-card__completed-at">
+              <%= t('dashboards.lookback.completed_at', date: random_book.completed_at.present? ? l(random_book.completed_at.to_date) : "不明") %>
+            </p>
           </div>
 
           <div class="lookback-card__section lookback-card__section--review">

@@ -92,4 +92,5 @@ ja:
       reading_memos: "【読書中のメモ】"
       no_rating: "評価なし"
       no_review: "（感想はありません）"
+      completed_at: "読了日: %{date}"
 
