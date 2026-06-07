@@ -72,6 +72,31 @@ RSpec.describe 'ダッシュボード', type: :system do
         click_link '別の本'
         expect(page).to have_css('.lookback-card')
       end
+
+      context '過去の振り返り（ランダム振り返り）での書影画像表示' do
+        it '書影画像がある場合、画像が表示されること' do
+          completed_book = create(:book, user: user, status: :completed, title: '画像あり本', rating: 4, completed_at: Date.current)
+          completed_book.cover_image.attach(
+            io: StringIO.new('fake png data'),
+            filename: 'cover.png',
+            content_type: 'image/png'
+          )
+
+          visit dashboard_path
+
+          expect(page).to have_css('.lookback-card__cover-image')
+          expect(page).not_to have_css('.lookback-card__cover-placeholder')
+        end
+
+        it '書影画像がない場合、プレースホルダーが表示されること' do
+          create(:book, user: user, status: :completed, title: '画像なし本', rating: 5, completed_at: Date.current)
+
+          visit dashboard_path
+
+          expect(page).to have_css('.lookback-card__cover-placeholder')
+          expect(page).not_to have_css('.lookback-card__cover-image')
+        end
+      end
     end
   end
 end

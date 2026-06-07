@@ -564,6 +564,15 @@
     font-size: 8px;
     top: -14px;
   }
+
+  .lookback-card__body {
+    flex-direction: column;
+    gap: var(--spacing-md);
+  }
+
+  .lookback-card__cover-wrapper {
+    align-self: center;
+  }
 }
 
 /* ---- 過去のランダム振り返り (Lookback Card) ---- */
@@ -721,4 +730,56 @@
   color: var(--color-text-muted);
   align-self: flex-end;
   font-style: normal;
+}
+
+.lookback-card__body {
+  display: flex;
+  gap: var(--spacing-md);
+  align-items: flex-start;
+}
+
+.lookback-card__cover-wrapper {
+  position: relative;
+  flex-shrink: 0;
+  width: 100px;
+  aspect-ratio: 3 / 4;
+  background-color: var(--color-bg);
+  border-radius: var(--border-radius);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.lookback-card__cover-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.lookback-card__cover-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  background-color: var(--color-bg);
+  color: var(--color-text-muted);
+}
+
+.lookback-card__cover-placeholder-icon {
+  font-size: 1.5rem;
+  margin-bottom: var(--spacing-xs);
+}
+
+.lookback-card__cover-placeholder-text {
+  font-size: 0.65rem;
+  font-weight: 600;
+}
+
+.lookback-card__details {
+  flex: 1;
+  min-width: 0;
 }
