@@ -545,10 +545,14 @@ RSpec.describe 'Books', type: :request do
           }
         end
 
-        it '書籍が作成される' do
+        it '書籍と読書ログが作成される' do
           expect {
             post books_path, params: past_reading_with_date_params
-          }.to change(Book, :count).by(1)
+          }.to change(Book, :count).by(1).and change(ReadingLog, :count).by(1)
+
+          log = ReadingLog.last
+          expect(log.pages_read).to eq(300)
+          expect(log.read_at).to eq(Date.current - 5)
         end
 
         it '書籍が completed ステータスで作成される' do
@@ -590,10 +594,14 @@ RSpec.describe 'Books', type: :request do
           }
         end
 
-        it '書籍が作成される' do
+        it '書籍と読書ログが作成される' do
           expect {
             post books_path, params: past_reading_without_date_params
-          }.to change(Book, :count).by(1)
+          }.to change(Book, :count).by(1).and change(ReadingLog, :count).by(1)
+
+          log = ReadingLog.last
+          expect(log.pages_read).to eq(200)
+          expect(log.read_at).to eq(Date.current)
         end
 
         it '書籍が completed ステータスで作成される' do
