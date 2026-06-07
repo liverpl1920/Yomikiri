@@ -84,4 +84,52 @@ RSpec.describe 'Dashboards', type: :request do
       end
     end
   end
+
+  describe 'GET /dashboard/lookback' do
+    context '未ログインの場合' do
+      it 'ログイン画面へリダイレクトされる' do
+        get lookback_dashboard_path
+
+        expect(response).to redirect_to(new_user_session_path)
+      end
+    end
+
+    context 'ログイン済みの場合' do
+      before { sign_in user }
+
+      context '読了済みの本が存在しない場合' do
+        it '200 OK を返し、ランダム振り返りカードが表示されないこと' do
+          get lookback_dashboard_path
+
+          expect(response).to have_http_status(:ok)
+          expect(response.body).not_to include('lookback-card')
+        end
+      end
+
+      context '読了済みの本が存在する場合' do
+        let!(:completed_book) { create(:book, user: user, status: :completed, title: '読了本タイトル', rating: 4, review: 'とても面白かった。') }
+
+        it '200 OK を返し、ランダム振り返りカードに書籍タイトルや感想・評価が表示されること' do
+          get lookback_dashboard_path
+
+          expect(response).to have_http_status(:ok)
+          expect(response.body).to include('lookback-card')
+          expect(response.body).to include('読了本タイトル')
+          expect(response.body).to include('★★★★☆')
+          expect(response.body).to include('とても面白かった。')
+        end
+
+        context 'メモも存在する場合' do
+          let!(:book_memo) { create(:book_memo, book: completed_book, content: '感銘を受けたメモ', page_number: '123') }
+
+          it 'メモの内容やページ番号が表示されること' do
+            get lookback_dashboard_path
+
+            expect(response.body).to include('感銘を受けたメモ')
+            expect(response.body).to include('p. 123')
+          end
+        end
+      end
+    end
+  end
 end

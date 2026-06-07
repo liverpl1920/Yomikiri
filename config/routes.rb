@@ -7,7 +7,9 @@ Rails.application.routes.draw do
   }
   root "top#index"
 
-  resource :dashboard, only: [ :show ]
+  resource :dashboard, only: [ :show ] do
+    get :lookback
+  end
   resource :mypage, only: [ :show, :update ] do
     get :stats
   end

@@ -1,0 +1,61 @@
+<%= turbo_frame_tag "random-lookback" do %>
+  <% if random_book %>
+    <section class="dashboard__card lookback-card" aria-label="<%= t('dashboards.lookback.lookback_title') %>">
+      <div class="lookback-card__header">
+        <h2 class="lookback-card__title">
+          <%= t('dashboards.lookback.lookback_title') %>
+        </h2>
+        <%= link_to lookback_dashboard_path, class: "lookback-card__shuffle", data: { turbo_frame: "random-lookback" }, aria: { label: t('dashboards.lookback.shuffle_btn') } do %>
+          <span class="lookback-card__shuffle-icon" aria-hidden="true">🔄</span>
+          <span class="lookback-card__shuffle-text"><%= t('dashboards.lookback.shuffle_btn') %></span>
+        <% end %>
+      </div>
+
+      <div class="lookback-card__book-info">
+        <h3 class="lookback-card__book-title">
+          <%= link_to random_book.title, book_path(random_book), data: { turbo: false } %>
+        </h3>
+        <% if random_book.author.present? %>
+          <p class="lookback-card__book-author"><%= random_book.author %></p>
+        <% end %>
+      </div>
+
+      <div class="lookback-card__section lookback-card__section--review">
+        <h4 class="lookback-card__section-title"><%= t('dashboards.lookback.overall_review') %></h4>
+        
+        <div class="lookback-card__rating" aria-label="評価: <%= random_book.rating || 0 %> / 5">
+          <% if random_book.rating.present? %>
+            <span class="lookback-card__stars"><%= "★" * random_book.rating %><%= "☆" * (5 - random_book.rating) %></span>
+          <% else %>
+            <span class="lookback-card__no-rating"><%= t('dashboards.lookback.no_rating') %></span>
+          <% end %>
+        </div>
+
+        <div class="lookback-card__review">
+          <% if random_book.review.present? %>
+            <%= simple_format(random_book.review) %>
+          <% else %>
+            <p class="lookback-card__no-review"><%= t('dashboards.lookback.no_review') %></p>
+          <% end %>
+        </div>
+      </div>
+
+      <% if random_memo %>
+        <div class="lookback-card__section lookback-card__section--memo">
+          <h4 class="lookback-card__section-title"><%= t('dashboards.lookback.reading_memos') %></h4>
+          
+          <div class="lookback-card__memo-body">
+            <blockquote class="lookback-card__memo-content">
+              <%= simple_format(random_memo.content) %>
+            </blockquote>
+            <% if random_memo.page_number.present? %>
+              <cite class="lookback-card__memo-page">
+                p. <%= random_memo.page_number %>
+              </cite>
+            <% end %>
+          </div>
+        </div>
+      <% end %>
+    </section>
+  <% end %>
+<% end %>
