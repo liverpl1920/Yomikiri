@@ -1,0 +1,567 @@
+/* ========================
+   ダッシュボード スタイル
+   BEM 命名規則に従う
+   ======================== */
+
+.dashboard {
+  padding: var(--spacing-xl) 0 var(--spacing-3xl);
+}
+
+.dashboard__header {
+  margin-bottom: var(--spacing-xl);
+}
+
+.dashboard__title {
+  font-size: var(--font-size-3xl);
+  font-weight: 700;
+  color: var(--color-text);
+  margin-bottom: var(--spacing-xs);
+}
+
+.dashboard__date {
+  font-size: var(--font-size-base);
+  color: var(--color-text-muted);
+}
+
+/* ---- グリッドレイアウト (2カラム) ---- */
+.dashboard__grid {
+  display: grid;
+  grid-template-columns: 1.6fr 1fr;
+  gap: var(--spacing-xl);
+  align-items: start;
+}
+
+/* ---- セクションタイトル ---- */
+.dashboard__section-title {
+  font-size: var(--font-size-xl);
+  font-weight: 700;
+  color: var(--color-text);
+  margin-bottom: var(--spacing-lg);
+  padding-bottom: var(--spacing-xs);
+  border-bottom: 2px solid var(--color-secondary);
+}
+
+/* ---- 進行中の書籍カードリスト ---- */
+.dashboard__book-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+}
+
+.dashboard__book-card {
+  display: flex;
+  gap: var(--spacing-lg);
+  background-color: var(--color-bg-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius-lg);
+  padding: var(--spacing-lg);
+  box-shadow: var(--shadow-sm);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.dashboard__book-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+/* 書影 */
+.dashboard__book-cover-wrapper {
+  position: relative;
+  flex-shrink: 0;
+  width: 100px;
+}
+
+.dashboard__book-cover {
+  width: 100px;
+  aspect-ratio: 3 / 4;
+  background-color: var(--color-bg);
+  border-radius: var(--border-radius);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+  transition: filter 0.3s, opacity 0.3s;
+}
+
+.dashboard__book-cover-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.dashboard__book-cover-placeholder {
+  font-size: 2.5rem;
+}
+
+.dashboard__urgency-badge {
+  position: absolute;
+  top: calc(-1 * var(--spacing-xs));
+  right: calc(-1 * var(--spacing-xs));
+  background-color: var(--color-danger);
+  color: #ffffff;
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 0.2rem 0.5rem;
+  border-radius: 99px;
+  line-height: 1.4;
+  white-space: nowrap;
+  box-shadow: var(--shadow-sm);
+}
+
+/* 書籍情報 */
+.dashboard__book-info {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+  flex: 1;
+  min-width: 0; /* レスポンシブで文字省略を効かせるため */
+}
+
+.dashboard__book-title {
+  font-size: var(--font-size-lg);
+  font-weight: 700;
+  line-height: 1.4;
+}
+
+.dashboard__book-title a {
+  color: var(--color-text);
+  text-decoration: none;
+}
+
+.dashboard__book-title a:hover {
+  color: var(--color-primary);
+  text-decoration: underline;
+}
+
+.dashboard__book-author {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+  margin-bottom: var(--spacing-xs);
+}
+
+/* 進捗バー */
+.dashboard__progress {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+  margin-bottom: var(--spacing-sm);
+}
+
+.dashboard__progress-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: var(--font-size-sm);
+}
+
+.dashboard__progress-text {
+  color: var(--color-text-muted);
+}
+
+.dashboard__progress-percentage {
+  font-weight: 600;
+  color: var(--color-primary);
+}
+
+.dashboard__progress-bar-wrapper {
+  height: 8px;
+  background-color: var(--color-border);
+  border-radius: 99px;
+  overflow: hidden;
+}
+
+.dashboard__progress-bar {
+  height: 100%;
+  background-color: var(--color-success);
+  border-radius: 99px;
+  transition: width 0.3s ease;
+  min-width: 2px;
+}
+
+/* ノルマ (木製プレート風) */
+.dashboard__quota {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  background-color: var(--color-bg);
+  border: 2px solid var(--color-secondary);
+  border-radius: var(--border-radius);
+  padding: var(--spacing-xs) var(--spacing-md);
+  margin-top: auto;
+  width: fit-content;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.dashboard__quota--completed {
+  border-color: var(--color-border);
+  background-color: var(--color-bg-surface);
+}
+
+.dashboard__quota-label {
+  font-size: var(--font-size-sm);
+  color: var(--color-secondary);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.dashboard__quota--completed .dashboard__quota-label {
+  color: var(--color-text-muted);
+}
+
+.dashboard__quota-value {
+  font-size: var(--font-size-sm);
+  color: var(--color-text);
+  white-space: nowrap;
+}
+
+.dashboard__quota-value strong {
+  font-size: var(--font-size-lg);
+  font-weight: 900;
+  color: var(--color-secondary);
+}
+
+.dashboard__quota-value--overdue {
+  color: var(--color-danger);
+  font-weight: 700;
+}
+
+/* アクションボタン */
+.dashboard__book-actions {
+  display: flex;
+  align-items: center;
+  align-self: center;
+  flex-shrink: 0;
+}
+
+/* ---- サイドバーとカード ---- */
+.dashboard__sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xl);
+}
+
+.dashboard__card {
+  background-color: var(--color-bg-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius-lg);
+  padding: var(--spacing-lg);
+  box-shadow: var(--shadow-sm);
+}
+
+.dashboard__card-title {
+  font-size: var(--font-size-lg);
+  font-weight: 700;
+  color: var(--color-text);
+  margin-bottom: var(--spacing-md);
+  padding-bottom: var(--spacing-xs);
+  border-bottom: 2px solid var(--color-border);
+}
+
+/* 読書統計 (Stats) */
+.dashboard__stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--spacing-sm);
+}
+
+.dashboard__stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius);
+  padding: var(--spacing-md) var(--spacing-xs);
+  text-align: center;
+  box-shadow: var(--shadow-sm);
+}
+
+.dashboard__stat-number {
+  font-size: var(--font-size-xl);
+  font-weight: 700;
+  color: var(--color-primary);
+  line-height: 1.2;
+}
+
+.dashboard__stat-label {
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+  font-weight: 600;
+  margin-top: var(--spacing-xs);
+}
+
+/* 目標進捗 (Goals) */
+.dashboard__goal-summary {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.dashboard__goal-quota {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius);
+  padding: var(--spacing-sm) var(--spacing-md);
+}
+
+.dashboard__goal-quota-label {
+  font-size: var(--font-size-sm);
+  color: var(--color-text);
+  font-weight: 600;
+}
+
+.dashboard__goal-quota-value {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+}
+
+.dashboard__goal-quota-value strong {
+  font-size: var(--font-size-lg);
+  color: var(--color-primary);
+}
+
+.dashboard__goal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: var(--font-size-sm);
+  margin-bottom: var(--spacing-xs);
+}
+
+.dashboard__goal-label {
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.dashboard__goal-progress-text {
+  color: var(--color-text-muted);
+}
+
+.dashboard__goal-bar-wrapper {
+  height: 8px;
+  background-color: var(--color-border);
+  border-radius: 99px;
+  overflow: hidden;
+}
+
+.dashboard__goal-bar {
+  height: 100%;
+  background: linear-gradient(90deg, var(--color-secondary) 0%, var(--color-secondary-hover) 100%);
+  border-radius: 99px;
+  transition: width 0.3s ease;
+}
+
+/* 週次アクティビティグラフ */
+.dashboard__activity-chart {
+  background-color: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius);
+  padding: var(--spacing-md) var(--spacing-sm);
+}
+
+.activity-chart {
+  display: flex;
+  justify-content: space-around;
+  align-items: flex-end;
+  height: 130px;
+  padding-top: var(--spacing-md);
+}
+
+.activity-chart__bar-group {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 12%;
+  height: 100%;
+}
+
+.activity-chart__bar-wrapper {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  width: 100%;
+  height: 105px; /* バーの最大高さ */
+  position: relative;
+  cursor: pointer;
+}
+
+.activity-chart__bar {
+  width: 16px;
+  background: linear-gradient(0deg, var(--color-primary) 0%, var(--color-primary-hover) 100%);
+  border-radius: 99px 99px 0 0;
+  transition: height 0.3s ease;
+  position: relative;
+  min-height: 4px;
+}
+
+.activity-chart__bar:hover {
+  background: var(--color-primary-hover);
+}
+
+.activity-chart__bar-value {
+  position: absolute;
+  top: -16px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 9px;
+  font-weight: 700;
+  color: var(--color-primary);
+  white-space: nowrap;
+}
+
+.activity-chart__day {
+  font-size: 10px;
+  color: var(--color-text-muted);
+  font-weight: 600;
+  margin-top: var(--spacing-sm);
+  text-align: center;
+}
+
+/* 最近読了した本 */
+.dashboard__completed-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.dashboard__completed-item {
+  display: flex;
+  gap: var(--spacing-md);
+  padding: var(--spacing-sm);
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius);
+  background-color: var(--color-bg);
+  text-decoration: none;
+  color: inherit;
+  transition: background-color 0.15s, transform 0.15s;
+}
+
+.dashboard__completed-item:hover {
+  background-color: var(--color-bg-surface);
+  transform: translateX(2px);
+  text-decoration: none;
+}
+
+.dashboard__completed-cover {
+  width: 45px;
+  aspect-ratio: 3 / 4;
+  background-color: var(--color-bg-surface);
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+}
+
+.dashboard__completed-cover-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.dashboard__completed-cover-placeholder {
+  font-size: 1.25rem;
+}
+
+.dashboard__completed-info {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 2px;
+  min-width: 0;
+}
+
+.dashboard__completed-title {
+  font-size: var(--font-size-sm);
+  font-weight: 700;
+  color: var(--color-text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.dashboard__completed-author {
+  font-size: 11px;
+  color: var(--color-text-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.dashboard__completed-stars {
+  font-size: 11px;
+  color: #d97706;
+  letter-spacing: 1px;
+}
+
+.dashboard__completed-empty {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+  text-align: center;
+  padding: var(--spacing-md) 0;
+}
+
+/* Empty State */
+.dashboard__empty {
+  text-align: center;
+  padding: var(--spacing-2xl) var(--spacing-md);
+  background-color: var(--color-bg-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius-lg);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-md);
+}
+
+.dashboard__empty-icon {
+  font-size: 3rem;
+  line-height: 1;
+}
+
+.dashboard__empty-text {
+  font-size: var(--font-size-base);
+  color: var(--color-text-muted);
+  max-width: 300px;
+}
+
+/* ---- レスポンシブ ---- */
+@media (max-width: 820px) {
+  .dashboard__grid {
+    grid-template-columns: 1fr;
+    gap: var(--spacing-lg);
+  }
+}
+
+@media (max-width: 540px) {
+  .dashboard__book-card {
+    flex-direction: column;
+    gap: var(--spacing-md);
+  }
+
+  .dashboard__book-cover-wrapper {
+    align-self: center;
+  }
+
+  .dashboard__book-actions {
+    align-self: stretch;
+  }
+
+  .dashboard__book-actions .btn {
+    width: 100%;
+  }
+
+  .activity-chart__bar {
+    width: 12px;
+  }
+
+  .activity-chart__bar-value {
+    font-size: 8px;
+    top: -14px;
+  }
+}

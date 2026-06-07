@@ -12,6 +12,14 @@ ja:
       unread: "未読"
       reading: "読書中"
       completed: "読了"
+    book_card:
+      pages: "ページ"
+      daily_quota_label: "今日のノルマ"
+      pages_per_day: "ページ/日"
+      overdue_quota: "期限超過（%{count}ページ）"
+      no_quota_today: "今日のノルマはありません"
+      overdue: "期限超過"
+      urgent_alert: "あと%{days}日"
   activerecord:
     models:
       book: "本"
@@ -58,3 +66,21 @@ ja:
 
   email_change:
     confirmation_sent: "確認メールを送信しました。メールのリンクをクリックしてメールアドレスの変更を完了してください。"
+
+  dashboards:
+    show:
+      welcome_back: "おかえりなさい、%{user} さん"
+      current_reads: "進行中の本"
+      no_reading_books: "現在進行中の本はありません。"
+      stats: "読書統計"
+      total_pages: "総読了ページ"
+      total_books: "読了冊数"
+      streak: "読書ストリーク"
+      reading_goal: "読書目標"
+      total_daily_quota: "今日の総ノルマ"
+      yearly_goal: "%{year}年の目標"
+      books_count: "冊"
+      weekly_activity: "週次アクティビティ"
+      recently_finished: "最近読了した本"
+      no_completed_books: "最近読了した本はありません。"
+      add_book: "本を登録"

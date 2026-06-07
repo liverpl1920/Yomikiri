@@ -11,13 +11,13 @@ RSpec.describe 'トップ画面遷移', type: :system do
     expect(page).to have_link('ログイン')
   end
 
-  it 'ログイン済みでトップへアクセスすると積読一覧へ遷移する' do
+  it 'ログイン済みでトップへアクセスするとダッシュボードへ遷移する' do
     user = create(:user)
     login_as(user, scope: :user)
 
     visit root_path
 
-    expect(page).to have_current_path(books_path)
+    expect(page).to have_current_path(dashboard_path)
   end
 
   describe 'ログアウト後遷移', js: true do

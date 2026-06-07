@@ -17,10 +17,10 @@ RSpec.describe 'Top', type: :request do
 
       before { sign_in user }
 
-      it '積読一覧ページへリダイレクトされる' do
+      it 'ダッシュボードページへリダイレクトされる' do
         get root_path
 
-        expect(response).to redirect_to(books_path)
+        expect(response).to redirect_to(dashboard_path)
       end
     end
   end

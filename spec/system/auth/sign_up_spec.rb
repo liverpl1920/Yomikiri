@@ -12,8 +12,8 @@ RSpec.describe '新規ユーザー登録', type: :system do
       fill_in 'user[password_confirmation]', with: 'password123'
       click_button '登録する'
 
-      # 登録成功後: registrations_controller の after_sign_up_path_for で books_path へリダイレクト
-      expect(page).to have_current_path(books_path)
+      # 登録成功後: registrations_controller の after_sign_up_path_for で dashboard_path へリダイレクト
+      expect(page).to have_current_path(dashboard_path)
     end
 
     it 'パスワード確認不一致の場合にエラーが表示される' do
@@ -34,7 +34,7 @@ RSpec.describe '新規ユーザー登録', type: :system do
       visit new_user_registration_path
 
       # 既存ユーザーはページアクセスがリダイレクトされる
-      expect(page).to have_current_path(books_path)
+      expect(page).to have_current_path(dashboard_path)
     end
   end
 end
