@@ -8,6 +8,7 @@ class User < ApplicationRecord
   has_many :book_memos, through: :books
 
   validates :nickname, length: { maximum: 50 }, allow_blank: true
+  validates :yearly_goal, presence: true, numericality: { only_integer: true, greater_than_or_equal_to: 1 }
 
   def completed_books_count
     books.completed.count

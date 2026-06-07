@@ -43,6 +43,7 @@ ja:
         email: "メールアドレス"
         nickname: "ニックネーム"
         current_password: "現在のパスワード"
+        yearly_goal: "年間目標"
     errors:
       models:
         book:

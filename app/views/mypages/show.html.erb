@@ -22,20 +22,24 @@
           <dd class="mypage__info-value"><%= current_user.email %></dd>
         </div>
         <div class="mypage__info-item">
+          <dt class="mypage__info-label">年間目標</dt>
+          <dd class="mypage__info-value"><%= current_user.yearly_goal %> 冊</dd>
+        </div>
+        <div class="mypage__info-item">
           <dt class="mypage__info-label">登録日</dt>
           <dd class="mypage__info-value"><%= l(current_user.created_at.to_date, format: :long) %></dd>
         </div>
       </dl>
 
-      <%# ニックネーム編集フォーム %>
+      <%# プロフィール編集フォーム %>
       <div class="mypage__nickname-edit">
-        <h3 class="mypage__nickname-edit-title">ニックネームを変更する</h3>
+        <h3 class="mypage__nickname-edit-title">プロフィールを変更する</h3>
         <%= form_with model: current_user, url: mypage_path, method: :patch, class: 'mypage__form' do |f| %>
-          <% if current_user.errors[:nickname].any? %>
+          <% if current_user.errors.any? %>
             <div class="mypage__form-errors" role="alert">
               <ul>
-                <% current_user.errors[:nickname].each do |message| %>
-                  <li>ニックネーム <%= message %></li>
+                <% current_user.errors.full_messages.each do |message| %>
+                  <li><%= message %></li>
                 <% end %>
               </ul>
             </div>
@@ -48,6 +52,13 @@
                   maxlength: 50,
                   class: 'mypage__form-input',
                   autocomplete: 'nickname' %>
+          </div>
+          <div class="mypage__form-group">
+            <%= f.label :yearly_goal, '年間目標（目標冊数）', class: 'mypage__form-label' %>
+            <%= f.number_field :yearly_goal,
+                  value: current_user.yearly_goal,
+                  min: 1,
+                  class: 'mypage__form-input' %>
           </div>
           <%= f.submit '更新する', class: 'btn btn--primary' %>
         <% end %>

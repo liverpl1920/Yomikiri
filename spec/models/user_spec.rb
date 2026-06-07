@@ -21,6 +21,24 @@ RSpec.describe User, type: :model do
     it 'ニックネームが51文字以上の場合は無効' do
       expect(build(:user, nickname: 'a' * 51)).not_to be_valid
     end
+
+    it '年間目標がない場合は無効' do
+      expect(build(:user, yearly_goal: nil)).not_to be_valid
+    end
+
+    it '年間目標が0以下の場合は無効' do
+      expect(build(:user, yearly_goal: 0)).not_to be_valid
+      expect(build(:user, yearly_goal: -1)).not_to be_valid
+    end
+
+    it '年間目標が小数の場合は無効' do
+      expect(build(:user, yearly_goal: 1.5)).not_to be_valid
+    end
+
+    it '年間目標が1以上の整数の場合は有効' do
+      expect(build(:user, yearly_goal: 1)).to be_valid
+      expect(build(:user, yearly_goal: 100)).to be_valid
+    end
   end
 
   describe 'アソシエーション' do

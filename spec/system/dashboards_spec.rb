@@ -26,6 +26,14 @@ RSpec.describe 'ダッシュボード', type: :system do
         expect(page).to have_text(I18n.t('dashboards.show.reading_goal'))
         expect(page).to have_text(I18n.t('dashboards.show.weekly_activity'))
         expect(page).to have_text(I18n.t('dashboards.show.recently_finished'))
+        expect(page).to have_text("0 / 50")
+      end
+
+      it 'ユーザーの年間目標がダッシュボードの表示に反映されること' do
+        user.update!(yearly_goal: 12)
+        visit dashboard_path
+
+        expect(page).to have_text("0 / 12")
       end
 
       it '進行中の本がない場合に空メッセージと登録リンクが表示されること' do

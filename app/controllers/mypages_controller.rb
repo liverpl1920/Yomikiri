@@ -26,8 +26,8 @@ class MypagesController < ApplicationController
   end
 
   def update
-    if current_user.update(nickname_params)
-      redirect_to mypage_path, notice: "ニックネームを更新しました。"
+    if current_user.update(user_params)
+      redirect_to mypage_path, notice: "プロフィールを更新しました。"
     else
       render :show, status: :unprocessable_entity
     end
@@ -39,8 +39,8 @@ class MypagesController < ApplicationController
     @completed_books = current_user.books.completed.order(completed_at: :desc)
   end
 
-  def nickname_params
-    params.require(:user).permit(:nickname)
+  def user_params
+    params.require(:user).permit(:nickname, :yearly_goal)
   end
 
   def set_reading_logs

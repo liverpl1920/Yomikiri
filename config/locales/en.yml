@@ -35,4 +35,8 @@ en:
       reading_memos: "【Reading Memos】"
       no_rating: "No Rating"
       no_review: "(No review written)"
+  activerecord:
+    attributes:
+      user:
+        yearly_goal: "Yearly Goal"
 

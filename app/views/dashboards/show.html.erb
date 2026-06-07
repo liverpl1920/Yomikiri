@@ -133,7 +133,7 @@
 
           <!-- 年間目標 (ダミーベース) -->
           <div class="dashboard__goal-item">
-            <% yearly_target = 50 %>
+            <% yearly_target = current_user.yearly_goal %>
             <% goal_percentage = yearly_target > 0 ? [(@total_books_read.to_f / yearly_target * 100).round, 100].min : 0 %>
             <div class="dashboard__goal-header">
               <span class="dashboard__goal-label"><%= t('.yearly_goal', year: Date.current.year) %></span>

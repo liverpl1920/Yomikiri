@@ -35,6 +35,12 @@ RSpec.describe 'Mypages', type: :request do
         expect(response.body).to include(user.email)
       end
 
+      it '年間目標が表示される' do
+        get mypage_path
+
+        expect(response.body).to include("#{user.yearly_goal} 冊")
+      end
+
       context 'ニックネームが未設定の場合' do
         let(:user) { create(:user, nickname: nil) }
 
@@ -79,12 +85,13 @@ RSpec.describe 'Mypages', type: :request do
     context 'ログイン済みの場合' do
       before { sign_in user }
 
-      context '有効なニックネームを入力した場合' do
-        it 'ニックネームが更新されてマイページへリダイレクトされる' do
-          patch mypage_path, params: { user: { nickname: '新ニックネーム' } }
+      context '有効なニックネームや年間目標を入力した場合' do
+        it 'ニックネームと年間目標が更新されてマイページへリダイレクトされる' do
+          patch mypage_path, params: { user: { nickname: '新ニックネーム', yearly_goal: 30 } }
 
           expect(response).to redirect_to(mypage_path)
           expect(user.reload.nickname).to eq('新ニックネーム')
+          expect(user.reload.yearly_goal).to eq(30)
         end
 
         it '空文字でニックネームをクリアできる' do
@@ -95,9 +102,27 @@ RSpec.describe 'Mypages', type: :request do
         end
       end
 
-      context '無効なニックネームを入力した場合（51文字以上）' do
-        it '422 を返してエラーが表示される' do
+      context '無効なニックネームや年間目標を入力した場合' do
+        it 'ニックネームが51文字以上の場合は422を返す' do
           patch mypage_path, params: { user: { nickname: 'a' * 51 } }
+
+          expect(response).to have_http_status(:unprocessable_entity)
+        end
+
+        it '年間目標が0以下の場合は422を返す' do
+          patch mypage_path, params: { user: { yearly_goal: 0 } }
+
+          expect(response).to have_http_status(:unprocessable_entity)
+        end
+
+        it '年間目標が小数の場合は422を返す' do
+          patch mypage_path, params: { user: { yearly_goal: 1.5 } }
+
+          expect(response).to have_http_status(:unprocessable_entity)
+        end
+
+        it '年間目標が空の場合は422を返す' do
+          patch mypage_path, params: { user: { yearly_goal: '' } }
 
           expect(response).to have_http_status(:unprocessable_entity)
         end
