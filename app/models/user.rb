@@ -6,6 +6,7 @@ class User < ApplicationRecord
 
   has_many :books, dependent: :destroy
   has_many :book_memos, through: :books
+  has_many :reading_logs, through: :books
 
   validates :nickname, length: { maximum: 50 }, allow_blank: true
   validates :yearly_goal, presence: true, numericality: { only_integer: true, greater_than_or_equal_to: 1 }
@@ -19,7 +20,7 @@ class User < ApplicationRecord
   end
 
   def consecutive_reading_days
-    dates = books.pluck(:updated_at).map(&:to_date).uniq.sort.reverse
+    dates = reading_logs.pluck(:read_at).uniq.sort.reverse
     return 0 if dates.empty?
 
     streak = 0
