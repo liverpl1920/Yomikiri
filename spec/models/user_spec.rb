@@ -42,8 +42,8 @@ RSpec.describe User, type: :model do
   end
 
   describe 'アソシエーション' do
-    # Book モデルは Issue #13 で実装予定のため、実装後にテストを有効化する
-    # it { is_expected.to have_many(:books).dependent(:destroy) }
+    it { is_expected.to have_many(:books).dependent(:destroy) }
+    it { is_expected.to have_many(:reading_logs).through(:books) }
   end
 
   describe '#completed_books_count' do
@@ -82,25 +82,26 @@ RSpec.describe User, type: :model do
 
   describe '#consecutive_reading_days' do
     let(:user) { create(:user) }
+    let(:book) { create(:book, user: user) }
 
     it '今日を含む連続した日付の日数を返す' do
-      create(:book, user: user).tap { |b| b.update_column(:updated_at, Date.current.beginning_of_day) }
-      create(:book, user: user).tap { |b| b.update_column(:updated_at, (Date.current - 1.day).beginning_of_day) }
-      create(:book, user: user).tap { |b| b.update_column(:updated_at, (Date.current - 2.days).beginning_of_day) }
+      create(:reading_log, book: book, read_at: Date.current)
+      create(:reading_log, book: book, read_at: Date.current - 1.day)
+      create(:reading_log, book: book, read_at: Date.current - 2.days)
 
       expect(user.consecutive_reading_days).to eq(3)
     end
 
     it '今日の記録がない場合は昨日からさかのぼる' do
-      create(:book, user: user).tap { |b| b.update_column(:updated_at, (Date.current - 1.day).beginning_of_day) }
-      create(:book, user: user).tap { |b| b.update_column(:updated_at, (Date.current - 2.days).beginning_of_day) }
+      create(:reading_log, book: book, read_at: Date.current - 1.day)
+      create(:reading_log, book: book, read_at: Date.current - 2.days)
 
       expect(user.consecutive_reading_days).to eq(2)
     end
 
     it '連続が途切れた場合は途切れた分まで集計する' do
-      create(:book, user: user).tap { |b| b.update_column(:updated_at, Date.current.beginning_of_day) }
-      create(:book, user: user).tap { |b| b.update_column(:updated_at, (Date.current - 2.days).beginning_of_day) }
+      create(:reading_log, book: book, read_at: Date.current)
+      create(:reading_log, book: book, read_at: Date.current - 2.days)
 
       expect(user.consecutive_reading_days).to eq(1)
     end
