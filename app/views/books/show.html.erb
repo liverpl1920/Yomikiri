@@ -6,7 +6,7 @@
 <div class="container" data-controller="modal">
   <div class="book-show">
     <%# 書影エリア（賞味期限ビジュアライザー） %>
-    <div class="book-show__cover-wrapper">
+    <div class="book-show__cover-wrapper" data-controller="image-modal">
       <div class="book-show__cover <%= @book.deadline_urgency_class %>">
         <% cover_src = book_cover_src(@book) %>
         <% if cover_src %>
@@ -14,6 +14,7 @@
                alt="<%= @book.title %>の書影"
                class="book-show__cover-image"
                loading="lazy"
+               data-action="click->image-modal#open"
                onerror="this.onerror=null;this.style.display='none';this.nextElementSibling.style.display='inline-flex';">
           <span class="book-show__cover-placeholder" aria-hidden="true" style="display: none;">📖</span>
         <% else %>
@@ -28,6 +29,16 @@
             あと<%= @book.days_remaining %>日
           <% end %>
         </span>
+      <% end %>
+
+      <%# 画像拡大モーダル (Issue #336) %>
+      <% if cover_src %>
+        <dialog data-image-modal-target="dialog" class="image-modal-dialog" data-action="click->image-modal#closeOnBackdrop">
+          <div class="image-modal-dialog__container">
+            <img src="<%= cover_src %>" alt="<%= @book.title %>の書影（拡大）" class="image-modal-dialog__image">
+            <button type="button" class="image-modal-dialog__close" data-action="click->image-modal#close" aria-label="閉じる">✕</button>
+          </div>
+        </dialog>
       <% end %>
     </div>
 

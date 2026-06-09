@@ -99,4 +99,43 @@ RSpec.describe '書籍詳細のUI状態', type: :system do
       expect(items[1]).to have_text('既存のメモ')
     end
   end
+
+  describe '書影拡大モーダル', js: true do
+    let!(:book) { create(:book, user: user, title: '書影テスト本', cover_image_url: 'http://example.com/cover.png') }
+
+    before do
+      allow_any_instance_of(BooksHelper).to receive(:book_cover_src).and_return('/icon.png')
+    end
+
+    it '書影画像をクリックしたときにモーダルが表示され、閉じるボタンまたは背景をクリックすると閉じること' do
+      visit book_path(book)
+
+      # 初期状態ではモーダルダイアログは表示されていない
+      expect(page).to have_css('.image-modal-dialog', visible: false)
+      expect(page).not_to have_css('dialog.image-modal-dialog[open]')
+
+      # 書影画像をクリック
+      find('.book-show__cover-image').click
+
+      # モーダルが表示され、dialogにopen属性が付与されていることを確認
+      expect(page).to have_css('dialog.image-modal-dialog[open]')
+      expect(page).to have_css('.image-modal-dialog__image', visible: true)
+
+      # 閉じるボタン（✕）をクリック
+      find('.image-modal-dialog__close').click
+
+      # モーダルが閉じ、open属性が消えることを確認
+      expect(page).not_to have_css('dialog.image-modal-dialog[open]')
+
+      # 再度書影をクリックして開き、背景クリックで閉じることを検証
+      find('.book-show__cover-image').click
+      expect(page).to have_css('dialog.image-modal-dialog[open]')
+
+      # ダイアログの外側（背景）をクリック
+      # HTML5 dialog の場合、dialog自体をクリックするとbackdropのクリックとして判定されるようにStimulusを実装している
+      # Capybaraの標準clickだと要素の中心（画像）をクリックしてしまうため、JSでdialog要素自体に直接clickイベントを送信してbackdropクリックをシミュレートする
+      page.execute_script("document.querySelector('dialog.image-modal-dialog').click()")
+      expect(page).not_to have_css('dialog.image-modal-dialog[open]')
+    end
+  end
 end
