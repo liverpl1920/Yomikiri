@@ -434,6 +434,7 @@
 
     <div class="book-show__actions">
       <%= link_to '一覧に戻る', books_path, class: 'btn btn--outline' %>
+      <%= link_to 'この本をもう一度読む', new_book_path(copy_from_id: @book.id), class: 'btn btn--secondary' %>
       <%= link_to '書籍情報を編集する', edit_book_path(@book), class: 'btn btn--secondary' %>
       <% unless @book.completed? || @book.deadline.nil? %>
         <button type="button" class="btn btn--secondary"

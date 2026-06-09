@@ -264,6 +264,96 @@ RSpec.describe 'Books', type: :request do
         expect(response.body).not_to include('isbn_input')
         expect(response.body).not_to include('書籍情報を取得')
       end
+
+      context 'copy_from_id パラメータが指定されている場合' do
+        context '自分の書籍IDの場合' do
+          let!(:original_book) do
+            create(:book,
+                   user: user,
+                   title: 'コピー元の本',
+                   author: '著者A',
+                   genre: 'IT',
+                   pages: 300,
+                   cover_image_url: 'https://example.com/cover.jpg',
+                   isbn: '9784873115658',
+                   translator: '翻訳者A',
+                   publisher: '出版社A',
+                   status: :completed,
+                   current_page: 300,
+                   deadline: Date.current + 10,
+                   completed_at: Time.current,
+                   memo: 'すばらしい本',
+                   rating: 5,
+                   review: '最高でした',
+                   memo_updated_at: Time.current)
+          end
+
+          it '200を返し、コピー元の属性が初期値としてフォームに含まれていること' do
+            get new_book_path(copy_from_id: original_book.id)
+            expect(response).to have_http_status(:ok)
+
+            expect(response.body).to include('コピー元の本')
+            expect(response.body).to include('著者A')
+            expect(response.body).to include('IT')
+            expect(response.body).to include('300')
+            expect(response.body).to include('https://example.com/cover.jpg')
+            expect(response.body).to include('9784873115658')
+            expect(response.body).to include('翻訳者A')
+            expect(response.body).to include('出版社A')
+          end
+
+          it 'リセットされるべき属性が初期化されていること' do
+            get new_book_path(copy_from_id: original_book.id)
+            expect(response).to have_http_status(:ok)
+
+            book_in_view = controller.instance_variable_get(:@book)
+            expect(book_in_view.status).to eq('unread')
+            expect(book_in_view.current_page).to eq(0)
+            expect(book_in_view.deadline).to be_nil
+            expect(book_in_view.completed_at).to be_nil
+            expect(book_in_view.memo).to be_nil
+            expect(book_in_view.rating).to be_nil
+            expect(book_in_view.review).to be_nil
+            expect(book_in_view.memo_updated_at).to be_nil
+            expect(book_in_view.extension_count).to eq(0)
+          end
+
+          it '画像がアタッチされている場合、複製オブジェクトにも画像がアタッチされていること' do
+            original_book.cover_image.attach(
+              io: File.open(Rails.root.join('spec/fixtures/files/test_cover.png')),
+              filename: 'test_cover.png',
+              content_type: 'image/png'
+            )
+            get new_book_path(copy_from_id: original_book.id)
+
+            book_in_view = controller.instance_variable_get(:@book)
+            expect(book_in_view.cover_image).to be_attached
+            expect(book_in_view.cover_image.blob).to eq(original_book.cover_image.blob)
+          end
+        end
+
+        context '他人の書籍IDの場合' do
+          let!(:other_book) { create(:book, user: other_user) }
+
+          it '空の新規書籍オブジェクトが設定されること' do
+            get new_book_path(copy_from_id: other_book.id)
+            expect(response).to have_http_status(:ok)
+
+            book_in_view = controller.instance_variable_get(:@book)
+            expect(book_in_view.title).to be_nil
+          end
+        end
+
+        context '存在しない書籍IDの場合' do
+          it '空の新規書籍オブジェクトが設定されること' do
+            get new_book_path(copy_from_id: 999999)
+            expect(response).to have_http_status(:ok)
+
+            book_in_view = controller.instance_variable_get(:@book)
+            expect(book_in_view.title).to be_nil
+          end
+        end
+      end
     end
 
     context '未認証ユーザーの場合' do
