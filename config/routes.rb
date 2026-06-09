@@ -22,6 +22,7 @@ Rails.application.routes.draw do
       get :search
       get :cover_proxy
       get :suggestions
+      get :check_duplicate
     end
     member do
       patch :update_progress

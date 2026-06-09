@@ -1,4 +1,4 @@
-<% content_for :title, "#{@book.title} | Yomikiri" %>
+<% content_for :title, "#{@book.display_title} | Yomikiri" %>
 <% content_for :head do %>
   <meta name="turbo-cache-control" content="no-cache">
 <% end %>
@@ -43,7 +43,12 @@
     </div>
 
     <div class="book-show__header">
-      <h1 class="book-show__title"><%= @book.title %></h1>
+      <h1 class="book-show__title"><%= @book.display_title %></h1>
+      <% if @book.previous_book %>
+        <p class="book-show__previous-link" style="margin-top: 0.5rem; margin-bottom: 0.5rem; font-size: 0.9rem;">
+          <%= link_to "前回（#{@book.reading_round - 1}回目）の読書記録はこちら", book_path(@book.previous_book), style: "color: #3b82f6; text-decoration: underline;" %>
+        </p>
+      <% end %>
       <% if @book.author.present? %>
         <p class="book-show__author"><%= @book.author %></p>
       <% end %>

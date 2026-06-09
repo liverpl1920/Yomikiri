@@ -196,7 +196,7 @@
 
                 <%# カード本文 %>
                 <div class="book-card__body">
-                  <h2 class="book-card__title"><%= book.title %></h2>
+                  <h2 class="book-card__title"><%= book.display_title %></h2>
 
                   <% if book.author.present? %>
                     <p class="book-card__author"><%= book.author %></p>
@@ -284,7 +284,7 @@
               <li class="memo-timeline__item" id="<%= dom_id(memo) %>">
                 <div class="memo-timeline__header">
                   <div class="memo-timeline__timestamps">
-                    <%= link_to memo.book.title, book_path(memo.book, anchor: dom_id(memo)), class: "memo-search-results__book-title" %>
+                    <%= link_to memo.book.display_title, book_path(memo.book, anchor: dom_id(memo)), class: "memo-search-results__book-title" %>
                     <span class="memo-timeline__date">作成：<%= l(memo.created_at, format: :default) %></span>
                   </div>
                 </div>

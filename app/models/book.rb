@@ -33,6 +33,7 @@ class Book < ApplicationRecord
   validate :cover_image_content_type, if: -> { cover_image.attached? }
   validate :cover_image_size, if: -> { cover_image.attached? }
 
+  before_validation :set_normalized_title
   before_save :auto_set_reading_status
   before_save :apply_past_reading_settings
   after_create :create_reading_log_for_past_reading, if: :past_reading_checked?
@@ -146,7 +147,46 @@ class Book < ApplicationRecord
     end
   end
 
+  def self.normalize_title(val)
+    val.to_s.unicode_normalize(:nfkc).gsub(/[[:space:]]+/, " ").strip.downcase
+  end
+
+  def normalize_title(val)
+    self.class.normalize_title(val)
+  end
+
+  def reading_round
+    current_normalized = normalized_title.presence || normalize_title(title)
+    return 1 if current_normalized.blank? || user.nil?
+
+    if new_record?
+      user.books.where(normalized_title: current_normalized).count + 1
+    else
+      user.books.where(normalized_title: current_normalized).where("id <= ?", id).count
+    end
+  end
+
+  def display_title
+    round = reading_round
+    if round > 1
+      "#{title}(#{round}回目)"
+    else
+      title
+    end
+  end
+
+  def previous_book
+    return nil if new_record? || user.nil?
+    current_normalized = normalized_title.presence || normalize_title(title)
+    return nil if current_normalized.blank?
+    user.books.where(normalized_title: current_normalized).where("id < ?", id).order(id: :desc).first
+  end
+
   private
+
+  def set_normalized_title
+    self.normalized_title = normalize_title(title)
+  end
 
   def completed_at_must_be_valid_date
     return if completed_at_input.blank?

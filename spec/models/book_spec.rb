@@ -784,4 +784,88 @@ RSpec.describe Book, type: :model do
       end
     end
   end
+
+  describe '重複タイトルと再読記録関連' do
+    let(:user) { create(:user) }
+
+    describe '.normalize_title / #normalize_title' do
+      it '全角半角、大文字小文字、空白を正規化すること' do
+        expect(Book.normalize_title("Ruby on Rails ")).to eq("ruby on rails")
+        expect(Book.normalize_title("リーダブルコード")).to eq(Book.normalize_title(" ﾘｰﾀﾞﾌﾞﾙｺｰﾄﾞ "))
+      end
+    end
+
+    describe '保存時の自動正規化' do
+      it '保存時に normalized_title が自動で設定されること' do
+        book = create(:book, user: user, title: " Ruby on Rails ")
+        expect(book.normalized_title).to eq("ruby on rails")
+      end
+    end
+
+    describe '回数と前回の本と表示タイトルの判定' do
+      let!(:book1) { create(:book, user: user, title: "リーダブルコード", created_at: 3.days.ago) }
+      let!(:book2) { create(:book, user: user, title: " ﾘｰﾀﾞﾌﾞﾙｺｰﾄﾞ ", created_at: 2.days.ago) }
+      let!(:book3) { create(:book, user: user, title: "リーダブルコード", created_at: 1.day.ago) }
+      let!(:other_book) { create(:book, user: user, title: "デザインパターン") }
+
+      context '1冊目の場合' do
+        it '回数は1であること' do
+          expect(book1.reading_round).to eq(1)
+        end
+
+        it '表示タイトルはそのままのタイトルであること' do
+          expect(book1.display_title).to eq("リーダブルコード")
+        end
+
+        it '前回の本は nil であること' do
+          expect(book1.previous_book).to be_nil
+        end
+      end
+
+      context '2冊目の場合' do
+        it '回数は2であること' do
+          expect(book2.reading_round).to eq(2)
+        end
+
+        it '表示タイトルに回数が付与されること' do
+          expect(book2.display_title).to eq(" ﾘｰﾀﾞﾌﾞﾙｺｰﾄﾞ (2回目)")
+        end
+
+        it '前回の本は 1冊目の本であること' do
+          expect(book2.previous_book).to eq(book1)
+        end
+      end
+
+      context '3冊目の場合' do
+        it '回数は3であること' do
+          expect(book3.reading_round).to eq(3)
+        end
+
+        it '表示タイトルに回数が付与されること' do
+          expect(book3.display_title).to eq("リーダブルコード(3回目)")
+        end
+
+        it '前回の本は 2冊目の本であること' do
+          expect(book3.previous_book).to eq(book2)
+        end
+      end
+
+      context '異なるタイトルの場合' do
+        it '回数は1であること' do
+          expect(other_book.reading_round).to eq(1)
+        end
+
+        it '前回の本は nil であること' do
+          expect(other_book.previous_book).to be_nil
+        end
+      end
+
+      context '新規レコード（未保存）の場合' do
+        it 'まだ保存されていない場合も、すでに登録されている数+1を返すこと' do
+          new_book = build(:book, user: user, title: "リーダブルコード")
+          expect(new_book.reading_round).to eq(4)
+        end
+      end
+    end
+  end
 end

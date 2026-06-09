@@ -2,7 +2,9 @@ import { Controller } from '@hotwired/stimulus'
 
 export default class extends Controller {
   static targets = ['pages', 'deadline', 'quotaDisplay',
-    'title', 'titleStatus', 'coverPreview', 'currentPage']
+    'title', 'titleStatus', 'coverPreview', 'currentPage', 'duplicateWarning']
+
+  static values = { bookId: String }
 
   connect () {
     this.calculateQuota()
@@ -10,6 +12,8 @@ export default class extends Controller {
     this.fetchPromise = null
     this.cachedBook = null
     this.syncCompletedAtFieldVisibility()
+    this.isDuplicate = false
+    this.checkDuplicate()
   }
 
   syncCompletedAtFieldVisibility () {
@@ -25,6 +29,7 @@ export default class extends Controller {
     this.markTitleFetched(book.title)
     this._updateCoverPreview(book.cover_image_url)
     this._setTitleStatus('書籍情報を自動入力しました')
+    this.checkDuplicate()
   }
 
   async fetchByTitle () {
@@ -356,6 +361,60 @@ export default class extends Controller {
         this._setTitleStatus(`${fieldNameJapanese}を取得しました。`)
       } else {
         this._setTitleStatus(`${fieldNameJapanese}の情報は見つかりませんでした。`)
+      }
+    }
+  }
+
+  async checkDuplicate () {
+    const title = this.hasTitleTarget ? this.titleTarget.value.trim() : ''
+    if (!title) {
+      this.hideDuplicateWarning()
+      return
+    }
+
+    const bookId = this.hasBookIdValue ? this.bookIdValue : null
+    let url = `/books/check_duplicate?title=${encodeURIComponent(title)}`
+    if (bookId) {
+      url += `&id=${bookId}`
+    }
+
+    try {
+      const res = await fetch(url)
+      const data = await res.json()
+      if (data.duplicate) {
+        console.log("checkDuplicate duplicate: true, count:", data.count)
+        this.showDuplicateWarning(data.count)
+      } else {
+        console.log("checkDuplicate duplicate: false")
+        this.hideDuplicateWarning()
+      }
+    } catch (e) {
+      console.error(e)
+    }
+  }
+
+  showDuplicateWarning (count) {
+    if (this.hasDuplicateWarningTarget) {
+      this.duplicateWarningTarget.textContent = `※同じタイトルの本が既に${count}冊登録されています。`
+      this.duplicateWarningTarget.hidden = false
+    }
+    this.isDuplicate = true
+  }
+
+  hideDuplicateWarning () {
+    if (this.hasDuplicateWarningTarget) {
+      this.duplicateWarningTarget.textContent = ''
+      this.duplicateWarningTarget.hidden = true
+    }
+    this.isDuplicate = false
+  }
+
+  handleSubmit (event) {
+    console.log("handleSubmit called. isDuplicate:", this.isDuplicate)
+    if (this.isDuplicate) {
+      const confirmed = window.confirm('同じタイトルの本が既に登録されています。このまま登録しますか？')
+      if (!confirmed) {
+        event.preventDefault()
       }
     }
   }
