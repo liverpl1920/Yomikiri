@@ -6,7 +6,7 @@
 
 <%= turbo_stream.replace "new-book-memo-form" do %>
   <div id="new-book-memo-form">
-    <%= form_with model: [@book, @new_book_memo], data: { controller: 'memo-format' } do |f| %>
+    <%= form_with model: [@book, @new_book_memo] do |f| %>
       <div class="book-show__memo-field">
         <%= f.label :page_number, '対象ページ（任意）', class: 'book-show__memo-label' %>
         <%= f.text_field :page_number,
@@ -16,33 +16,12 @@
         <small class="book-show__memo-help">最大20文字</small>
       </div>
       <div class="book-show__memo-field">
-        <div class="book-show__memo-toolbar" role="group" aria-label="メモ装飾ツール">
-          <div class="book-show__memo-toolbar-group">
-            <%= button_tag '太字',
-                  type: 'button',
-                  class: 'btn btn--secondary btn--sm',
-                  data: { action: 'memo-format#insertBold' } %>
-          </div>
-          <div class="book-show__memo-toolbar-group">
-            <label for="new-book-memo-color" class="book-show__memo-label">文字色</label>
-            <input id="new-book-memo-color"
-                   type="color"
-                   value="#dc2626"
-                   class="book-show__memo-color-input"
-                   data-memo-format-target="color">
-            <%= button_tag '色を適用',
-                  type: 'button',
-                  class: 'btn btn--secondary btn--sm',
-                  data: { action: 'memo-format#insertColor' } %>
-          </div>
-        </div>
         <%= f.text_area :content,
               class: 'book-show__memo-input',
               rows: 4,
               maxlength: BookMemo::CONTENT_MAX_LENGTH,
-              placeholder: '読書中の気づきや記録を追加できます',
-              data: { memo_format_target: 'textarea' } %>
-        <small class="book-show__memo-help">最大2000文字（太字: **テキスト** / 色: [color=#ff0000]テキスト[/color]）</small>
+              placeholder: '読書中の気づきや記録を追加できます' %>
+        <small class="book-show__memo-help">最大2000文字</small>
       </div>
       <div class="book-show__memo-actions">
         <%= f.submit 'メモを追加する', class: 'btn btn--primary' %>

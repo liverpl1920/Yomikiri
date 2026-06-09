@@ -265,16 +265,17 @@ RSpec.describe 'BookMemos', type: :request do
     end
   end
 
-  describe 'GET /books/:id (メモ装飾表示)' do
+  describe 'GET /books/:id (メモ表示)' do
     before { sign_in user }
 
-    it '太字と文字色が変換されて表示される' do
+    it '太字と文字色が変換されず、プレーンテキストとして表示される' do
       create(:book_memo, book: book, content: '**重要** [color=#ff0000]要確認[/color]')
 
       get book_path(book)
 
-      expect(response.body).to include('<strong>重要</strong>')
-      expect(response.body).to include('<span style="color: #ff0000;">要確認</span>')
+      expect(response.body).to include('**重要** [color=#ff0000]要確認[/color]')
+      expect(response.body).not_to include('<strong>重要</strong>')
+      expect(response.body).not_to include('style="color: #ff0000;"')
     end
 
     it '不正なHTMLはエスケープされる' do
