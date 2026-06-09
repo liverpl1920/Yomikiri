@@ -49,7 +49,28 @@ class BooksController < ApplicationController
   end
 
   def new
-    @book = current_user.books.build
+    if params[:copy_from_id]
+      original_book = current_user.books.find_by(id: params[:copy_from_id])
+      if original_book
+        @book = original_book.dup
+        @book.status = :unread
+        @book.current_page = 0
+        @book.extension_count = 0
+        @book.deadline = nil
+        @book.completed_at = nil
+        @book.memo = nil
+        @book.rating = nil
+        @book.review = nil
+        @book.memo_updated_at = nil
+        if original_book.cover_image.attached?
+          @book.cover_image.attach(original_book.cover_image.blob)
+        end
+      else
+        @book = current_user.books.build
+      end
+    else
+      @book = current_user.books.build
+    end
   end
 
   def create
