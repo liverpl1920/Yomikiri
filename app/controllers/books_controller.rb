@@ -188,6 +188,25 @@ class BooksController < ApplicationController
     render json: { books: [], error: "検索中にエラーが発生しました" }
   end
 
+  def check_duplicate
+    title = params[:title].to_s
+    normalized = Book.normalize_title(title)
+
+    if normalized.blank?
+      render json: { duplicate: false }
+      return
+    end
+
+    books = current_user.books.where(normalized_title: normalized)
+    books = books.where.not(id: params[:id]) if params[:id].present?
+
+    if books.exists?
+      render json: { duplicate: true, count: books.count }
+    else
+      render json: { duplicate: false }
+    end
+  end
+
   SUGGESTION_FIELDS = %w[author genre publisher translator].freeze
 
   def suggestions

@@ -2,7 +2,9 @@
                multipart: true,
                html: { autocomplete: 'off' },
                data: {
-                 controller: 'book-form'
+                 controller: 'book-form',
+                 action: 'submit->book-form#handleSubmit',
+                 book_form_book_id_value: book.id
                }) do |f| %>
 
   <%# バリデーションエラー一覧 %>
@@ -30,7 +32,7 @@
           data: {
             'book-form-target': 'title',
             'title-autocomplete-target': 'input',
-            action: 'input->title-autocomplete#onInput keydown->title-autocomplete#onKeydown'
+            action: 'input->title-autocomplete#onInput keydown->title-autocomplete#onKeydown input->book-form#checkDuplicate'
           } %>
         <ul class="title-autocomplete__list title-autocomplete__list--hidden"
           data-title-autocomplete-target="list"
@@ -39,6 +41,7 @@
         <% if book.errors[:title].any? %>
       <span class="form-field__error"><%= book.errors[:title].first %></span>
     <% end %>
+    <p class="form-field__warning" data-book-form-target="duplicateWarning" hidden style="color: #d93025; margin-top: 0.25rem; font-size: 0.875rem; font-weight: bold;"></p>
     <p class="book-form__title-status" data-book-form-target="titleStatus" aria-live="polite"></p>
     <div class="book-cover-preview" data-book-form-target="coverPreview" hidden></div>
     <button type="button"

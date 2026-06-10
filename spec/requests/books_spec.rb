@@ -1822,4 +1822,70 @@ RSpec.describe 'Books', type: :request do
       end
     end
   end
+
+  describe 'GET /books/check_duplicate' do
+    context '未ログインの場合' do
+      it 'ログイン画面へリダイレクトされる' do
+        get check_duplicate_books_path, params: { title: 'テスト本' }
+        expect(response).to redirect_to(new_user_session_path)
+      end
+    end
+
+    context 'ログイン済みの場合' do
+      before { sign_in user }
+
+      context 'タイトルが空の場合' do
+        it 'duplicate: false を返す' do
+          get check_duplicate_books_path, params: { title: '' }
+          expect(response).to have_http_status(:ok)
+          json = JSON.parse(response.body)
+          expect(json['duplicate']).to be false
+        end
+      end
+
+      context '重複する本がない場合' do
+        it 'duplicate: false を返す' do
+          get check_duplicate_books_path, params: { title: '新しいタイトル' }
+          expect(response).to have_http_status(:ok)
+          json = JSON.parse(response.body)
+          expect(json['duplicate']).to be false
+        end
+      end
+
+      context '重複する本がある場合' do
+        let!(:existing_book) { create(:book, user: user, title: 'リーダブルコード') }
+
+        it 'duplicate: true と count を返す' do
+          get check_duplicate_books_path, params: { title: 'リーダブルコード' }
+          expect(response).to have_http_status(:ok)
+          json = JSON.parse(response.body)
+          expect(json['duplicate']).to be true
+          expect(json['count']).to eq(1)
+        end
+
+        it '全角半角、大文字小文字、空白の差異があっても重複と判定すること' do
+          get check_duplicate_books_path, params: { title: ' ﾘｰﾀﾞﾌﾞﾙｺｰﾄﾞ ' }
+          expect(response).to have_http_status(:ok)
+          json = JSON.parse(response.body)
+          expect(json['duplicate']).to be true
+        end
+
+        it '他ユーザーの重複本はカウントしないこと' do
+          create(:book, user: other_user, title: 'リーダブルコード')
+          get check_duplicate_books_path, params: { title: 'リーダブルコード' }
+          expect(response).to have_http_status(:ok)
+          json = JSON.parse(response.body)
+          expect(json['duplicate']).to be true
+          expect(json['count']).to eq(1) # 他ユーザーのは含まれない
+        end
+
+        it '自身のIDを除外指定した場合は duplicate: false を返すこと' do
+          get check_duplicate_books_path, params: { title: 'リーダブルコード', id: existing_book.id }
+          expect(response).to have_http_status(:ok)
+          json = JSON.parse(response.body)
+          expect(json['duplicate']).to be false
+        end
+      end
+    end
+  end
 end
