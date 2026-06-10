@@ -11,6 +11,19 @@ class Book < ApplicationRecord
   attr_accessor :is_past_reading, :completed_at_input
 
   enum :status, { unread: 0, reading: 1, completed: 2 }
+  enum :category, {
+    other: 0,
+    literature: 1,
+    entertainment: 2,
+    technical: 3,
+    manga: 4,
+    essay: 5,
+    practical: 6,
+    magazine: 7,
+    academic: 8,
+    non_fiction: 9,
+    humanities: 10
+  }, default: :other
 
   validates :title, presence: true, length: { maximum: 255 }
   validates :author, length: { maximum: 255 }, allow_blank: true
@@ -24,6 +37,7 @@ class Book < ApplicationRecord
   validates :current_page, presence: true, numericality: { only_integer: true, greater_than_or_equal_to: 0 }
   validates :deadline, presence: true, unless: :deadline_optional?
   validates :status, presence: true
+  validates :category, presence: true
 
   validate :current_page_not_exceed_pages
   validate :deadline_cannot_be_in_the_past, if: -> { new_record? || (!completed? && will_save_change_to_deadline?) }
