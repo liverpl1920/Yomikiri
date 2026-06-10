@@ -146,5 +146,34 @@ RSpec.describe ReadingReportSummaryService do
         expect(summary[:memo_details]).to eq([])
       end
     end
+
+    describe 'genres' do
+      let(:book_backend) { create(:book, user: user, title: 'Go言語', genre: 'バックエンド') }
+      let(:book_frontend) { create(:book, user: user, title: 'React実践', genre: 'フロントエンド') }
+      let(:book_no_genre) { create(:book, user: user, title: '無の書', genre: nil) }
+      let(:book_empty_genre) { create(:book, user: user, title: '空の書', genre: '') }
+
+      it 'ジャンルごとの読了ページ数および比率を集計し、降順（同数の場合はジャンル名順）でソートする' do
+        reference_date = Date.new(2026, 5, 17)
+
+        create(:reading_log, book: book_backend, read_at: Date.new(2026, 5, 15), pages_read: 60)
+        create(:reading_log, book: book_frontend, read_at: Date.new(2026, 5, 16), pages_read: 30)
+        create(:reading_log, book: book_no_genre, read_at: Date.new(2026, 5, 17), pages_read: 10)
+        create(:reading_log, book: book_empty_genre, read_at: Date.new(2026, 5, 14), pages_read: 20)
+
+        summary = described_class.call(user: user, period_type: :weekly, reference_date: reference_date)
+
+        expect(summary[:genres]).to eq([
+          { name: 'バックエンド', pages_read: 60, ratio: 50.0 },
+          { name: 'フロントエンド', pages_read: 30, ratio: 25.0 },
+          { name: '未分類', pages_read: 30, ratio: 25.0 }
+        ])
+      end
+
+      it '読書ログがない場合は空配列を返す' do
+        summary = described_class.call(user: user, period_type: :weekly, reference_date: Date.new(2026, 5, 17))
+        expect(summary[:genres]).to eq([])
+      end
+    end
   end
 end

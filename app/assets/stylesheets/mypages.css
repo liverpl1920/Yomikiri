@@ -456,6 +456,14 @@
   border-radius: inherit;
 }
 
+.mypage-stats__bar-fill--genre {
+  background: linear-gradient(90deg, #7c3aed 0%, #a78bfa 100%);
+}
+
+.mypage-stats__genre {
+  margin-top: 2rem;
+}
+
 @media (max-width: 768px) {
   .mypage-stats__cards {
     grid-template-columns: 1fr;
