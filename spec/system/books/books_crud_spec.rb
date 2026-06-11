@@ -12,6 +12,7 @@ RSpec.describe '書籍管理', type: :system do
 
       fill_in 'タイトル', with: 'テスト駆動開発'
       fill_in '著者', with: 'Kent Beck'
+      select '技術書', from: '種類'
       fill_in 'ページ数', with: '280', exact: true
       fill_in '読了期限', with: (Date.current + 14).strftime('%Y-%m-%d')
       click_button '登録する'
@@ -19,6 +20,7 @@ RSpec.describe '書籍管理', type: :system do
       # 詳細画面にリダイレクト
       expect(page).to have_text('テスト駆動開発')
       expect(page).to have_text('Kent Beck')
+      expect(page).to have_text('技術書')
     end
 
     it 'タイトルが空の場合はエラーが表示される' do
@@ -117,7 +119,7 @@ RSpec.describe '書籍管理', type: :system do
     before { login_as(user, scope: :user) }
 
     it '詳細画面の「この本をもう一度読む」リンクから値が引き継がれた新規登録画面に遷移し、新しく登録できること' do
-      original_book = create(:book, user: user, title: 'コピー元の本', author: '著者A', genre: 'IT', pages: 300)
+      original_book = create(:book, user: user, title: 'コピー元の本', author: '著者A', genre: 'IT', category: :technical, pages: 300)
 
       visit book_path(original_book)
       click_link 'この本をもう一度読む'
@@ -126,6 +128,7 @@ RSpec.describe '書籍管理', type: :system do
       expect(find_field('タイトル').value).to eq('コピー元の本')
       expect(find_field('著者').value).to eq('著者A')
       expect(find_field('ジャンル').value).to eq('IT')
+      expect(find_field('種類').value).to eq('technical')
       expect(find_field('ページ数').value).to eq('300')
 
       fill_in '読了期限', with: (Date.current + 7).strftime('%Y-%m-%d')
@@ -133,6 +136,7 @@ RSpec.describe '書籍管理', type: :system do
 
       expect(page).to have_text('コピー元の本')
       expect(page).to have_text('著者A')
+      expect(page).to have_text('技術書')
       expect(page).to have_text('未読')
     end
   end

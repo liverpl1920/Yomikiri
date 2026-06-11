@@ -4,6 +4,7 @@ FactoryBot.define do
     title { '実践的なRailsアプリケーション開発' }
     author { '山田太郎' }
     genre { '技術書' }
+    category { :technical }
     pages { 300 }
     current_page { 0 }
     deadline { Date.current + 14 }

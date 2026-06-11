@@ -346,13 +346,13 @@ class BooksController < ApplicationController
   end
 
   def book_params
-    permitted = params.require(:book).permit(:title, :author, :genre, :pages, :current_page, :deadline, :status, :cover_image_url, :cover_image, :isbn, :memo, :is_past_reading, :completed_at_input, :translator, :publisher)
+    permitted = params.require(:book).permit(:title, :author, :genre, :category, :pages, :current_page, :deadline, :status, :cover_image_url, :cover_image, :isbn, :memo, :is_past_reading, :completed_at_input, :translator, :publisher)
     permitted[:current_page] = 0 if permitted[:current_page].blank?
       permitted
   end
 
   def edit_book_params
-    params.require(:book).permit(:title, :author, :genre, :pages, :deadline, :cover_image_url, :cover_image, :isbn, :translator, :publisher)
+    params.require(:book).permit(:title, :author, :genre, :category, :pages, :deadline, :cover_image_url, :cover_image, :isbn, :translator, :publisher)
   end
 
   def memo_params

@@ -87,6 +87,19 @@
     </div>
   </div>
 
+  <%# 種類 %>
+  <div class="form-field">
+    <%= f.label :category, '種類', class: 'form-field__label' %>
+    <span class="form-field__required" aria-hidden="true">必須</span>
+    <%= f.select :category,
+          Book.categories.keys.map { |k| [I18n.t("book.category.#{k}"), k] },
+          {},
+          class: "form-field__input #{'form-field__input--error' if book.errors[:category].any?}" %>
+    <% if book.errors[:category].any? %>
+      <span class="form-field__error"><%= book.errors[:category].first %></span>
+    <% end %>
+  </div>
+
   <%# ジャンル %>
   <div class="form-field">
     <%= f.label :genre, 'ジャンル', class: 'form-field__label' %>
