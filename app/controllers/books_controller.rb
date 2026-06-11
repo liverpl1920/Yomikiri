@@ -197,7 +197,7 @@ class BooksController < ApplicationController
       return
     end
 
-    books = current_user.books.where(normalized_title: normalized)
+    books = Book.where(user_id: current_user.id, normalized_title: normalized)
     books = books.where.not(id: params[:id]) if params[:id].present?
 
     if books.exists?

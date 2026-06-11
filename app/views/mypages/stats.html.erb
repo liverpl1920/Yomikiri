@@ -100,6 +100,30 @@
       <% end %>
     </section>
 
+    <section class="mypage-stats__genre mypage-stats__breakdown">
+      <h2 class="mypage-stats__breakdown-title">ジャンル別読書ポートフォリオ</h2>
+
+      <% if @summary[:genres].empty? %>
+        <p class="mypage-stats__empty">この期間の読書記録はありません。</p>
+      <% else %>
+        <ul class="mypage-stats__list">
+          <% @summary[:genres].each do |genre_summary| %>
+            <% pages_read = genre_summary[:pages_read] %>
+            <% ratio = genre_summary[:ratio] %>
+            <li class="mypage-stats__item">
+              <div class="mypage-stats__item-head">
+                <span class="mypage-stats__book-title"><%= genre_summary[:name] %></span>
+                <span class="mypage-stats__book-pages"><%= pages_read %> ページ (<%= ratio %>%)</span>
+              </div>
+              <div class="mypage-stats__bar" role="img" aria-label="<%= genre_summary[:name] %> の読了ページ割合">
+                <span class="mypage-stats__bar-fill mypage-stats__bar-fill--genre" style="width: <%= ratio %>%"></span>
+              </div>
+            </li>
+          <% end %>
+        </ul>
+      <% end %>
+    </section>
+
     <section class="mypage-stats__breakdown">
       <h2 class="mypage-stats__breakdown-title">書籍別の読了ページ内訳</h2>
 

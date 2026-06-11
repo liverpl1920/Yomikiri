@@ -97,4 +97,25 @@ RSpec.describe 'マイページ', type: :system do
       expect(page).to have_text('1以上')
     end
   end
+
+  describe '読書統計' do
+    let(:book_backend) { create(:book, user: user, title: 'Go言語', genre: 'バックエンド') }
+    let(:book_no_genre) { create(:book, user: user, title: '無の書', genre: nil) }
+
+    before do
+      create(:reading_log, book: book_backend, read_at: Date.current, pages_read: 80)
+      create(:reading_log, book: book_no_genre, read_at: Date.current, pages_read: 20)
+      login_as(user, scope: :user)
+    end
+
+    it '統計ページにアクセスすると、ジャンル別読書ポートフォリオが表示される' do
+      visit stats_mypage_path
+
+      expect(page).to have_text('ジャンル別読書ポートフォリオ')
+      expect(page).to have_text('バックエンド')
+      expect(page).to have_text('80 ページ (80.0%)')
+      expect(page).to have_text('未分類')
+      expect(page).to have_text('20 ページ (20.0%)')
+    end
+  end
 end
