@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-RSpec.describe '読了フロー', type: :system do
+RSpec.describe '読了フロー', type: :system, js: true do
   let!(:user) { create(:user) }
 
   before { login_as(user, scope: :user) }
@@ -20,7 +20,9 @@ RSpec.describe '読了フロー', type: :system do
       it '「読了にする！」ボタンを押すとお祝いモーダルが表示される' do
         visit book_path(book)
 
-        click_button '読了にする！'
+        accept_confirm '本当に読了にしますか？' do
+          click_button '読了にする！'
+        end
 
         expect(page).to have_text('読了おめでとうございます！')
         expect(page).to have_text(book.title)
@@ -29,7 +31,9 @@ RSpec.describe '読了フロー', type: :system do
       it 'お祝いモーダルに「一覧に戻る」リンクがある' do
         visit book_path(book)
 
-        click_button '読了にする！'
+        accept_confirm '本当に読了にしますか？' do
+          click_button '読了にする！'
+        end
 
         within('.celebration-modal-overlay') do
           expect(page).to have_link('一覧に戻る', href: books_path)
@@ -39,12 +43,26 @@ RSpec.describe '読了フロー', type: :system do
       it '「一覧に戻る」リンクで書籍一覧画面へ遷移する' do
         visit book_path(book)
 
-        click_button '読了にする！'
+        accept_confirm '本当に読了にしますか？' do
+          click_button '読了にする！'
+        end
         within('.celebration-modal-overlay') do
           click_link '一覧に戻る'
         end
 
         expect(page).to have_current_path(books_path)
+      end
+
+      it '「読了にする！」ボタンで確認ダイアログをキャンセルした場合、読了状態にならず画面が維持される' do
+        visit book_path(book)
+
+        dismiss_confirm '本当に読了にしますか？' do
+          click_button '読了にする！'
+        end
+
+        expect(page).not_to have_text('読了おめでとうございます！')
+        expect(page).to have_button('読了にする！')
+        expect(book.reload.status).not_to eq('completed')
       end
     end
 
