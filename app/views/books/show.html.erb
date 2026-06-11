@@ -142,7 +142,8 @@
         <%= button_to '読了にする！', complete_book_path(@book),
               method: :patch,
               class: complete_btn_class,
-              form: { data: { turbo: false } } %>
+              form: { data: { turbo: false } },
+              onclick: "return confirm('本当に読了にしますか？')" %>
       </div>
     <% end %>
 
