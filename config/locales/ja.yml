@@ -12,6 +12,18 @@ ja:
       unread: "未読"
       reading: "読書中"
       completed: "読了"
+    category:
+      other: "その他"
+      literature: "純文学"
+      entertainment: "エンターテインメント"
+      technical: "技術書"
+      manga: "漫画"
+      essay: "エッセイ"
+      practical: "実用書"
+      magazine: "雑誌"
+      academic: "専門書"
+      non_fiction: "ノンフィクション"
+      humanities: "教養"
     book_card:
       pages: "ページ"
       daily_quota_label: "今日のノルマ"
@@ -28,6 +40,7 @@ ja:
       book:
         title: "タイトル"
         author: "著者"
+        category: "種類"
         memo: "コメント・メモ"
         cover_image_url: "書影URL"
         cover_image: "書影画像"

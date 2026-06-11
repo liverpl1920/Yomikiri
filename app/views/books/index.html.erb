@@ -202,6 +202,10 @@
                     <p class="book-card__author"><%= book.author %></p>
                   <% end %>
 
+                  <% if book.category.present? %>
+                    <span class="book-card__category"><%= I18n.t("book.category.#{book.category}") %></span>
+                  <% end %>
+
                   <% if book.genre.present? %>
                     <span class="book-card__genre"><%= book.genre %></span>
                   <% end %>

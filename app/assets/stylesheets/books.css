@@ -1477,6 +1477,19 @@
     white-space: nowrap;
   }
 
+.book-card__category {
+  display: inline-block;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: #0369a1;
+  background-color: #e0f2fe;
+  border: 1px solid #bae6fd;
+  border-radius: 99px;
+  padding: 0.1rem 0.5rem;
+  width: fit-content;
+  margin-right: 0.25rem;
+}
+
 .book-card__genre {
   display: inline-block;
   font-size: 0.75rem;
@@ -1487,6 +1500,7 @@
   border-radius: 99px;
   padding: 0.1rem 0.5rem;
   width: fit-content;
+  margin-right: 0.25rem;
 }
 
 /* ---- メモタイムライン ---- */

@@ -337,6 +337,14 @@ RSpec.describe Book, type: :model do
         expect(book1.cover_image.blob.id).to eq(first_blob_id)
       end
     end
+
+    describe 'category' do
+      it '種類がない場合は無効' do
+        book = build(:book)
+        book.category = nil
+        expect(book).not_to be_valid
+      end
+    end
   end
 
   describe 'アソシエーション' do
@@ -365,6 +373,28 @@ RSpec.describe Book, type: :model do
     it 'デフォルトのステータスは unread' do
       book = create(:book)
       expect(book.reload).to be_unread
+    end
+  end
+
+  describe 'enum: category' do
+    it '各種類を正しく定義していること' do
+      expect(build(:book, category: :technical)).to be_technical
+      expect(build(:book, category: :literature)).to be_literature
+      expect(build(:book, category: :entertainment)).to be_entertainment
+      expect(build(:book, category: :manga)).to be_manga
+      expect(build(:book, category: :essay)).to be_essay
+      expect(build(:book, category: :practical)).to be_practical
+      expect(build(:book, category: :magazine)).to be_magazine
+      expect(build(:book, category: :academic)).to be_academic
+      expect(build(:book, category: :non_fiction)).to be_non_fiction
+      expect(build(:book, category: :humanities)).to be_humanities
+      expect(build(:book, category: :other)).to be_other
+    end
+
+    it 'デフォルトの種類は other' do
+      user = create(:user)
+      book = Book.create!(user: user, title: 'テスト本', pages: 100)
+      expect(book.reload).to be_other
     end
   end
 

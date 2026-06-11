@@ -258,6 +258,20 @@
         </dd>
       </div>
 
+      <div class="book-show__detail-item">
+        <dt class="book-show__detail-label">種類</dt>
+        <dd class="book-show__detail-value">
+          <%= @book.category.present? ? I18n.t("book.category.#{@book.category}") : "-" %>
+        </dd>
+      </div>
+
+      <% if @book.genre.present? %>
+        <div class="book-show__detail-item">
+          <dt class="book-show__detail-label">ジャンル</dt>
+          <dd class="book-show__detail-value"><%= @book.genre %></dd>
+        </div>
+      <% end %>
+
       <% if @book.translator.present? %>
         <div class="book-show__detail-item">
           <dt class="book-show__detail-label">翻訳者</dt>
