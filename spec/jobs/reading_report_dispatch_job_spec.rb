@@ -16,6 +16,15 @@ RSpec.describe ReadingReportDispatchJob, type: :job do
       }.to change { ActionMailer::Base.deliveries.count }.by(2)
     end
 
+    it '年次レポートを全ユーザーに送信する' do
+      user1 = create(:user, email: 'u1@example.com')
+      ref_date = Date.new(2027, 1, 1)
+
+      expect {
+        described_class.perform_now('yearly', ref_date)
+      }.to change { ActionMailer::Base.deliveries.count }.by(1)
+    end
+
     it '未対応の period_type では例外を発生させる' do
       expect {
         described_class.perform_now('daily', reference_date)

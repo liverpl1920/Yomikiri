@@ -1,7 +1,7 @@
 class ReadingReportDispatchJob < ApplicationJob
   queue_as :default
 
-  PERIOD_TYPES = %w[weekly monthly].freeze
+  PERIOD_TYPES = %w[weekly monthly yearly].freeze
   MAX_DELIVERY_ATTEMPTS = 3
 
   def perform(period_type, reference_date = Date.current)
@@ -44,10 +44,13 @@ class ReadingReportDispatchJob < ApplicationJob
   end
 
   def mail_for(user, period_type, reference_date)
-    if period_type == "weekly"
+    case period_type
+    when "weekly"
       ReadingReportMailer.weekly_report(user, reference_date)
-    else
+    when "monthly"
       ReadingReportMailer.monthly_report(user, reference_date)
+    when "yearly"
+      ReadingReportMailer.yearly_report(user, reference_date)
     end
   end
 end

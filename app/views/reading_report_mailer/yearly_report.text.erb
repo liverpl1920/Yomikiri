@@ -1,0 +1,58 @@
+<%= @user.nickname.presence || @user.email %> さん
+
+あけましておめでとうございます！
+<%= @summary[:start_date].year %>年の読書の軌跡をまとめた年次レポートをお届けします。
+
+■ 年間読書実績
+・総読了冊数: <%= @summary[:yearly_completed_books_count] %> 冊
+・総読書ページ数: <%= @summary[:total_pages] %> ページ
+・年間読書日数: <%= (@summary[:end_date] - @summary[:start_date]).to_i + 1 %>日中 <%= @summary[:yearly_reading_days_count] %>日
+<% if @summary[:peak_month].present? %>
+・読書のピーク月: あなたが今年最も読書に没頭したのは <%= @summary[:peak_month] %>月 でした！
+<% else %>
+・読書のピーク月: 該当なし
+<% end %>
+
+■ Yomikiri 独自アワード
+【電光石火アワード】（登録から最も早く読了した本）
+<% if @summary[:lightning_award_book].present? %>
+- 『<%= @summary[:lightning_award_book][:title] %>』 (登録から <%= @summary[:lightning_award_book][:days] %> 日で読了)
+<% else %>
+- 該当なし
+<% end %>
+
+【最も向き合った本】（年間読書ページ数が最大の本）
+<% if @summary[:most_faced_book].present? %>
+- 『<%= @summary[:most_faced_book][:title] %>』 (今年 <%= @summary[:most_faced_book][:pages_read] %> ページ読了)
+<% else %>
+- 該当なし
+<% end %>
+
+【言い訳アワード】（今年最も期限を延長した本）
+<% if @summary[:excuse_award_book].present? %>
+- 『<%= @summary[:excuse_award_book][:title] %>』 (期限延長回数: <%= @summary[:excuse_award_book][:extension_count] %> 回)
+<% else %>
+- 該当なし
+<% end %>
+
+■ 年間のアウトプット
+・今年残したメモの総数: <%= @summary[:memo_details].size %> 件
+<% if @summary[:most_memo_book_and_excerpt].present? %>
+・特にメモが多かった本: 『<%= @summary[:most_memo_book_and_excerpt][:title] %>』 (計 <%= @summary[:most_memo_book_and_excerpt][:total_memos] %> 件)
+【メモの抜粋】
+--------------------------------------------------
+<%= @summary[:most_memo_book_and_excerpt][:excerpt_content].truncate(150) %>
+--------------------------------------------------
+<% end %>
+
+■ 新年に向けた「積読の現在地」
+・現在積まれている未読・読書中の本: <%= @summary[:tsundoku_current_state][:count] %> 冊 (残り <%= @summary[:tsundoku_current_state][:total_pages] %> ページ)
+
+新年最初の読書目標に、まずはこちらの本から読み始めてみませんか？
+<% if @summary[:new_year_proposal_book].present? %>
+☞ 『<%= @summary[:new_year_proposal_book] %>』
+<% else %>
+（現在、積まれている未読・読書中の本はありません。新しい本を登録して新年をスタートしましょう！）
+<% end %>
+
+今年も Yomikiri と一緒に、一歩ずつ積読を解消して充実した読書ライフを送りましょう！
