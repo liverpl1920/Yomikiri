@@ -33,7 +33,7 @@ group :test do
   gem "capybara"
   gem "selenium-webdriver"
   gem "database_cleaner-active_record"
-  gem "shoulda-matchers", "~> 5.0"
+  gem "shoulda-matchers", "~> 8.0"
   gem "rspec_junit_formatter"
   gem "simplecov", require: false
   gem "bundler-audit", require: false
