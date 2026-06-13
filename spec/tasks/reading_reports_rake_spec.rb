@@ -30,18 +30,30 @@ RSpec.describe 'reading_reports:dispatch' do
     expect(ReadingReportDispatchJob).not_to have_received(:perform_now).with('monthly', Date.new(2026, 5, 17))
   end
 
-  it '月末では monthly を実行する' do
-    ENV['DATE'] = '2026-05-31'
+  it '毎月1日では monthly を実行する' do
+    ENV['DATE'] = '2026-06-01'
 
     allow(ReadingReportDispatchJob).to receive(:perform_now)
 
     Rake::Task['reading_reports:dispatch'].invoke
 
-    expect(ReadingReportDispatchJob).to have_received(:perform_now).with('monthly', Date.new(2026, 5, 31))
+    expect(ReadingReportDispatchJob).to have_received(:perform_now).with('monthly', Date.new(2026, 6, 1))
+    expect(ReadingReportDispatchJob).not_to have_received(:perform_now).with('yearly', Date.new(2026, 6, 1))
   end
 
-  it '平日かつ月末以外ではスキップする' do
-    ENV['DATE'] = '2026-05-13' # Wednesday
+  it '毎年1月1日では monthly と yearly を実行する' do
+    ENV['DATE'] = '2027-01-01'
+
+    allow(ReadingReportDispatchJob).to receive(:perform_now)
+
+    Rake::Task['reading_reports:dispatch'].invoke
+
+    expect(ReadingReportDispatchJob).to have_received(:perform_now).with('monthly', Date.new(2027, 1, 1))
+    expect(ReadingReportDispatchJob).to have_received(:perform_now).with('yearly', Date.new(2027, 1, 1))
+  end
+
+  it '平日かつ1日以外ではスキップする' do
+    ENV['DATE'] = '2026-05-13' # Wednesday (and not 1st)
 
     allow(ReadingReportDispatchJob).to receive(:perform_now)
 

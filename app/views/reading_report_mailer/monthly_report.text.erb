@@ -1,17 +1,60 @@
 <%= @user.nickname.presence || @user.email %> さん
 
-今月の読書レポートをお届けします。
-対象期間: <%= @summary[:start_date] %> 〜 <%= @summary[:end_date] %>
+前月の読書レポートをお届けします。
 
-合計読了ページ数: <%= @summary[:total_pages] %> ページ
+■ 対象期間
+<%= @summary[:start_date] %> 〜 <%= @summary[:end_date] %>
 
-読んだ本一覧:
-<% if @summary[:books].empty? %>
+■ 読書実績
+・総読書ページ数: <%= @summary[:total_pages] %> ページ
+・読書した日数: <%= (@summary[:end_date] - @summary[:start_date]).to_i + 1 %>日中 <%= @summary[:reading_days_count] %>日
+
+■ 今月読了した本一覧
+<% if @summary[:completed_books].empty? %>
 - 該当なし
 <% else %>
-<% @summary[:books].each do |book| %>
-- <%= book[:title] %>: <%= book[:pages_read] %> ページ
+<% @summary[:completed_books].each do |book| %>
+- <%= book[:title] %> (読了日: <%= book[:completed_at] %>)
 <% end %>
 <% end %>
 
-来月も計画的に読書を進めていきましょう。
+■ 今月読み進めた本一覧 (現在進行中など)
+<% if @summary[:progressing_books].empty? %>
+- 該当なし
+<% else %>
+<% @summary[:progressing_books].each do |book| %>
+- <%= book[:title] %>: <%= book[:pages_read] %> ページ読了
+<% end %>
+<% end %>
+
+■ 積読解消の指標
+・積読の増減: 新規登録 <%= @summary[:tsundoku_balance][:registered] %> 冊 vs 読了 <%= @summary[:tsundoku_balance][:completed] %> 冊
+
+■ 賞味期限（読了期限）の達成状況
+・期限内に読了できた本: <%= @summary[:deadline_status][:completed_in_deadline] %> 冊
+・期限を延長した回数: <%= @summary[:deadline_status][:extensions] %> 回
+・現在期限切れになっている本: <%= @summary[:deadline_status][:overdue_count] %> 冊
+
+■ 来月の「賞味期限」間近な積読リスト
+<% if @summary[:next_month_urgent_books].empty? %>
+- 該当なし
+<% else %>
+<% @summary[:next_month_urgent_books].each do |book| %>
+- <%= book[:title] %> (進捗率: <%= book[:progress] %>%, 今日のノルマ: <%= book[:daily_quota] %>ページ)
+<% end %>
+<% end %>
+
+■ アウトプットの振り返り
+・今月残したブックメモの総数: <%= @summary[:memo_details].size %> 件
+
+<% unless @summary[:random_memos].empty? %>
+【今月のメモピックアップ】
+<% @summary[:random_memos].each do |memo| %>
+--------------------------------------------------
+▼ 書籍: <%= memo[:book_title] %><%= memo[:page_number].present? ? "（p.#{memo[:page_number]}）" : "" %>
+<%= memo[:content].truncate(100) %>
+--------------------------------------------------
+<% end %>
+<% end %>
+
+来月も Yomikiri で積読を少しずつ解消していきましょう！
