@@ -112,6 +112,7 @@ class Book < ApplicationRecord
     relation = relation.genre_like(params[:genre]) if params[:genre].present?
     relation = relation.publisher_like(params[:publisher]) if params[:publisher].present?
     relation = relation.translator_like(params[:translator]) if params[:translator].present?
+    relation = relation.where(category: params[:category]) if params[:category].present?
     relation = relation.completed_from(params[:completed_from]) if params[:completed_from].present?
     relation = relation.completed_to(params[:completed_to]) if params[:completed_to].present?
     relation

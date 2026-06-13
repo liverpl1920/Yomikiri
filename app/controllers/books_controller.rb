@@ -17,7 +17,7 @@ class BooksController < ApplicationController
     @search_params = normalized_index_search_params
     @search_active = @search_params.values.any?(&:present?)
 
-    book_search_keys = [ :title, :author, :genre, :publisher, :translator, :completed_from, :completed_to ]
+    book_search_keys = [ :title, :author, :genre, :publisher, :translator, :completed_from, :completed_to, :category ]
     book_search_active = @search_params.slice(*book_search_keys).values.any?(&:present?)
 
     if @search_active
@@ -364,13 +364,14 @@ class BooksController < ApplicationController
   end
 
   def normalized_index_search_params
-    permitted = params.permit(:title, :author, :genre, :publisher, :translator, :completed_from, :completed_to, :memo_keyword)
+    permitted = params.permit(:title, :author, :genre, :publisher, :translator, :completed_from, :completed_to, :memo_keyword, :category)
     title = permitted[:title].to_s.strip
     author = permitted[:author].to_s.strip
     genre = permitted[:genre].to_s.strip
     publisher = permitted[:publisher].to_s.strip
     translator = permitted[:translator].to_s.strip
     memo_keyword = permitted[:memo_keyword].to_s.strip
+    category = permitted[:category].to_s.strip
     completed_from = parse_iso_date(permitted[:completed_from])
     completed_to = parse_iso_date(permitted[:completed_to])
 
@@ -385,6 +386,7 @@ class BooksController < ApplicationController
       publisher: publisher.presence,
       translator: translator.presence,
       memo_keyword: memo_keyword.presence,
+      category: category.presence,
       completed_from: completed_from,
       completed_to: completed_to
     }

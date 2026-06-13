@@ -147,6 +147,37 @@ RSpec.describe 'Books index search', type: :request do
         expect(rendered_titles).not_to include(other_users_book.title)
       end
 
+      it '書籍の種類で絞り込み検索できる' do
+        technical_book = create(:book, user: user, title: '技術書A', category: :technical)
+        literature_book = create(:book, user: user, title: '純文学B', category: :literature)
+
+        get books_path, params: { category: 'technical' }
+
+        expect(response).to have_http_status(:ok)
+        expect(rendered_titles).to include(technical_book.title)
+        expect(rendered_titles).not_to include(literature_book.title)
+      end
+
+      it '書籍の種類が未指定（空）の場合は絞り込まない' do
+        technical_book = create(:book, user: user, title: '技術書A', category: :technical)
+        literature_book = create(:book, user: user, title: '純文学B', category: :literature)
+
+        get books_path, params: { category: '' }
+
+        expect(response).to have_http_status(:ok)
+        expect(rendered_titles).to include(technical_book.title)
+        expect(rendered_titles).to include(literature_book.title)
+      end
+
+      it '書籍の種類の検索条件がフォームに保持される' do
+        get books_path, params: { category: 'technical' }
+
+        doc = Nokogiri::HTML.parse(response.body)
+        selected_option = doc.css('select#category option[selected]')
+        expect(selected_option.text).to eq('技術書')
+        expect(selected_option.attr('value').value).to eq('technical')
+      end
+
       it '検索時も既存ソート（未了本優先・期限順）が維持される' do
         mixed_reading = create(:book, user: user, title: '共通検索_読書中', status: :reading, deadline: Date.current + 10)
         mixed_unread = create(:book, user: user, title: '共通検索_未読', status: :unread, deadline: Date.current + 2)
