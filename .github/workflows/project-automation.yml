@@ -1,26 +1,10 @@
 name: Project Automation
 
 on:
-  issues:
-    types: [opened, reopened]
   pull_request:
     types: [closed]
 
 jobs:
-  # ─────────────────────────────────────────
-  # Issue/PR がプロジェクトに未登録の場合に自動追加
-  # ─────────────────────────────────────────
-  add_to_project:
-    name: Add to GitHub Project
-    runs-on: ubuntu-latest
-    if: github.event.action == 'opened' || github.event.action == 'reopened'
-
-    steps:
-      - uses: actions/add-to-project@v1.0.2
-        with:
-          project-url: https://github.com/users/liverpl1920/projects/2
-          github-token: ${{ secrets.PROJECT_TOKEN }}
-
   # ─────────────────────────────────────────
   # PR マージ時: linked issue を "Done" へ移動
   # ─────────────────────────────────────────
