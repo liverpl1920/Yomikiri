@@ -182,3 +182,15 @@ ul, ol {
   border-color: var(--color-danger-hover, #b91c1c);
   text-decoration: none;
 }
+
+.btn--danger-ghost {
+  background-color: transparent;
+  color: var(--color-danger);
+  border-color: var(--color-danger);
+}
+
+.btn--danger-ghost:hover {
+  background-color: rgba(166, 58, 80, 0.08);
+  border-color: var(--color-danger);
+  text-decoration: none;
+}
