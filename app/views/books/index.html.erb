@@ -199,7 +199,7 @@
                   <h2 class="book-card__title"><%= book.display_title %></h2>
 
                   <% if book.author.present? %>
-                    <p class="book-card__author"><%= book.author %></p>
+                    <p class="book-card__author"><%= book_author_display(book) %></p>
                   <% end %>
 
                   <% if book.category.present? %>

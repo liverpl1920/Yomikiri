@@ -66,7 +66,7 @@ class Book < ApplicationRecord
   end
 
   def authors
-    author.to_s.split(/[,，]/).map(&:strip).reject(&:blank?)
+    author.to_s.split(/[,，、]/).map(&:strip).reject(&:blank?)
   end
 
   def translators
