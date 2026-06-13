@@ -46,4 +46,26 @@ RSpec.describe BooksHelper, type: :helper do
       expect(Rails.logger).to have_received(:warn).with(/active_storage_url_failed/)
     end
   end
+
+  describe '#book_author_display' do
+    it '著者が1人の場合はそのまま著者名を返す' do
+      book = build(:book, author: '著者A')
+      expect(helper.book_author_display(book)).to eq('著者A')
+    end
+
+    it '著者が複数人（カンマ区切り）の場合は1人目に " ..." を付加して返す' do
+      book = build(:book, author: '著者A, 著者B, 著者C')
+      expect(helper.book_author_display(book)).to eq('著者A ...')
+    end
+
+    it '著者が複数人（読点区切り）の場合は1人目に " ..." を付加して返す' do
+      book = build(:book, author: '著者A、著者B')
+      expect(helper.book_author_display(book)).to eq('著者A ...')
+    end
+
+    it '著者が空の場合は空文字を返す' do
+      book = build(:book, author: '')
+      expect(helper.book_author_display(book)).to eq('')
+    end
+  end
 end

@@ -33,4 +33,16 @@ module BooksHelper
       end
     end
   end
+
+  # 一覧画面の書籍カード用著者表示文字列を返す。
+  # 著者が複数人いる場合は1人目のみ表示し、末尾に " ..." を付加する。
+  # 著者が1人または未設定の場合はそのまま返す。
+  def book_author_display(book)
+    authors = book.authors
+    if authors.length > 1
+      "#{authors.first} ..."
+    else
+      book.author.to_s
+    end
+  end
 end
