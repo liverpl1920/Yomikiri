@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2026_06_10_224511) do
+ActiveRecord::Schema[7.2].define(version: 2026_06_13_030823) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -78,6 +78,15 @@ ActiveRecord::Schema[7.2].define(version: 2026_06_10_224511) do
     t.index ["user_id"], name: "index_books_on_user_id"
   end
 
+  create_table "genres", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.string "name", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["user_id", "name"], name: "index_genres_on_user_id_and_name", unique: true
+    t.index ["user_id"], name: "index_genres_on_user_id"
+  end
+
   create_table "reading_logs", force: :cascade do |t|
     t.bigint "book_id", null: false
     t.integer "pages_read", null: false
@@ -113,5 +122,6 @@ ActiveRecord::Schema[7.2].define(version: 2026_06_10_224511) do
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "book_memos", "books"
   add_foreign_key "books", "users"
+  add_foreign_key "genres", "users"
   add_foreign_key "reading_logs", "books"
 end

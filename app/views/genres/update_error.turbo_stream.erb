@@ -1,0 +1,4 @@
+<%# ジャンル更新失敗時: 編集フォームにエラーを表示 %>
+<%= turbo_stream.replace dom_id(@genre),
+      partial: "genres/edit_form",
+      locals: { genre: @genre } %>

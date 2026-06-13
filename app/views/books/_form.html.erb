@@ -108,7 +108,13 @@
       <%= f.text_field :genre,
             class: "form-field__input #{'form-field__input--error' if book.errors[:genre].any?}",
             placeholder: '例: プログラミング',
-            autocomplete: 'off' %>
+            autocomplete: 'off',
+            list: "genre-datalist" %>
+      <datalist id="genre-datalist">
+        <% current_user.genres.order(:name).each do |g| %>
+          <option value="<%= g.name %>">
+        <% end %>
+      </datalist>
       <button type="button"
               class="btn btn--outline btn--sm"
               data-action="click->book-form#fetchSingleField"

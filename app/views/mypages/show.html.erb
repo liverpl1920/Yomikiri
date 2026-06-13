@@ -133,6 +133,29 @@
       <% end %>
     </div>
 
+    <%# ジャンル設定 %>
+    <div class="mypage__card" id="genre-settings">
+      <h2 class="mypage__card-title">ジャンル設定</h2>
+      <p class="mypage__genre-caption">
+        よく使うジャンルを登録しておくと、書籍登録・編集時に候補として表示されます（最大50件）。
+      </p>
+
+      <%# ジャンル追加フォーム %>
+      <div id="genre-add-form-container">
+        <%= render "genres/genre_form", genre: Genre.new %>
+      </div>
+
+      <%# ジャンル一覧 %>
+      <% genres = current_user.genres.order(:name) %>
+      <% if genres.empty? %>
+        <p class="mypage__genre-empty" id="genre-list-empty">ジャンルはまだ登録されていません。</p>
+      <% else %>
+        <ul class="genre-list" id="genre-list">
+          <%= render genres %>
+        </ul>
+      <% end %>
+    </div>
+
     <%# アカウント設定 %>
     <div class="mypage__card">
       <h2 class="mypage__card-title">アカウント設定</h2>

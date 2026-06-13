@@ -1,0 +1,25 @@
+<%# ジャンル編集フォーム（Turbo Frame 内に表示） %>
+<%= turbo_frame_tag dom_id(genre) do %>
+  <li class="genre-list__item genre-list__item--editing">
+    <%= form_with model: [genre], url: mypage_genre_path(genre), method: :patch, class: "genre-edit-form" do |f| %>
+      <% if genre.errors.any? %>
+        <div class="genre-edit-form__errors" role="alert">
+          <ul>
+            <% genre.errors.full_messages.each do |message| %>
+              <li><%= message %></li>
+            <% end %>
+          </ul>
+        </div>
+      <% end %>
+      <%= f.text_field :name,
+            class: "genre-edit-form__input",
+            maxlength: 30,
+            autocomplete: "off" %>
+      <div class="genre-list__actions">
+        <%= f.submit "保存", class: "btn btn--primary btn--xs" %>
+        <%= link_to "キャンセル", mypage_path, class: "btn btn--outline btn--xs",
+              data: { turbo_frame: dom_id(genre) } %>
+      </div>
+    <% end %>
+  </li>
+<% end %>

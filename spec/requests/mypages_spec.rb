@@ -70,6 +70,30 @@ RSpec.describe 'Mypages', type: :request do
           expect(response.body).to include('読了した本はまだありません')
         end
       end
+
+      context 'ジャンル設定' do
+        it 'ジャンル設定カードが表示される' do
+          get mypage_path
+
+          expect(response.body).to include('ジャンル設定')
+        end
+
+        it 'ジャンルが未登録の場合は空メッセージが表示される' do
+          get mypage_path
+
+          expect(response.body).to include('ジャンルはまだ登録されていません')
+        end
+
+        context 'ジャンルが登録されている場合' do
+          let!(:genre) { create(:genre, user: user, name: 'SF') }
+
+          it '登録済みジャンルが表示される' do
+            get mypage_path
+
+            expect(response.body).to include('SF')
+          end
+        end
+      end
     end
   end
 
