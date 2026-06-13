@@ -12,6 +12,7 @@ Rails.application.routes.draw do
   end
   resource :mypage, only: [ :show, :update ] do
     get :stats
+    resources :genres, only: [ :create, :edit, :update, :destroy ]
   end
   resource :email_change, only: [ :edit, :update ], controller: "users/email_changes"
   get "email_change/complete", to: "users/email_changes#complete", as: :email_change_complete

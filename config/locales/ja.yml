@@ -36,6 +36,7 @@ ja:
     models:
       book: "本"
       user: "ユーザー"
+      genre: "ジャンル"
     attributes:
       book:
         title: "タイトル"
@@ -57,6 +58,8 @@ ja:
         nickname: "ニックネーム"
         current_password: "現在のパスワード"
         yearly_goal: "年間目標"
+      genre:
+        name: "ジャンル名"
     errors:
       models:
         book:
@@ -77,6 +80,8 @@ ja:
           attributes:
             email:
               same_email: "は現在のメールアドレスと同じものは設定できません"
+        genre:
+          too_many_genres: "ジャンルは最大%{max}件までしか登録できません"
 
   email_change:
     confirmation_sent: "確認メールを送信しました。メールのリンクをクリックしてメールアドレスの変更を完了してください。"

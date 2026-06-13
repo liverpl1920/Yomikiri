@@ -623,3 +623,146 @@
     grid-template-columns: 4rem 1fr 3rem;
   }
 }
+
+/* ---- ジャンル設定 ---- */
+.mypage__genre-caption {
+  margin-bottom: var(--spacing-md);
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+}
+
+.mypage__genre-empty {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+  margin-top: var(--spacing-md);
+}
+
+/* ジャンル追加フォーム */
+.genre-add-form {
+  margin-bottom: var(--spacing-md);
+}
+
+.genre-add-form__errors {
+  margin-bottom: var(--spacing-sm);
+  color: var(--color-danger, #d93025);
+  font-size: var(--font-size-sm);
+}
+
+.genre-add-form__errors ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.genre-add-form__row {
+  display: flex;
+  gap: var(--spacing-sm);
+  align-items: center;
+}
+
+.genre-add-form__input {
+  flex: 1;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius);
+  font-size: var(--font-size-base);
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  min-width: 0;
+}
+
+.genre-add-form__input:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.15);
+}
+
+/* ジャンル一覧 */
+.genre-list {
+  list-style: none;
+  padding: 0;
+  margin: var(--spacing-md) 0 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.genre-list__item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-md);
+  padding: var(--spacing-sm) var(--spacing-md);
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius);
+  background-color: var(--color-bg-surface);
+}
+
+.genre-list__item--editing {
+  flex-direction: column;
+  align-items: stretch;
+  gap: var(--spacing-sm);
+}
+
+.genre-list__name {
+  font-size: var(--font-size-base);
+  color: var(--color-text);
+  flex: 1;
+}
+
+.genre-list__actions {
+  display: flex;
+  gap: var(--spacing-xs);
+  flex-shrink: 0;
+}
+
+/* ジャンル編集フォーム */
+.genre-edit-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.genre-edit-form__errors {
+  color: var(--color-danger, #d93025);
+  font-size: var(--font-size-sm);
+}
+
+.genre-edit-form__errors ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.genre-edit-form__input {
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius);
+  font-size: var(--font-size-base);
+  background-color: var(--color-bg);
+  color: var(--color-text);
+}
+
+.genre-edit-form__input:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.15);
+}
+
+/* 削除ボタン（小） */
+.btn--danger-outline {
+  color: var(--color-danger, #d93025);
+  border-color: var(--color-danger, #d93025);
+  background: transparent;
+}
+
+.btn--danger-outline:hover {
+  background-color: var(--color-danger, #d93025);
+  color: #fff;
+}
+
+.btn--xs {
+  padding: 0.2rem 0.6rem;
+  font-size: var(--font-size-xs, 0.75rem);
+}

@@ -1,0 +1,4 @@
+<%# ジャンル追加失敗時: フォームのエラーを表示 %>
+<%= turbo_stream.replace "genre-add-form-container",
+      partial: "genres/genre_form",
+      locals: { genre: @genre } %>

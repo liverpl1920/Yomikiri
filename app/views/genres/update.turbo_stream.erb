@@ -1,0 +1,2 @@
+<%# ジャンル更新成功時: ジャンル行を表示モードに戻す %>
+<%= turbo_stream.replace dom_id(@genre), partial: "genres/genre", locals: { genre: @genre } %>

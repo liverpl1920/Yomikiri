@@ -7,6 +7,7 @@ class User < ApplicationRecord
   has_many :books, dependent: :destroy
   has_many :book_memos, through: :books
   has_many :reading_logs, through: :books
+  has_many :genres, dependent: :destroy
 
   validates :nickname, length: { maximum: 50 }, allow_blank: true
   validates :yearly_goal, presence: true, numericality: { only_integer: true, greater_than_or_equal_to: 1 }

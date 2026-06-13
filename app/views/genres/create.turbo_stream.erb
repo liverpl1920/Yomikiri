@@ -1,0 +1,17 @@
+<%# ジャンル追加成功時: ジャンル行をリストに追加し、フォームをリセット %>
+<%# 空メッセージ要素を除去 %>
+<%= turbo_stream.remove "genre-list-empty" %>
+<%# genre-list が存在しなければ作成してから prepend %>
+<% if current_user.genres.count == 1 %>
+  <%= turbo_stream.after "genre-add-form-container" do %>
+    <ul class="genre-list" id="genre-list">
+      <%= render @genre %>
+    </ul>
+  <% end %>
+<% else %>
+  <%= turbo_stream.prepend "genre-list", partial: "genres/genre", locals: { genre: @genre } %>
+<% end %>
+<%# 追加フォームをリセット %>
+<%= turbo_stream.replace "genre-add-form-container",
+      partial: "genres/genre_form",
+      locals: { genre: Genre.new } %>
