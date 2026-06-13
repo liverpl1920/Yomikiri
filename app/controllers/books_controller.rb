@@ -75,11 +75,23 @@ class BooksController < ApplicationController
 
   def create
     @book = current_user.books.build(book_params)
-    if @book.save
+    success = false
+
+    Book.transaction do
+      success = @book.save
+      raise ActiveRecord::Rollback unless success
+
+      create_initial_reading_log!
+    end
+
+    if success
       redirect_to @book, notice: "#{@book.title}を登録しました。"
     else
       render :new, status: :unprocessable_entity
     end
+  rescue ActiveRecord::RecordInvalid
+    @book.errors.add(:base, "読書ログの記録に失敗しました")
+    render :new, status: :unprocessable_entity
   end
 
   def show
@@ -329,6 +341,18 @@ class BooksController < ApplicationController
       read_at: Date.current,
       start_page: previous_page.to_i + 1,
       end_page: current_page.to_i
+    )
+  end
+
+  def create_initial_reading_log!
+    return unless @book.current_page.to_i > 0
+    return if ActiveModel::Type::Boolean.new.cast(@book.is_past_reading)
+
+    @book.reading_logs.create!(
+      pages_read: @book.current_page,
+      read_at: Date.current,
+      start_page: 0,
+      end_page: @book.current_page
     )
   end
 

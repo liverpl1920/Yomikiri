@@ -404,15 +404,24 @@ RSpec.describe 'Books', type: :request do
           expect(Book.last.genre).to eq('プログラミング')
         end
 
-        it '既に読んだページ数を指定した場合は進捗に反映される' do
+        it '既に読んだページ数を指定した場合は進捗に反映され、当日の読書ログが作成される' do
           params_with_current_page = valid_params.deep_dup
           params_with_current_page[:book][:current_page] = 80
 
-          post books_path, params: params_with_current_page
+          expect {
+            post books_path, params: params_with_current_page
+          }.to change(Book, :count).by(1).and change(ReadingLog, :count).by(1)
 
           created_book = Book.last
           expect(created_book.current_page).to eq(80)
           expect(created_book.progress_percentage).to eq(31)
+
+          log = ReadingLog.last
+          expect(log.book).to eq(created_book)
+          expect(log.pages_read).to eq(80)
+          expect(log.read_at).to eq(Date.current)
+          expect(log.start_page).to eq(0)
+          expect(log.end_page).to eq(80)
         end
 
         it '既に読んだページ数が未入力の場合は0として保存される' do
