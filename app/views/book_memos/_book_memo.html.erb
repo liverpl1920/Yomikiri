@@ -1,4 +1,4 @@
-<li class="memo-timeline__item" id="<%= dom_id(book_memo) %>">
+<%= turbo_frame_tag dom_id(book_memo), tag: :li, class: "memo-timeline__item" do %>
   <div class="memo-timeline__header">
     <div class="memo-timeline__timestamps">
       <time class="memo-timeline__date" datetime="<%= book_memo.created_at.iso8601 %>">
@@ -32,4 +32,4 @@
   <div class="memo-timeline__body">
     <%= render_book_memo_content(book_memo.content) %>
   </div>
-</li>
+<% end %>

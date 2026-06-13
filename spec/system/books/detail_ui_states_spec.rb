@@ -100,6 +100,69 @@ RSpec.describe '書籍詳細のUI状態', type: :system do
     end
   end
 
+  describe 'メモのインプレース編集', js: true do
+    let!(:book) { create(:book, user: user, title: 'テスト対象書籍') }
+    let!(:book_memo) { create(:book_memo, book: book, content: '元のメモ内容', page_number: '50') }
+
+    before do
+      visit book_path(book)
+    end
+
+    it '編集ボタンをクリックするとその場で編集フォームが表示され、キャンセルすると元に戻ること' do
+      within "#book_memo_#{book_memo.id}" do
+        expect(page).to have_text('元のメモ内容')
+        expect(page).to have_text('対象ページ： 50')
+        expect(page).not_to have_css('textarea')
+
+        click_link '編集'
+
+        # フォームに切り替わる
+        expect(page).not_to have_css('.memo-timeline__body')
+        expect(page).to have_css('textarea')
+        expect(page).to have_field('book_memo_content', with: '元のメモ内容')
+        expect(page).to have_field('book_memo_page_number', with: '50')
+
+        click_link 'キャンセル'
+
+        # 元に戻る
+        expect(page).to have_css('.memo-timeline__body')
+        expect(page).to have_text('元のメモ内容')
+        expect(page).to have_text('対象ページ： 50')
+        expect(page).not_to have_css('textarea')
+      end
+    end
+
+    it '更新すると画面遷移なしで内容が更新されること' do
+      within "#book_memo_#{book_memo.id}" do
+        click_link '編集'
+        fill_in 'book_memo_content', with: '更新されたメモ内容'
+        fill_in 'book_memo_page_number', with: '60'
+        click_button 'メモを更新する'
+      end
+
+      # 画面全体のリロードがないことを暗黙的に期待しつつ、更新後の内容が表示されること
+      within "#book_memo_#{book_memo.id}" do
+        expect(page).to have_text('更新されたメモ内容')
+        expect(page).to have_text('対象ページ： 60')
+        expect(page).not_to have_css('textarea')
+      end
+
+      expect(book_memo.reload.content).to eq('更新されたメモ内容')
+      expect(book_memo.reload.page_number).to eq('60')
+    end
+
+    it 'バリデーションエラー時はその場でエラーメッセージが表示されること' do
+      within "#book_memo_#{book_memo.id}" do
+        click_link '編集'
+        fill_in 'book_memo_content', with: ''
+        click_button 'メモを更新する'
+
+        expect(page).to have_text('Contentを入力してください')
+        expect(page).to have_css('textarea')
+      end
+    end
+  end
+
   describe '書影拡大モーダル', js: true do
     let!(:book) { create(:book, user: user, title: '書影テスト本', cover_image_url: 'http://example.com/cover.png') }
 
