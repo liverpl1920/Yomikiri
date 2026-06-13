@@ -118,7 +118,12 @@
 
         <%# 現在ページを直接入力 %>
         <%= form_with url: update_progress_book_path(@book), method: :patch,
-              data: { turbo: false } do |f| %>
+              data: {
+                turbo: false,
+                controller: "confirm-progress",
+                confirm_progress_last_page_value: @book.current_page,
+                action: "submit->confirm-progress#check"
+              } do |f| %>
           <div class="progress-update__field">
             <label class="progress-update__label" for="direct_page">現在ページ</label>
             <div class="progress-update__input-row">
@@ -126,7 +131,8 @@
                      class="progress-update__input"
                      value="<%= @book.current_page %>" min="0"
                      max="<%= @book.pages %>"
-                     aria-label="現在ページ">
+                     aria-label="現在ページ"
+                     data-confirm-progress-target="input">
               <span class="progress-update__unit">/ <%= @book.pages %> ページ</span>
             </div>
           </div>
