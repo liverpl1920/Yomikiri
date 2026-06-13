@@ -57,6 +57,14 @@
         </div>
 
         <div class="books-index__search-field">
+          <%= label_tag :category, "書籍の種類", class: "books-index__search-label" %>
+          <%= select_tag :category,
+                         options_for_select(Book.categories_i18n.map { |k, v| [v, k] }, @search_params[:category]),
+                         include_blank: "すべての種類",
+                         class: "books-index__search-input" %>
+        </div>
+
+        <div class="books-index__search-field">
           <%= label_tag :genre, "ジャンル", class: "books-index__search-label" %>
           <div class="search-filter-autocomplete"
                data-controller="search-filter-autocomplete"
