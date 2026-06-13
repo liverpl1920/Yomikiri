@@ -25,7 +25,7 @@ class ReadingReportSummaryService
       start_date: period_range.begin,
       end_date: period_range.end,
       books:,
-      genres:,
+      categories:,
       total_pages:,
       daily_pages:,
       reading_log_details:,
@@ -136,18 +136,19 @@ class ReadingReportSummaryService
       end
   end
 
-  def genres
+  def categories
     grouped = scoped_logs
-      .group("CASE WHEN books.genre IS NULL OR books.genre = '' THEN '未分類' ELSE books.genre END")
+      .group("books.category")
       .sum(:pages_read)
 
     total = total_pages
     return [] if total.zero?
 
-    grouped.map do |genre_name, pages|
+    grouped.map do |category_key, pages|
+      name = Book.categories_i18n[category_key] || "未分類"
       ratio = ((pages.to_f / total) * 100).round(1)
-      { name: genre_name, pages_read: pages, ratio: ratio }
-    end.sort_by { |g| [ -g[:pages_read], g[:name] ] }
+      { name: name, pages_read: pages, ratio: ratio, key: category_key.to_sym }
+    end.sort_by { |c| [ -c[:pages_read], c[:name] ] }
   end
 
   def monthly_report_details

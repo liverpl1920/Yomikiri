@@ -100,30 +100,6 @@
       <% end %>
     </section>
 
-    <section class="mypage-stats__genre mypage-stats__breakdown">
-      <h2 class="mypage-stats__breakdown-title">ジャンル別読書ポートフォリオ</h2>
-
-      <% if @summary[:genres].empty? %>
-        <p class="mypage-stats__empty">この期間の読書記録はありません。</p>
-      <% else %>
-        <ul class="mypage-stats__list">
-          <% @summary[:genres].each do |genre_summary| %>
-            <% pages_read = genre_summary[:pages_read] %>
-            <% ratio = genre_summary[:ratio] %>
-            <li class="mypage-stats__item">
-              <div class="mypage-stats__item-head">
-                <span class="mypage-stats__book-title"><%= genre_summary[:name] %></span>
-                <span class="mypage-stats__book-pages"><%= pages_read %> ページ (<%= ratio %>%)</span>
-              </div>
-              <div class="mypage-stats__bar" role="img" aria-label="<%= genre_summary[:name] %> の読了ページ割合">
-                <span class="mypage-stats__bar-fill mypage-stats__bar-fill--genre" style="width: <%= ratio %>%"></span>
-              </div>
-            </li>
-          <% end %>
-        </ul>
-      <% end %>
-    </section>
-
     <section class="mypage-stats__breakdown">
       <h2 class="mypage-stats__breakdown-title">書籍別の読了ページ内訳</h2>
 
@@ -145,6 +121,60 @@
             </li>
           <% end %>
         </ul>
+      <% end %>
+    </section>
+
+    <section class="mypage-stats__breakdown mypage-stats__category-section">
+      <h2 class="mypage-stats__breakdown-title">種類別読書ポートフォリオ</h2>
+
+      <% if @summary[:categories].empty? %>
+        <p class="mypage-stats__empty">この期間の読書記録はありません。</p>
+      <% else %>
+        <%
+          colors = {
+            'other' => '#8b5cf6',         # バイオレット
+            'literature' => '#3b82f6',    # ブルー
+            'entertainment' => '#ec4899', # ピンク
+            'technical' => '#10b981',     # エメラルド
+            'manga' => '#f59e0b',         # アンバー
+            'essay' => '#14b8a6',         # ティール
+            'practical' => '#f43f5e',     # ローズ
+            'magazine' => '#06b6d4',      # シアン
+            'academic' => '#6366f1',      # インディゴ
+            'non_fiction' => '#f97316',   # オレンジ
+            'humanities' => '#6b7280'     # グレー
+          }
+
+          conic_pieces = []
+          current_percent = 0.0
+
+          @summary[:categories].each do |cat|
+            key = cat[:key]
+            color = colors[key.to_s] || '#6b7280'
+            start_pct = current_percent
+            end_pct = current_percent + cat[:ratio]
+            conic_pieces << "#{color} #{start_pct}% #{end_pct}%"
+            current_percent = end_pct
+          end
+
+          conic_style = "background: conic-gradient(#{conic_pieces.join(', ')});"
+        %>
+        <div class="mypage-stats__chart-container">
+          <div class="mypage-stats__pie-chart" style="<%= conic_style %>" role="img" aria-label="種類別読了ページ割合の円グラフ"></div>
+          <div class="mypage-stats__chart-legend">
+            <ul class="mypage-stats__legend-list">
+              <% @summary[:categories].each do |cat| %>
+                <% key = cat[:key] %>
+                <% color = colors[key.to_s] || '#6b7280' %>
+                <li class="mypage-stats__legend-item">
+                  <span class="mypage-stats__legend-color" style="background-color: <%= color %>"></span>
+                  <span class="mypage-stats__legend-label"><%= cat[:name] %></span>
+                  <span class="mypage-stats__legend-value"><%= cat[:pages_read] %> ページ (<%= cat[:ratio] %>%)</span>
+                </li>
+              <% end %>
+            </ul>
+          </div>
+        </div>
       <% end %>
     </section>
 

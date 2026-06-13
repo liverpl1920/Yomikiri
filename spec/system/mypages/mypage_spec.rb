@@ -99,22 +99,22 @@ RSpec.describe 'マイページ', type: :system do
   end
 
   describe '読書統計' do
-    let(:book_backend) { create(:book, user: user, title: 'Go言語', genre: 'バックエンド') }
-    let(:book_no_genre) { create(:book, user: user, title: '無の書', genre: nil) }
+    let(:book_technical) { create(:book, user: user, title: 'Go言語', category: :technical) }
+    let(:book_literature) { create(:book, user: user, title: '人間失格', category: :literature) }
 
     before do
-      create(:reading_log, book: book_backend, read_at: Date.current, pages_read: 80)
-      create(:reading_log, book: book_no_genre, read_at: Date.current, pages_read: 20)
+      create(:reading_log, book: book_technical, read_at: Date.current, pages_read: 80)
+      create(:reading_log, book: book_literature, read_at: Date.current, pages_read: 20)
       login_as(user, scope: :user)
     end
 
-    it '統計ページにアクセスすると、ジャンル別読書ポートフォリオが表示される' do
+    it '統計ページにアクセスすると、種類別読書ポートフォリオが表示される' do
       visit stats_mypage_path
 
-      expect(page).to have_text('ジャンル別読書ポートフォリオ')
-      expect(page).to have_text('バックエンド')
+      expect(page).to have_text('種類別読書ポートフォリオ')
+      expect(page).to have_text('技術書')
       expect(page).to have_text('80 ページ (80.0%)')
-      expect(page).to have_text('未分類')
+      expect(page).to have_text('純文学')
       expect(page).to have_text('20 ページ (20.0%)')
     end
   end

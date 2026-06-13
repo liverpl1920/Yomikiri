@@ -25,6 +25,12 @@ class Book < ApplicationRecord
     humanities: 10
   }, default: :other
 
+  def self.categories_i18n
+    categories.keys.each_with_object({}) do |key, hash|
+      hash[key] = I18n.t("book.category.#{key}", default: key.to_s.titleize)
+    end
+  end
+
   validates :title, presence: true, length: { maximum: 255 }
   validates :author, length: { maximum: 255 }, allow_blank: true
   validates :memo, length: { maximum: MEMO_MAX_LENGTH }, allow_blank: true
