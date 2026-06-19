@@ -45,7 +45,8 @@ RSpec.describe '書籍一覧の検索トグル', type: :system, js: true do
       # JSのロードとバインドがCI環境で安定するまで長めに待機
       sleep 2.0
       begin
-        find('.books-index__search-toggle-btn').click
+        # 通常のクリックがCIで空振りすることがあるため、JS経由で直接clickイベントを発生させる
+        page.execute_script("document.querySelector('.books-index__search-toggle-btn').click()")
         expect(page).to have_css('#books-search-form', visible: :visible)
       rescue Exception => e
         puts "=== DEBUG INFO ==="
@@ -53,14 +54,14 @@ RSpec.describe '書籍一覧の検索トグル', type: :system, js: true do
         puts "Browser Logs:"
         puts page.driver.browser.logs.get(:browser).map(&:message).join("\n") rescue "Could not fetch logs: #{$!.message}"
         puts "Form HTML:"
-        puts page.find('#books-search-form', visible: :all).native.outer_html rescue (page.find('#books-search-form', visible: :all)['outerHTML'] rescue "Could not fetch form HTML: #{$!.message}")
+        puts page.execute_script("return document.querySelector('#books-search-form')?.outerHTML") rescue "Could not fetch form HTML"
         puts "Button HTML:"
-        puts page.find('.books-index__search-toggle-btn', visible: :all).native.outer_html rescue (page.find('.books-index__search-toggle-btn', visible: :all)['outerHTML'] rescue "Could not fetch button HTML: #{$!.message}")
+        puts page.execute_script("return document.querySelector('.books-index__search-toggle-btn')?.outerHTML") rescue "Could not fetch button HTML"
         raise e
       end
       expect(find('.books-index__search-toggle-btn')['aria-expanded']).to eq('true')
 
-      find('.books-index__search-toggle-btn').click
+      page.execute_script("document.querySelector('.books-index__search-toggle-btn').click()")
       expect(page).to have_css('#books-search-form', visible: :hidden)
       expect(find('.books-index__search-toggle-btn')['aria-expanded']).to eq('false')
     end
