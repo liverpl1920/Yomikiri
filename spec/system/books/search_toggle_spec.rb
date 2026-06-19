@@ -44,8 +44,20 @@ RSpec.describe '書籍一覧の検索トグル', type: :system, js: true do
 
       # JSのイベントバインドが安定するまで僅かに待機
       sleep 0.5
-      find('.books-index__search-toggle-btn').click
-      expect(page).to have_css('#books-search-form', visible: :visible)
+      begin
+        find('.books-index__search-toggle-btn').click
+        expect(page).to have_css('#books-search-form', visible: :visible)
+      rescue => e
+        puts "=== DEBUG INFO ==="
+        puts "Current Path: #{page.current_path}"
+        puts "Browser Logs:"
+        puts page.driver.browser.logs.get(:browser).map(&:message).join("\n") rescue "Could not fetch logs: #{$!.message}"
+        puts "Form HTML:"
+        puts page.find('#books-search-form', visible: :all).native.outer_html rescue (page.find('#books-search-form', visible: :all)['outerHTML'] rescue "Could not fetch form HTML: #{$!.message}")
+        puts "Button HTML:"
+        puts page.find('.books-index__search-toggle-btn', visible: :all).native.outer_html rescue (page.find('.books-index__search-toggle-btn', visible: :all)['outerHTML'] rescue "Could not fetch button HTML: #{$!.message}")
+        raise e
+      end
       expect(find('.books-index__search-toggle-btn')['aria-expanded']).to eq('true')
 
       find('.books-index__search-toggle-btn').click
