@@ -42,6 +42,8 @@ RSpec.describe '書籍一覧の検索トグル', type: :system, js: true do
 
       expect(page).to have_css('#books-search-form', visible: :hidden)
 
+      # JSのイベントバインドが安定するまで僅かに待機
+      sleep 0.5
       find('.books-index__search-toggle-btn').click
       expect(page).to have_css('#books-search-form', visible: :visible)
       expect(find('.books-index__search-toggle-btn')['aria-expanded']).to eq('true')
