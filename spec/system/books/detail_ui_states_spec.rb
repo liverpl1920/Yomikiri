@@ -201,4 +201,36 @@ RSpec.describe '書籍詳細のUI状態', type: :system do
       expect(page).not_to have_css('dialog.image-modal-dialog[open]')
     end
   end
+
+  describe '前後ナビゲーション（Issue #376）' do
+    let!(:book1) { create(:book, user: user, title: '最初の本') }
+    let!(:book2) { create(:book, user: user, title: '中間の本') }
+    let!(:book3) { create(:book, user: user, title: '最後の本') }
+    let!(:other_user) { create(:user) }
+    let!(:other_book) { create(:book, user: other_user, title: '他人の本') }
+
+    it '中間の本では「前の本」と「次の本」のリンクが正しく機能し、遷移できること' do
+      visit book_path(book2)
+
+      expect(page).to have_link('＜ 前の本', href: book_path(book1))
+      expect(page).to have_link('次の本 ＞', href: book_path(book3))
+
+      click_link '＜ 前の本'
+      expect(page).to have_current_path(book_path(book1))
+    end
+
+    it '最初の本では「前の本」が非活性で「次の本」が有効であること' do
+      visit book_path(book1)
+
+      expect(page).to have_css('.book-show__nav-btn--disabled', text: '＜ 前の本')
+      expect(page).to have_link('次の本 ＞', href: book_path(book2))
+    end
+
+    it '最後の本では「前の本」が有効で「次の本」が非活性であること' do
+      visit book_path(book3)
+
+      expect(page).to have_link('＜ 前の本', href: book_path(book2))
+      expect(page).to have_css('.book-show__nav-btn--disabled', text: '次の本 ＞')
+    end
+  end
 end

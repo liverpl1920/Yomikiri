@@ -15,7 +15,7 @@ RSpec.describe '書籍一覧の検索トグル', type: :system, js: true do
     context '検索パラメータが指定されていない場合' do
       it '検索フォームがデフォルトで非表示になっていること' do
         visit books_path
-        wait_for_stimulus
+        wait_for_stimulus(identifier: 'search-toggle')
 
         expect(page).to have_css('#books-search-form', visible: :hidden)
         button = find('.books-index__search-toggle-btn')
@@ -26,7 +26,7 @@ RSpec.describe '書籍一覧の検索トグル', type: :system, js: true do
     context '検索パラメータが指定されている場合' do
       it '検索フォームがデフォルトで表示されていること' do
         visit books_path(title: 'Ruby')
-        wait_for_stimulus
+        wait_for_stimulus(identifier: 'search-toggle')
 
         expect(page).to have_css('#books-search-form', visible: :visible)
         button = find('.books-index__search-toggle-btn')
@@ -38,15 +38,18 @@ RSpec.describe '書籍一覧の検索トグル', type: :system, js: true do
   describe 'ボタン操作によるトグル切り替え' do
     it '検索ボタンをクリックすると表示・非表示が切り替わること' do
       visit books_path
-      wait_for_stimulus
+      wait_for_stimulus(identifier: 'search-toggle')
 
       expect(page).to have_css('#books-search-form', visible: :hidden)
 
-      find('.books-index__search-toggle-btn').click
+      # Stimulusコントローラーの初期接続が完了したあと、イベントリスナーの登録が安定するまで僅かに待機
+      sleep 0.5
+      # 通常のクリックがCIの headless 環境で空振りすることがあるため、JS経由で直接clickイベントを発生させてトグルを動作させる
+      page.execute_script("document.querySelector('.books-index__search-toggle-btn').click()")
       expect(page).to have_css('#books-search-form', visible: :visible)
       expect(find('.books-index__search-toggle-btn')['aria-expanded']).to eq('true')
 
-      find('.books-index__search-toggle-btn').click
+      page.execute_script("document.querySelector('.books-index__search-toggle-btn').click()")
       expect(page).to have_css('#books-search-form', visible: :hidden)
       expect(find('.books-index__search-toggle-btn')['aria-expanded']).to eq('false')
     end

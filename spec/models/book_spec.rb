@@ -898,4 +898,81 @@ RSpec.describe Book, type: :model do
       end
     end
   end
+
+  describe '詳細画面の前後ナビゲーション（Issue #376）' do
+    let(:user) { create(:user) }
+    let(:other_user) { create(:user) }
+    let!(:book1) { create(:book, user: user) }
+    let!(:book2) { create(:book, user: user) }
+    let!(:book3) { create(:book, user: user) }
+    let!(:other_book) { create(:book, user: other_user) }
+
+    describe '#prev_book_by_id' do
+      context '最初の本（最小 id）の場合' do
+        it 'nil を返すこと' do
+          expect(book1.prev_book_by_id).to be_nil
+        end
+      end
+
+      context '中間の本の場合' do
+        it '1つ前の本を返すこと' do
+          expect(book2.prev_book_by_id).to eq(book1)
+        end
+      end
+
+      context '最後の本の場合' do
+        it '1つ前の本を返すこと' do
+          expect(book3.prev_book_by_id).to eq(book2)
+        end
+      end
+
+      context '他ユーザーの本が存在する場合' do
+        it '他ユーザーの本は返さないこと' do
+          # other_book の id が book1 より小さい場合でも対象外
+          expect(book1.prev_book_by_id).to be_nil
+        end
+      end
+
+      context '新規レコード（未保存）の場合' do
+        it 'nil を返すこと' do
+          new_book = build(:book, user: user)
+          expect(new_book.prev_book_by_id).to be_nil
+        end
+      end
+    end
+
+    describe '#next_book_by_id' do
+      context '最初の本の場合' do
+        it '1つ後の本を返すこと' do
+          expect(book1.next_book_by_id).to eq(book2)
+        end
+      end
+
+      context '中間の本の場合' do
+        it '1つ後の本を返すこと' do
+          expect(book2.next_book_by_id).to eq(book3)
+        end
+      end
+
+      context '最後の本（最大 id）の場合' do
+        it 'nil を返すこと' do
+          expect(book3.next_book_by_id).to be_nil
+        end
+      end
+
+      context '他ユーザーの本が存在する場合' do
+        it '他ユーザーの本は返さないこと' do
+          # other_book の id が book3 より大きい場合でも対象外
+          expect(book3.next_book_by_id).to be_nil
+        end
+      end
+
+      context '新規レコード（未保存）の場合' do
+        it 'nil を返すこと' do
+          new_book = build(:book, user: user)
+          expect(new_book.next_book_by_id).to be_nil
+        end
+      end
+    end
+  end
 end
