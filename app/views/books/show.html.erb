@@ -458,6 +458,25 @@
       </section>
     <% end %>
 
+    <%# 前後の書籍ナビゲーション (Issue #376) %>
+    <nav class="book-show__nav" aria-label="前後の書籍">
+      <% if (prev_book = @book.prev_book_by_id) %>
+        <%= link_to book_path(prev_book), class: "btn btn--outline book-show__nav-btn", id: "prev-book-link", aria: { label: "前の本: #{prev_book.title}" } do %>
+          ＜ 前の本
+        <% end %>
+      <% else %>
+        <span class="book-show__nav-btn book-show__nav-btn--disabled" aria-disabled="true">＜ 前の本</span>
+      <% end %>
+
+      <% if (next_book = @book.next_book_by_id) %>
+        <%= link_to book_path(next_book), class: "btn btn--outline book-show__nav-btn", id: "next-book-link", aria: { label: "次の本: #{next_book.title}" } do %>
+          次の本 ＞
+        <% end %>
+      <% else %>
+        <span class="book-show__nav-btn book-show__nav-btn--disabled" aria-disabled="true">次の本 ＞</span>
+      <% end %>
+    </nav>
+
     <div class="book-show__actions">
       <%= link_to '一覧に戻る', books_path, class: 'btn btn--outline' %>
       <%= link_to 'この本をもう一度読む', new_book_path(copy_from_id: @book.id), class: 'btn btn--primary' %>

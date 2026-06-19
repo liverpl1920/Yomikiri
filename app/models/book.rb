@@ -203,6 +203,21 @@ class Book < ApplicationRecord
     user.books.where(normalized_title: current_normalized).where("id < ?", id).order(id: :desc).first
   end
 
+  # 詳細画面の前後ナビゲーション用（Issue #376）
+  # ユーザーの全書籍を id 順で並べた際の「前の本」（id が小さい最大のもの）
+  def prev_book_by_id
+    return nil if new_record? || user.nil?
+
+    user.books.where("id < ?", id).order(id: :desc).first
+  end
+
+  # ユーザーの全書籍を id 順で並べた際の「次の本」（id が大きい最小のもの）
+  def next_book_by_id
+    return nil if new_record? || user.nil?
+
+    user.books.where("id > ?", id).order(id: :asc).first
+  end
+
   private
 
   def set_normalized_title
