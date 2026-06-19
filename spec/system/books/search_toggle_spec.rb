@@ -42,23 +42,11 @@ RSpec.describe '書籍一覧の検索トグル', type: :system, js: true do
 
       expect(page).to have_css('#books-search-form', visible: :hidden)
 
-      # JSのロードとバインドがCI環境で安定するまで長めに待機
-      sleep 2.0
-      begin
-        # 通常のクリックがCIで空振りすることがあるため、JS経由で直接clickイベントを発生させる
-        page.execute_script("document.querySelector('.books-index__search-toggle-btn').click()")
-        expect(page).to have_css('#books-search-form', visible: :visible)
-      rescue Exception => e
-        puts "=== DEBUG INFO ==="
-        puts "Current Path: #{page.current_path}"
-        puts "Browser Logs:"
-        puts page.driver.browser.logs.get(:browser).map(&:message).join("\n") rescue "Could not fetch logs: #{$!.message}"
-        puts "Form HTML:"
-        puts page.execute_script("return document.querySelector('#books-search-form')?.outerHTML") rescue "Could not fetch form HTML"
-        puts "Button HTML:"
-        puts page.execute_script("return document.querySelector('.books-index__search-toggle-btn')?.outerHTML") rescue "Could not fetch button HTML"
-        raise e
-      end
+      # Stimulusコントローラーの初期接続が完了したあと、イベントリスナーの登録が安定するまで僅かに待機
+      sleep 0.5
+      # 通常のクリックがCIの headless 環境で空振りすることがあるため、JS経由で直接clickイベントを発生させてトグルを動作させる
+      page.execute_script("document.querySelector('.books-index__search-toggle-btn').click()")
+      expect(page).to have_css('#books-search-form', visible: :visible)
       expect(find('.books-index__search-toggle-btn')['aria-expanded']).to eq('true')
 
       page.execute_script("document.querySelector('.books-index__search-toggle-btn').click()")
