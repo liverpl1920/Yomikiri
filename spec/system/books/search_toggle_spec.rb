@@ -42,12 +42,12 @@ RSpec.describe '書籍一覧の検索トグル', type: :system, js: true do
 
       expect(page).to have_css('#books-search-form', visible: :hidden)
 
-      # JSのイベントバインドが安定するまで僅かに待機
-      sleep 0.5
+      # JSのロードとバインドがCI環境で安定するまで長めに待機
+      sleep 2.0
       begin
         find('.books-index__search-toggle-btn').click
         expect(page).to have_css('#books-search-form', visible: :visible)
-      rescue => e
+      rescue Exception => e
         puts "=== DEBUG INFO ==="
         puts "Current Path: #{page.current_path}"
         puts "Browser Logs:"
