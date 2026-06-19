@@ -50,7 +50,7 @@
         </p>
       <% end %>
       <% if @book.author.present? %>
-        <p class="book-show__author"><%= @book.author %></p>
+        <p class="book-show__author"><%= book_author_display(@book) %></p>
       <% end %>
       <% if @book.translator.present? %>
         <p class="book-show__translator">翻訳: <%= @book.translator %></p>
