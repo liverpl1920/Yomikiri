@@ -38,7 +38,7 @@
               <%= link_to random_book.title, book_path(random_book), data: { turbo: false } %>
             </h3>
             <% if random_book.author.present? %>
-              <p class="lookback-card__book-author"><%= random_book.author %></p>
+              <p class="lookback-card__book-author"><%= book_author_display(random_book) %></p>
             <% end %>
             <p class="lookback-card__completed-at">
               <%= t('dashboards.lookback.completed_at', date: random_book.completed_at.present? ? l(random_book.completed_at.to_date) : "不明") %>

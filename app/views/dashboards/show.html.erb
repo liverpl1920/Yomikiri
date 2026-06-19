@@ -43,7 +43,7 @@
                 <h3 class="dashboard__book-title">
                   <%= link_to book.title, book_path(book) %>
                 </h3>
-                <p class="dashboard__book-author"><%= book.author %></p>
+                <p class="dashboard__book-author"><%= book_author_display(book) %></p>
 
                 <!-- 進捗バー -->
                 <div class="dashboard__progress">
@@ -191,7 +191,7 @@
                 </div>
                 <div class="dashboard__completed-info">
                   <h3 class="dashboard__completed-title"><%= book.title %></h3>
-                  <p class="dashboard__completed-author"><%= book.author %></p>
+                  <p class="dashboard__completed-author"><%= book_author_display(book) %></p>
                   <% if book.rating.present? %>
                     <div class="dashboard__completed-rating">
                       <span class="dashboard__completed-stars">
