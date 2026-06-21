@@ -39,6 +39,7 @@ RSpec.describe Genre, type: :model do
     context "ユーザーのジャンルが50件に達している場合" do
       it "新規追加で無効である" do
         user = create(:user)
+        user.genres.destroy_all
         create_list(:genre, 50, user: user)
         new_genre = build(:genre, user: user, name: "超過ジャンル")
         expect(new_genre).to be_invalid
@@ -49,6 +50,7 @@ RSpec.describe Genre, type: :model do
     context "ユーザーのジャンルが49件の場合" do
       it "新規追加で有効である" do
         user = create(:user)
+        user.genres.destroy_all
         create_list(:genre, 49, user: user)
         new_genre = build(:genre, user: user, name: "追加ジャンル")
         expect(new_genre).to be_valid
