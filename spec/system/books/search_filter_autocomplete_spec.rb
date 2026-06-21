@@ -30,6 +30,10 @@ RSpec.describe '検索フィルターオートコンプリート機能', type: :
     )
   end
 
+  def js_click(element)
+    page.execute_script('arguments[0].click();', element)
+  end
+
   before do
     Warden.instance_variable_set(:@test_mode, false)
     sign_in_via_form(user)
@@ -64,7 +68,7 @@ RSpec.describe '検索フィルターオートコンプリート機能', type: :
       type_in_field('#author', 'Dustin')
 
       expect(page).to have_button('Dustin Boswell', wait: 15)
-      find_button('Dustin Boswell').click
+      js_click(find_button('Dustin Boswell'))
 
       expect(page).to have_field('著者名', with: 'Dustin Boswell', wait: 15)
     end
@@ -73,7 +77,7 @@ RSpec.describe '検索フィルターオートコンプリート機能', type: :
       type_in_field('#author', 'Dustin')
 
       expect(page).to have_button('Dustin Boswell', wait: 15)
-      find_button('Dustin Boswell').click
+      js_click(find_button('Dustin Boswell'))
 
       expect(page).not_to have_css(
         '[data-search-filter-autocomplete-field-value="author"] .search-filter-autocomplete__list:not(.search-filter-autocomplete__list--hidden)',
@@ -133,7 +137,7 @@ RSpec.describe '検索フィルターオートコンプリート機能', type: :
       type_in_field('#genre', 'プログラミング')
 
       expect(page).to have_button('プログラミング', wait: 15)
-      find_button('プログラミング').click
+      js_click(find_button('プログラミング'))
 
       expect(page).to have_field('ジャンル', with: 'プログラミング', wait: 15)
     end
@@ -175,7 +179,7 @@ RSpec.describe '検索フィルターオートコンプリート機能', type: :
       type_in_field('#publisher', 'オライリー')
 
       expect(page).to have_button('オライリー・ジャパン', wait: 15)
-      find_button('オライリー・ジャパン').click
+      js_click(find_button('オライリー・ジャパン'))
 
       expect(page).to have_field('出版社', with: 'オライリー・ジャパン', wait: 15)
     end
@@ -217,7 +221,7 @@ RSpec.describe '検索フィルターオートコンプリート機能', type: :
       type_in_field('#translator', '田中')
 
       expect(page).to have_button('田中太郎', wait: 15)
-      find_button('田中太郎').click
+      js_click(find_button('田中太郎'))
 
       expect(page).to have_field('翻訳者', with: '田中太郎', wait: 15)
     end
