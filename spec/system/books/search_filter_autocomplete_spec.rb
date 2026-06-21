@@ -35,7 +35,7 @@ RSpec.describe '検索フィルターオートコンプリート機能', type: :
     sign_in_via_form(user)
     visit books_path
     wait_for_stimulus(identifier: 'search-toggle')
-    
+
     find('.books-index__search-toggle-btn').click
     expect(page).to have_css('.books-index__search-toggle-btn[aria-expanded="true"]', wait: 15)
 
@@ -148,7 +148,7 @@ RSpec.describe '検索フィルターオートコンプリート機能', type: :
     before do
       visit books_path
       wait_for_stimulus(identifier: 'search-toggle')
-      
+
       find('.books-index__search-toggle-btn').click
       expect(page).to have_css('.books-index__search-toggle-btn[aria-expanded="true"]', wait: 15)
 
@@ -190,7 +190,7 @@ RSpec.describe '検索フィルターオートコンプリート機能', type: :
     before do
       visit books_path
       wait_for_stimulus(identifier: 'search-toggle')
-      
+
       find('.books-index__search-toggle-btn').click
       expect(page).to have_css('.books-index__search-toggle-btn[aria-expanded="true"]', wait: 15)
 

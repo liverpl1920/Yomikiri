@@ -38,9 +38,9 @@ module SystemSpecSignInHelper
                  "  try { return !!window.Stimulus.getControllerForElementAndIdentifier(el, '#{identifier}'); } " \
                  "  catch (e) { return false; }" \
                  "})()"
-               else
+    else
                  "window.Stimulus && window.Stimulus.controllers.length > 0"
-               end
+    end
     until Time.now - start > timeout
       if page.evaluate_script(js_check)
         connected = true
