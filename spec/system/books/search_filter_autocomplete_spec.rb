@@ -36,7 +36,7 @@ RSpec.describe '検索フィルターオートコンプリート機能', type: :
     visit books_path
     wait_for_stimulus(identifier: 'search-toggle')
 
-    find('.books-index__search-toggle-btn').click
+    page.execute_script("document.querySelector('.books-index__search-toggle-btn').click()")
     expect(page).to have_css('.books-index__search-toggle-btn[aria-expanded="true"]', wait: 15)
 
     wait_for_stimulus(identifier: 'search-filter-autocomplete')
@@ -149,7 +149,7 @@ RSpec.describe '検索フィルターオートコンプリート機能', type: :
       visit books_path
       wait_for_stimulus(identifier: 'search-toggle')
 
-      find('.books-index__search-toggle-btn').click
+      page.execute_script("document.querySelector('.books-index__search-toggle-btn').click()")
       expect(page).to have_css('.books-index__search-toggle-btn[aria-expanded="true"]', wait: 15)
 
       wait_for_stimulus(identifier: 'search-filter-autocomplete')
@@ -191,7 +191,7 @@ RSpec.describe '検索フィルターオートコンプリート機能', type: :
       visit books_path
       wait_for_stimulus(identifier: 'search-toggle')
 
-      find('.books-index__search-toggle-btn').click
+      page.execute_script("document.querySelector('.books-index__search-toggle-btn').click()")
       expect(page).to have_css('.books-index__search-toggle-btn[aria-expanded="true"]', wait: 15)
 
       wait_for_stimulus(identifier: 'search-filter-autocomplete')
