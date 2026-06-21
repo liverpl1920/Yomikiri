@@ -32,10 +32,15 @@ module SystemSpecSignInHelper
     start = Time.now
     timeout = 15
     js_check = if identifier
-                 "window.Stimulus && window.Stimulus.controllers.some(c => c.identifier === '#{identifier}')"
-    else
+                 "window.Stimulus && (() => { " \
+                 "  const el = document.querySelector('[data-controller~=\"#{identifier}\"]');" \
+                 "  if (!el) return false;" \
+                 "  try { return !!window.Stimulus.getControllerForElementAndIdentifier(el, '#{identifier}'); } " \
+                 "  catch (e) { return false; }" \
+                 "})()"
+               else
                  "window.Stimulus && window.Stimulus.controllers.length > 0"
-    end
+               end
     until Time.now - start > timeout
       if page.evaluate_script(js_check)
         connected = true
