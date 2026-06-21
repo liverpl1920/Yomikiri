@@ -25,6 +25,7 @@ RSpec.describe '検索フィルターオートコンプリート機能', type: :
       sleep 0.1
     end
     expect(connected).to be(true), 'search-filter-autocomplete controller did not connect within 10 seconds'
+    sleep 0.5
   end
 
   def type_in_field(selector, text)
@@ -34,6 +35,7 @@ RSpec.describe '検索フィルターオートコンプリート機能', type: :
       "el.value = #{text.to_json};" \
       "el.dispatchEvent(new Event('input', { bubbles: true }));"
     )
+    sleep 0.5
   end
 
   def press_key_on(selector, key)
