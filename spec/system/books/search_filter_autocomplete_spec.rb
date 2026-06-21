@@ -13,21 +13,6 @@ RSpec.describe '検索フィルターオートコンプリート機能', type: :
                   deadline: Date.current + 20)
   end
 
-  def wait_for_search_filter_autocomplete_controller
-    connected = false
-    start = Time.now
-    until Time.now - start > 10
-      connected = page.evaluate_script(
-        "window.Stimulus && window.Stimulus.controllers.some(c => c.identifier === 'search-filter-autocomplete')"
-      )
-      break if connected
-
-      sleep 0.1
-    end
-    expect(connected).to be(true), 'search-filter-autocomplete controller did not connect within 10 seconds'
-    sleep 0.5
-  end
-
   def type_in_field(selector, text)
     page.execute_script(
       "const el = document.querySelector(#{selector.to_json});" \
@@ -49,10 +34,10 @@ RSpec.describe '検索フィルターオートコンプリート機能', type: :
     Warden.instance_variable_set(:@test_mode, false)
     sign_in_via_form(user)
     visit books_path
-    wait_for_stimulus
+    wait_for_stimulus(identifier: 'search-toggle')
     find('.books-index__search-toggle-btn').click
-    wait_for_stimulus
-    wait_for_search_filter_autocomplete_controller
+    wait_for_stimulus(identifier: 'search-filter-autocomplete')
+    sleep 0.5
   end
 
   describe '著者名フィールドのオートコンプリート' do
@@ -60,23 +45,23 @@ RSpec.describe '検索フィルターオートコンプリート機能', type: :
       type_in_field('#author', 'Dustin')
 
       expect(page).to have_css(
-        '.search-filter-autocomplete__list:not(.search-filter-autocomplete__list--hidden)',
+        '[data-search-filter-autocomplete-field-value="author"] .search-filter-autocomplete__list:not(.search-filter-autocomplete__list--hidden)',
         wait: 15
       )
-      expect(page).to have_css('.search-filter-autocomplete__item', wait: 15)
+      expect(page).to have_css('[data-search-filter-autocomplete-field-value="author"] .search-filter-autocomplete__item', wait: 15)
     end
 
     it '候補に著者名が含まれる' do
       type_in_field('#author', 'Dustin')
 
-      expect(page).to have_css('.search-filter-autocomplete__button', text: 'Dustin Boswell', wait: 15)
+      expect(page).to have_css('[data-search-filter-autocomplete-field-value="author"] .search-filter-autocomplete__button', text: 'Dustin Boswell', wait: 15)
     end
 
     it '候補をクリックすると入力フィールドに値がセットされる' do
       type_in_field('#author', 'Dustin')
 
-      expect(page).to have_css('.search-filter-autocomplete__button', text: 'Dustin Boswell', wait: 15)
-      find('.search-filter-autocomplete__button', text: 'Dustin Boswell').click
+      expect(page).to have_css('[data-search-filter-autocomplete-field-value="author"] .search-filter-autocomplete__button', text: 'Dustin Boswell', wait: 15)
+      find('[data-search-filter-autocomplete-field-value="author"] .search-filter-autocomplete__button', text: 'Dustin Boswell').click
 
       expect(page).to have_field('著者名', with: 'Dustin Boswell', wait: 15)
     end
@@ -84,11 +69,11 @@ RSpec.describe '検索フィルターオートコンプリート機能', type: :
     it '候補選択後にドロップダウンが閉じる' do
       type_in_field('#author', 'Dustin')
 
-      expect(page).to have_css('.search-filter-autocomplete__button', text: 'Dustin Boswell', wait: 15)
-      find('.search-filter-autocomplete__button', text: 'Dustin Boswell').click
+      expect(page).to have_css('[data-search-filter-autocomplete-field-value="author"] .search-filter-autocomplete__button', text: 'Dustin Boswell', wait: 15)
+      find('[data-search-filter-autocomplete-field-value="author"] .search-filter-autocomplete__button', text: 'Dustin Boswell').click
 
       expect(page).not_to have_css(
-        '.search-filter-autocomplete__list:not(.search-filter-autocomplete__list--hidden)',
+        '[data-search-filter-autocomplete-field-value="author"] .search-filter-autocomplete__list:not(.search-filter-autocomplete__list--hidden)',
         wait: 15
       )
     end
@@ -96,7 +81,7 @@ RSpec.describe '検索フィルターオートコンプリート機能', type: :
     it 'Enterキーで候補を選択できる' do
       type_in_field('#author', 'Dustin')
 
-      expect(page).to have_css('.search-filter-autocomplete__item', wait: 15)
+      expect(page).to have_css('[data-search-filter-autocomplete-field-value="author"] .search-filter-autocomplete__item', wait: 15)
       press_key_on('#author', 'ArrowDown')
       press_key_on('#author', 'Enter')
 
@@ -107,13 +92,13 @@ RSpec.describe '検索フィルターオートコンプリート機能', type: :
       type_in_field('#author', 'Dustin')
 
       expect(page).to have_css(
-        '.search-filter-autocomplete__list:not(.search-filter-autocomplete__list--hidden)',
+        '[data-search-filter-autocomplete-field-value="author"] .search-filter-autocomplete__list:not(.search-filter-autocomplete__list--hidden)',
         wait: 15
       )
       press_key_on('#author', 'Escape')
 
       expect(page).not_to have_css(
-        '.search-filter-autocomplete__list:not(.search-filter-autocomplete__list--hidden)',
+        '[data-search-filter-autocomplete-field-value="author"] .search-filter-autocomplete__list:not(.search-filter-autocomplete__list--hidden)',
         wait: 15
       )
     end
@@ -126,7 +111,7 @@ RSpec.describe '検索フィルターオートコンプリート機能', type: :
 
       sleep 0.8
       expect(page).not_to have_css(
-        '.search-filter-autocomplete__list:not(.search-filter-autocomplete__list--hidden)'
+        '[data-search-filter-autocomplete-field-value="author"] .search-filter-autocomplete__list:not(.search-filter-autocomplete__list--hidden)'
       )
     end
   end
@@ -136,7 +121,7 @@ RSpec.describe '検索フィルターオートコンプリート機能', type: :
       type_in_field('#genre', 'プログラミング')
 
       expect(page).to have_css(
-        '.search-filter-autocomplete__list:not(.search-filter-autocomplete__list--hidden)',
+        '[data-search-filter-autocomplete-field-value="genre"] .search-filter-autocomplete__list:not(.search-filter-autocomplete__list--hidden)',
         wait: 15
       )
     end
@@ -144,8 +129,8 @@ RSpec.describe '検索フィルターオートコンプリート機能', type: :
     it '候補をクリックすると入力フィールドに値がセットされる' do
       type_in_field('#genre', 'プログラミング')
 
-      expect(page).to have_css('.search-filter-autocomplete__button', text: 'プログラミング', wait: 15)
-      find('.search-filter-autocomplete__button', text: 'プログラミング').click
+      expect(page).to have_css('[data-search-filter-autocomplete-field-value="genre"] .search-filter-autocomplete__button', text: 'プログラミング', wait: 15)
+      find('[data-search-filter-autocomplete-field-value="genre"] .search-filter-autocomplete__button', text: 'プログラミング').click
 
       expect(page).to have_field('ジャンル', with: 'プログラミング', wait: 15)
     end
@@ -159,17 +144,17 @@ RSpec.describe '検索フィルターオートコンプリート機能', type: :
 
     before do
       visit books_path
-      wait_for_stimulus
+      wait_for_stimulus(identifier: 'search-toggle')
       find('.books-index__search-toggle-btn').click
-      wait_for_stimulus
-      wait_for_search_filter_autocomplete_controller
+      wait_for_stimulus(identifier: 'search-filter-autocomplete')
+      sleep 0.5
     end
 
     it '入力すると候補ドロップダウンが表示される' do
       type_in_field('#publisher', 'オライリー')
 
       expect(page).to have_css(
-        '.search-filter-autocomplete__list:not(.search-filter-autocomplete__list--hidden)',
+        '[data-search-filter-autocomplete-field-value="publisher"] .search-filter-autocomplete__list:not(.search-filter-autocomplete__list--hidden)',
         wait: 15
       )
     end
@@ -177,14 +162,14 @@ RSpec.describe '検索フィルターオートコンプリート機能', type: :
     it '候補に出版社名が含まれる' do
       type_in_field('#publisher', 'オライリー')
 
-      expect(page).to have_css('.search-filter-autocomplete__button', text: 'オライリー・ジャパン', wait: 15)
+      expect(page).to have_css('[data-search-filter-autocomplete-field-value="publisher"] .search-filter-autocomplete__button', text: 'オライリー・ジャパン', wait: 15)
     end
 
     it '候補をクリックすると入力フィールドに値がセットされる' do
       type_in_field('#publisher', 'オライリー')
 
-      expect(page).to have_css('.search-filter-autocomplete__button', text: 'オライリー・ジャパン', wait: 15)
-      find('.search-filter-autocomplete__button', text: 'オライリー・ジャパン').click
+      expect(page).to have_css('[data-search-filter-autocomplete-field-value="publisher"] .search-filter-autocomplete__button', text: 'オライリー・ジャパン', wait: 15)
+      find('[data-search-filter-autocomplete-field-value="publisher"] .search-filter-autocomplete__button', text: 'オライリー・ジャパン').click
 
       expect(page).to have_field('出版社', with: 'オライリー・ジャパン', wait: 15)
     end
@@ -198,17 +183,17 @@ RSpec.describe '検索フィルターオートコンプリート機能', type: :
 
     before do
       visit books_path
-      wait_for_stimulus
+      wait_for_stimulus(identifier: 'search-toggle')
       find('.books-index__search-toggle-btn').click
-      wait_for_stimulus
-      wait_for_search_filter_autocomplete_controller
+      wait_for_stimulus(identifier: 'search-filter-autocomplete')
+      sleep 0.5
     end
 
     it '入力すると候補ドロップダウンが表示される' do
       type_in_field('#translator', '田中')
 
       expect(page).to have_css(
-        '.search-filter-autocomplete__list:not(.search-filter-autocomplete__list--hidden)',
+        '[data-search-filter-autocomplete-field-value="translator"] .search-filter-autocomplete__list:not(.search-filter-autocomplete__list--hidden)',
         wait: 15
       )
     end
@@ -216,14 +201,14 @@ RSpec.describe '検索フィルターオートコンプリート機能', type: :
     it '候補に翻訳者名が含まれる' do
       type_in_field('#translator', '田中')
 
-      expect(page).to have_css('.search-filter-autocomplete__button', text: '田中太郎', wait: 15)
+      expect(page).to have_css('[data-search-filter-autocomplete-field-value="translator"] .search-filter-autocomplete__button', text: '田中太郎', wait: 15)
     end
 
     it '候補をクリックすると入力フィールドに値がセットされる' do
       type_in_field('#translator', '田中')
 
-      expect(page).to have_css('.search-filter-autocomplete__button', text: '田中太郎', wait: 15)
-      find('.search-filter-autocomplete__button', text: '田中太郎').click
+      expect(page).to have_css('[data-search-filter-autocomplete-field-value="translator"] .search-filter-autocomplete__button', text: '田中太郎', wait: 15)
+      find('[data-search-filter-autocomplete-field-value="translator"] .search-filter-autocomplete__button', text: '田中太郎').click
 
       expect(page).to have_field('翻訳者', with: '田中太郎', wait: 15)
     end
