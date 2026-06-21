@@ -79,6 +79,7 @@ RSpec.describe 'Mypages', type: :request do
         end
 
         it 'ジャンルが未登録の場合は空メッセージが表示される' do
+          user.genres.destroy_all
           get mypage_path
 
           expect(response.body).to include('ジャンルはまだ登録されていません')

@@ -110,4 +110,14 @@ RSpec.describe User, type: :model do
       expect(user.consecutive_reading_days).to eq(0)
     end
   end
+
+  describe 'コールバック' do
+    describe '#prepare_default_genres' do
+      it 'ユーザー作成時にデフォルトジャンルが7つ自動登録されること' do
+        user = create(:user)
+        expect(user.genres.count).to eq(7)
+        expect(user.genres.pluck(:name)).to match_array(User::DEFAULT_GENRES)
+      end
+    end
+  end
 end

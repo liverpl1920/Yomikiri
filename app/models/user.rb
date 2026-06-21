@@ -9,6 +9,10 @@ class User < ApplicationRecord
   has_many :reading_logs, through: :books
   has_many :genres, dependent: :destroy
 
+  DEFAULT_GENRES = [ "ビジネス", "小説・文学", "技術書・専門書", "自己啓発", "エッセイ・読み物", "実用書・趣味", "その他" ].freeze
+
+  after_create :prepare_default_genres
+
   validates :nickname, length: { maximum: 50 }, allow_blank: true
   validates :yearly_goal, presence: true, numericality: { only_integer: true, greater_than_or_equal_to: 1 }
 
@@ -37,5 +41,13 @@ class User < ApplicationRecord
 
   def display_name
     nickname.presence || email
+  end
+
+  private
+
+  def prepare_default_genres
+    DEFAULT_GENRES.each do |name|
+      genres.create!(name: name)
+    end
   end
 end
