@@ -209,6 +209,20 @@ RSpec.describe Book, type: :model do
       end
     end
 
+    describe 'retire_reason' do
+      it '空でも有効' do
+        expect(build(:book, retire_reason: '')).to be_valid
+      end
+
+      it '1000文字以内であれば有効' do
+        expect(build(:book, retire_reason: 'a' * 1000)).to be_valid
+      end
+
+      it '1001文字以上は無効' do
+        expect(build(:book, retire_reason: 'a' * 1001)).not_to be_valid
+      end
+    end
+
     describe 'cover_image_url' do
       it 'nilでも有効' do
         expect(build(:book, cover_image_url: nil)).to be_valid
@@ -370,6 +384,11 @@ RSpec.describe Book, type: :model do
       expect(book).to be_completed
     end
 
+    it 'retired（リタイア）を持つ' do
+      book = build(:book, status: :retired)
+      expect(book).to be_retired
+    end
+
     it 'デフォルトのステータスは unread' do
       book = create(:book)
       expect(book.reload).to be_unread
@@ -402,6 +421,13 @@ RSpec.describe Book, type: :model do
     context '読了済みの場合' do
       it '0を返す' do
         book = build(:book, status: :completed, current_page: 300, pages: 300)
+        expect(book.daily_quota).to eq(0)
+      end
+    end
+
+    context 'リタイアの場合' do
+      it '0を返す' do
+        book = build(:book, status: :retired, current_page: 100, pages: 300)
         expect(book.daily_quota).to eq(0)
       end
     end
@@ -509,6 +535,11 @@ RSpec.describe Book, type: :model do
       expect(book.deadline_urgency_class).to eq('')
     end
 
+    it 'リタイア済みの場合は空文字を返す' do
+      book = build(:book, status: :retired, deadline: Date.current)
+      expect(book.deadline_urgency_class).to eq('')
+    end
+
     it '残り8日以上の場合は空文字を返す' do
       book = build(:book, deadline: Date.current + 8)
       expect(book.deadline_urgency_class).to eq('')
@@ -568,6 +599,15 @@ RSpec.describe Book, type: :model do
 
       result = Book.where(user: user).for_index_list
       expect(result.last.id).to eq(book_completed.id)
+      expect(result.first.id).to eq(book_unread.id)
+    end
+
+    it 'リタイア済みの本が最後に表示される（読了本と同様にソートされる）' do
+      book_retired   = create(:book, user: user, deadline: Date.current + 1, status: :retired)
+      book_unread    = create(:book, user: user, deadline: Date.current + 10, status: :unread)
+
+      result = Book.where(user: user).for_index_list
+      expect(result.last.id).to eq(book_retired.id)
       expect(result.first.id).to eq(book_unread.id)
     end
 

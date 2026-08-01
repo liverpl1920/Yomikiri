@@ -12,6 +12,7 @@ ja:
       unread: "未読"
       reading: "読書中"
       completed: "読了"
+      retired: "リタイア"
     category:
       other: "その他"
       literature: "純文学"
@@ -53,6 +54,7 @@ ja:
         deadline: "読了期限"
         status: "ステータス"
         extension_count: "延長回数"
+        retire_reason: "リタイア理由"
       user:
         email: "メールアドレス"
         nickname: "ニックネーム"

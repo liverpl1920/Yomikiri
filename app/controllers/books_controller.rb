@@ -11,7 +11,7 @@ class BooksController < ApplicationController
   MAX_REDIRECTS = 3
 
   before_action :authenticate_user!
-  before_action :set_book, only: [ :show, :edit, :update, :destroy, :update_progress, :update_memo, :complete, :change_deadline, :update_review ]
+  before_action :set_book, only: [ :show, :edit, :update, :destroy, :update_progress, :update_memo, :complete, :change_deadline, :update_review, :retire ]
 
   def index
     @search_params = normalized_index_search_params
@@ -171,6 +171,15 @@ class BooksController < ApplicationController
     @book.errors.add(:base, "読書ログの記録に失敗しました")
     prepare_show_vars
     render :show, status: :unprocessable_entity
+  end
+
+  def retire
+    if @book.update(status: :retired, retire_reason: retire_params[:retire_reason])
+      redirect_to @book, notice: "#{@book.title}をリタイアしました。"
+    else
+      prepare_show_vars
+      render :show, status: :unprocessable_entity
+    end
   end
 
   def destroy
@@ -385,6 +394,10 @@ class BooksController < ApplicationController
 
   def review_params
     params.require(:book).permit(:rating, :review)
+  end
+
+  def retire_params
+    params.permit(:retire_reason)
   end
 
   def normalized_index_search_params

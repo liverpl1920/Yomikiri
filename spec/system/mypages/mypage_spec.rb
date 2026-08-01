@@ -96,6 +96,19 @@ RSpec.describe 'マイページ', type: :system do
       expect(page).to have_text('年間目標')
       expect(page).to have_text('1以上')
     end
+
+    it '更新に失敗した場合でも、登録済みのジャンルが表示されたままであること' do
+      create(:genre, user: user, name: '既存ジャンル')
+      visit mypage_path
+
+      expect(page).to have_text('既存ジャンル')
+
+      fill_in '年間目標（目標冊数）', with: '0'
+      click_button '更新する'
+
+      expect(page).to have_text('既存ジャンル')
+      expect(page).not_to have_text('ジャンルはまだ登録されていません。')
+    end
   end
 
   describe '読書統計' do
@@ -116,6 +129,67 @@ RSpec.describe 'マイページ', type: :system do
       expect(page).to have_text('80 ページ (80.0%)')
       expect(page).to have_text('純文学')
       expect(page).to have_text('20 ページ (20.0%)')
+    end
+  end
+
+  describe 'ジャンル設定', js: true do
+    before do
+      login_as(user, scope: :user)
+    end
+
+    it '登録済みのジャンルが表示される' do
+      genre = create(:genre, user: user, name: '既存ジャンル')
+      visit mypage_path
+
+      expect(page).to have_text('既存ジャンル')
+      expect(page).not_to have_text('ジャンルはまだ登録されていません。')
+    end
+
+    it 'ジャンルが登録されていない場合はメッセージが表示される' do
+      visit mypage_path
+
+      expect(page).to have_text('ジャンルはまだ登録されていません。')
+    end
+
+    it 'ジャンルを新規登録できる' do
+      visit mypage_path
+
+      fill_in 'genre_name_input', with: '新規ジャンル'
+      click_button '追加'
+
+      expect(page).to have_text('新規ジャンル')
+      expect(page).not_to have_text('ジャンルはまだ登録されていません。')
+    end
+
+    it 'ジャンルを編集できる' do
+      genre = create(:genre, user: user, name: '編集前ジャンル')
+      visit mypage_path
+
+      within "#genre_#{genre.id}" do
+        click_link '編集'
+        fill_in 'genre[name]', with: '編集後ジャンル'
+        click_button '保存'
+      end
+
+      expect(page).to have_text('編集後ジャンル')
+      expect(page).not_to have_text('編集前ジャンル')
+    end
+
+    it 'ジャンルを削除できる' do
+      genre = create(:genre, user: user, name: '削除対象ジャンル')
+      visit mypage_path
+
+      expect(page).to have_text('削除対象ジャンル')
+
+      # JS confirm のハンドリング
+      page.accept_confirm '「削除対象ジャンル」を削除しますか？' do
+        within "#genre_#{genre.id}" do
+          click_button '削除'
+        end
+      end
+
+      expect(page).not_to have_text('削除対象ジャンル')
+      expect(page).to have_text('ジャンルはまだ登録されていません。')
     end
   end
 end

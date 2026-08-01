@@ -142,7 +142,7 @@
     <% end %>
 
     <%# 読了ボタン (W-6) %>
-    <% unless @book.completed? || (@book.unread? && @book.deadline.nil?) %>
+    <% unless @book.completed? || @book.retired? || (@book.unread? && @book.deadline.nil?) %>
       <% complete_btn_class = @book.progress_percentage >= 100 ? 'book-show__complete-btn book-show__complete-btn--highlighted' : 'book-show__complete-btn' %>
       <div class="book-show__complete-section">
         <%= button_to '読了にする！', complete_book_path(@book),
@@ -335,6 +335,8 @@
         <dd class="book-show__detail-value">
           <% if @book.completed? %>
             <span class="book-show__quota-done">読了済み</span>
+          <% elsif @book.retired? %>
+            <span class="book-show__quota-done">リタイア</span>
           <% elsif @book.deadline.nil? %>
             <span class="book-show__detail-none">-</span>
           <% elsif @book.overdue? %>
@@ -354,6 +356,13 @@
         <dt class="book-show__detail-label">延長回数</dt>
         <dd class="book-show__detail-value"><%= @book.extension_count %> 回</dd>
       </div>
+
+      <% if @book.retired? %>
+        <div class="book-show__detail-item" style="grid-column: 1 / -1;">
+          <dt class="book-show__detail-label">リタイア理由</dt>
+          <dd class="book-show__detail-value" style="white-space: pre-wrap; font-weight: normal;"><%= @book.retire_reason.presence || "なし" %></dd>
+        </div>
+      <% end %>
     </dl>
 
     <section class="book-show__memo" aria-label="コメント・メモ">
@@ -481,10 +490,16 @@
       <%= link_to '一覧に戻る', books_path, class: 'btn btn--outline' %>
       <%= link_to 'この本をもう一度読む', new_book_path(copy_from_id: @book.id), class: 'btn btn--primary' %>
       <%= link_to '書籍情報を編集する', edit_book_path(@book), class: 'btn btn--outline' %>
-      <% unless @book.completed? || @book.deadline.nil? %>
+      <% unless @book.completed? || @book.retired? || @book.deadline.nil? %>
         <button type="button" class="btn btn--primary"
                 data-action="click->modal#openExtend">
           期限を延長する
+        </button>
+      <% end %>
+      <% unless @book.completed? || @book.retired? || (@book.unread? && @book.deadline.nil?) %>
+        <button type="button" class="btn btn--outline"
+                data-action="click->modal#openRetire">
+          リタイアする
         </button>
       <% end %>
       <button type="button" class="btn btn--danger-ghost"
@@ -659,6 +674,44 @@
           <div class="celebration-modal__form-actions">
             <%= f.submit '評価・感想を保存して一覧に戻る', class: 'btn btn--primary' %>
             <%= link_to '保存せずに一覧に戻る', books_path, class: 'btn btn--outline' %>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  <% end %>
+
+  <%# リタイア確認・理由入力モーダル %>
+  <% unless @book.completed? || @book.retired? %>
+    <div class="modal-overlay"
+         hidden
+         aria-hidden="true"
+         aria-modal="true"
+         role="dialog"
+         aria-labelledby="retire-modal-title"
+         data-modal-target="retireOverlay"
+         data-action="click->modal#closeRetireOnBackdrop">
+      <div class="modal">
+        <h2 class="modal__title" id="retire-modal-title">読書のリタイア</h2>
+        <p class="modal__body">
+          「<span class="modal__book-name"><%= @book.title %></span>」の読書をリタイアしますか？<br>
+          リタイアすると、この本はリタイア状態となり、今日のノルマ計算から除外されます。
+        </p>
+        <%= form_with url: retire_book_path(@book), method: :patch, data: { turbo: false } do |f| %>
+          <div class="modal__field">
+            <label class="modal__label" for="retire_reason">リタイア理由（任意）</label>
+            <%= f.text_area :retire_reason,
+                  id: 'retire_reason',
+                  class: 'modal__input',
+                  rows: 3,
+                  maxlength: 1000,
+                  placeholder: '途中で読むのをやめる理由やメモを残せます（最大1000文字）' %>
+          </div>
+          <div class="modal__actions">
+            <button type="button" class="btn btn--outline"
+                    data-action="click->modal#closeRetire">
+              キャンセル
+            </button>
+            <%= f.submit "リタイアする", class: "btn btn--danger" %>
           </div>
         <% end %>
       </div>
