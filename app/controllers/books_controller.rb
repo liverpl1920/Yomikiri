@@ -53,6 +53,13 @@ class BooksController < ApplicationController
       original_book = current_user.books.find_by(id: params[:copy_from_id])
       if original_book
         @book = original_book.dup
+        @book.read_count = original_book.read_count + 1
+        clean_title = original_book.title.gsub(/\A【\d+度目】/, "")
+        if @book.read_count >= 2
+          @book.title = "【#{@book.read_count}度目】#{clean_title}"
+        else
+          @book.title = clean_title
+        end
         @book.status = :unread
         @book.current_page = 0
         @book.extension_count = 0
@@ -379,7 +386,7 @@ class BooksController < ApplicationController
   end
 
   def book_params
-    permitted = params.require(:book).permit(:title, :author, :genre, :category, :pages, :current_page, :deadline, :status, :cover_image_url, :cover_image, :isbn, :memo, :is_past_reading, :completed_at_input, :translator, :publisher)
+    permitted = params.require(:book).permit(:title, :author, :genre, :category, :pages, :current_page, :deadline, :status, :cover_image_url, :cover_image, :isbn, :memo, :is_past_reading, :completed_at_input, :translator, :publisher, :read_count)
     permitted[:current_page] = 0 if permitted[:current_page].blank?
       permitted
   end

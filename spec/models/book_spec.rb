@@ -863,6 +863,11 @@ RSpec.describe Book, type: :model do
         expect(Book.normalize_title("Ruby on Rails ")).to eq("ruby on rails")
         expect(Book.normalize_title("リーダブルコード")).to eq(Book.normalize_title(" ﾘｰﾀﾞﾌﾞﾙｺｰﾄﾞ "))
       end
+
+      it '【N度目】プレフィックスが除去されて正規化されること' do
+        expect(Book.normalize_title("【2度目】リーダブルコード")).to eq("リーダブルコード")
+        expect(Book.normalize_title("【10度目】Ruby on Rails")).to eq("ruby on rails")
+      end
     end
 
     describe '保存時の自動正規化' do
@@ -897,8 +902,8 @@ RSpec.describe Book, type: :model do
           expect(book2.reading_round).to eq(2)
         end
 
-        it '表示タイトルに回数が付与されること' do
-          expect(book2.display_title).to eq(" ﾘｰﾀﾞﾌﾞﾙｺｰﾄﾞ (2回目)")
+        it '表示タイトルはそのままのタイトルであること' do
+          expect(book2.display_title).to eq(" ﾘｰﾀﾞﾌﾞﾙｺｰﾄﾞ ")
         end
 
         it '前回の本は 1冊目の本であること' do
@@ -911,8 +916,8 @@ RSpec.describe Book, type: :model do
           expect(book3.reading_round).to eq(3)
         end
 
-        it '表示タイトルに回数が付与されること' do
-          expect(book3.display_title).to eq("リーダブルコード(3回目)")
+        it '表示タイトルはそのままのタイトルであること' do
+          expect(book3.display_title).to eq("リーダブルコード")
         end
 
         it '前回の本は 2冊目の本であること' do
@@ -1013,6 +1018,33 @@ RSpec.describe Book, type: :model do
           expect(new_book.next_book_by_id).to be_nil
         end
       end
+    end
+  end
+
+  describe '読了時の read_count 自動設定' do
+    let(:user) { create(:user) }
+
+    it '未読で保存した時は read_count が 0 であること' do
+      book = create(:book, user: user, status: :unread)
+      expect(book.read_count).to eq(0)
+    end
+
+    it '読了で保存した時は read_count が 1 に自動設定されること' do
+      book = create(:book, user: user, status: :completed)
+      expect(book.read_count).to eq(1)
+    end
+
+    it '未読から読了に更新した時に read_count が 0 から 1 に自動設定されること' do
+      book = create(:book, user: user, status: :unread)
+      expect(book.read_count).to eq(0)
+      book.update!(status: :completed)
+      expect(book.reload.read_count).to eq(1)
+    end
+
+    it 'すでに 1 以上の read_count を持つ書籍が completed に更新されても read_count が変更されないこと' do
+      book = create(:book, user: user, status: :unread, read_count: 2)
+      book.update!(status: :completed)
+      expect(book.reload.read_count).to eq(2)
     end
   end
 end

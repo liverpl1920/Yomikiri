@@ -98,8 +98,9 @@ RSpec.describe '重複タイトル登録時の警告と再読記録', type: :sys
       new_book = Book.last
       expect(page).to have_current_path(book_path(new_book))
 
-      # タイトルに(2回目)が表示されること
-      expect(page).to have_text('リーダブルコード(2回目)')
+      # サフィックス表示は廃止され、タイトルはそのまま表示されること
+      expect(page).to have_text('リーダブルコード')
+      expect(page).not_to have_text('リーダブルコード(2回目)')
 
       # 前回リンクが表示され、クリックすると1回目に遷移すること
       expect(page).to have_link('前回（1回目）の読書記録はこちら')
@@ -113,13 +114,13 @@ RSpec.describe '重複タイトル登録時の警告と再読記録', type: :sys
   end
 
   describe '一覧画面での表示' do
-    let!(:book2) { create(:book, user: user, title: 'リーダブルコード', pages: 300, current_page: 0, deadline: Date.current + 7) }
+    let!(:book2) { create(:book, user: user, title: '【2度目】リーダブルコード', pages: 300, current_page: 0, deadline: Date.current + 7, read_count: 2) }
 
     it '再読記録の回数が一覧画面でも表示されること' do
       visit books_path
 
       expect(page).to have_text('リーダブルコード')
-      expect(page).to have_text('リーダブルコード(2回目)')
+      expect(page).to have_text('【2度目】リーダブルコード')
     end
   end
 end
