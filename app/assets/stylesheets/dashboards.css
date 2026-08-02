@@ -284,6 +284,13 @@
   line-height: 1.2;
 }
 
+.dashboard__stat-unit {
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+  color: var(--color-primary);
+  margin-left: 2px;
+}
+
 .dashboard__stat-label {
   font-size: 0.75rem;
   color: var(--color-text-muted);

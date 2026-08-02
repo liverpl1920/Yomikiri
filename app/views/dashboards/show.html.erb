@@ -111,7 +111,9 @@
             <span class="dashboard__stat-label"><%= t('.total_books') %></span>
           </div>
           <div class="dashboard__stat-item">
-            <span class="dashboard__stat-number"><%= @streak_days %></span>
+            <div>
+              <span class="dashboard__stat-number"><%= @streak_days %></span><span class="dashboard__stat-unit"><%= t('streak.unit', count: @streak_days) %></span>
+            </div>
             <span class="dashboard__stat-label"><%= t('.streak') %></span>
           </div>
         </div>

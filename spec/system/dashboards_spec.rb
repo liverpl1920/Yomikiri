@@ -136,6 +136,25 @@ RSpec.describe 'ダッシュボード', type: :system do
           expect(page).not_to have_css('.lookback-card__cover-image')
         end
       end
+
+      it '読書ストリークが表示され、0日の時は「0日」、1日以上の時は「X日連続」と表示されること' do
+        visit dashboard_path
+        within '.dashboard__stats' do
+          expect(page).to have_text("0")
+          expect(page).to have_text("日")
+          expect(page).not_to have_text("日連続")
+        end
+
+        # 今日の読書ログを作成してストリークを1にする
+        book = create(:book, user: user, title: 'テスト本')
+        create(:reading_log, book: book, read_at: Date.current, pages_read: 10)
+
+        visit dashboard_path
+        within '.dashboard__stats' do
+          expect(page).to have_text("1")
+          expect(page).to have_text("日連続")
+        end
+      end
     end
   end
 end

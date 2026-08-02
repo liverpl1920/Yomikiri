@@ -1,4 +1,8 @@
 ja:
+  streak:
+    unit:
+      zero: "日"
+      other: "日連続"
   date:
     formats:
       default: "%Y/%m/%d"

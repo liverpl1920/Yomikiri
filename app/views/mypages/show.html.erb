@@ -114,7 +114,9 @@
           <span class="mypage__stat-label">総読了ページ数</span>
         </div>
         <div class="mypage__stat-item">
-          <span class="mypage__stat-number"><%= current_user.consecutive_reading_days %></span>
+          <div>
+            <span class="mypage__stat-number"><%= current_user.consecutive_reading_days %></span><span class="mypage__stat-unit"><%= t('streak.unit', count: current_user.consecutive_reading_days) %></span>
+          </div>
           <span class="mypage__stat-label">連続読書日数</span>
         </div>
       </div>
