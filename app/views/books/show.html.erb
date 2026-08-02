@@ -164,13 +164,39 @@
       <% if @progress_chart_data.any? { |row| row[:pages_read].positive? } %>
         <% chart_rows = @progress_chart_data %>
         <% max_pages = [@progress_chart_max_pages, 1].max %>
-        <% chart_width = [chart_rows.size * 28, 520].max %>
+        <% chart_width = 520 %>
         <% chart_height = 220 %>
         <% chart_padding = { left: 48, right: 20, top: 16, bottom: 30 } %>
         <% plot_width = chart_width - chart_padding[:left] - chart_padding[:right] %>
         <% plot_height = chart_height - chart_padding[:top] - chart_padding[:bottom] %>
         <% y_ticks = [0, (max_pages / 2.0).ceil, max_pages].uniq.sort.reverse %>
-        <% x_label_indexes = [0, chart_rows.size / 2, chart_rows.size - 1].uniq %>
+        <%
+          step = if chart_rows.size <= 10
+                   1
+                 elsif chart_rows.size <= 20
+                   2
+                 elsif chart_rows.size <= 40
+                   5
+                 elsif chart_rows.size <= 80
+                   7
+                 else
+                   14
+                 end
+
+          x_label_indexes = []
+          (0...chart_rows.size).step(step) do |i|
+            x_label_indexes << i
+          end
+
+          last_idx = chart_rows.size - 1
+          if last_idx > 0 && !x_label_indexes.include?(last_idx)
+            if last_idx - x_label_indexes.last < [step / 2.0, 1].max
+              x_label_indexes.pop
+            end
+            x_label_indexes << last_idx
+          end
+          x_label_indexes.uniq!
+        %>
         <% x_positions = chart_rows.each_index.map do |index|
              if chart_rows.size == 1
                chart_padding[:left] + (plot_width / 2.0)

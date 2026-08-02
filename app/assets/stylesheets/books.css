@@ -1886,6 +1886,14 @@
     padding: var(--spacing-md);
   }
 
+  .book-show__chart-scroll {
+    overflow-x: hidden;
+  }
+
+  .book-show__chart-svg {
+    min-width: 0;
+  }
+
   .book-show__chart-table-wrap {
     max-height: 180px;
   }
