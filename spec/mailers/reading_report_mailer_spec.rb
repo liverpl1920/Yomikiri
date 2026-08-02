@@ -143,4 +143,30 @@ RSpec.describe ReadingReportMailer, type: :mailer do
       expect(mail.body.encoded).to include('向き合い本')
     end
   end
+
+  describe '送信元アドレス' do
+    let(:user) { create(:user) }
+
+    context '環境変数 MAILER_SENDER が設定されていない場合' do
+      before do
+        stub_const('ENV', ENV.to_h.except('MAILER_SENDER'))
+      end
+
+      it 'デフォルト値が noreply@yomikiri-app.com になること' do
+        mail = described_class.weekly_report(user)
+        expect(mail.from).to eq([ 'noreply@yomikiri-app.com' ])
+      end
+    end
+
+    context '環境変数 MAILER_SENDER が設定されている場合' do
+      before do
+        stub_const('ENV', ENV.to_h.merge('MAILER_SENDER' => 'custom-sender@example.com'))
+      end
+
+      it '環境変数の値が設定されること' do
+        mail = described_class.weekly_report(user)
+        expect(mail.from).to eq([ 'custom-sender@example.com' ])
+      end
+    end
+  end
 end
