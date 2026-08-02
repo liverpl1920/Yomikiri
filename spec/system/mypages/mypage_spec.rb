@@ -63,6 +63,27 @@ RSpec.describe 'マイページ', type: :system do
       expect(page).to have_text(I18n.l(Date.current - 1.day, format: :long))
       expect(page).to have_text('記録なし')
     end
+
+    it '連続読書日数（ストリーク）が表示され、0日の時は「0日」、1日以上の時は「X日連続」と表示されること' do
+      login_as(user, scope: :user)
+
+      visit mypage_path
+      within '.mypage__stats' do
+        expect(page).to have_text("0")
+        expect(page).to have_text("日")
+        expect(page).not_to have_text("日連続")
+      end
+
+      # 今日の読書ログを作成してストリークを1にする
+      book = create(:book, user: user, title: 'テスト本')
+      create(:reading_log, book: book, read_at: Date.current, pages_read: 10)
+
+      visit mypage_path
+      within '.mypage__stats' do
+        expect(page).to have_text("1")
+        expect(page).to have_text("日連続")
+      end
+    end
   end
 
   describe 'プロフィール更新' do

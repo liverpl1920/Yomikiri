@@ -1,6 +1,11 @@
 # frozen_string_literal: true
 
 en:
+  streak:
+    unit:
+      zero: "days"
+      one: "day"
+      other: "days streak"
   hello: "Hello world"
   book:
     book_card:

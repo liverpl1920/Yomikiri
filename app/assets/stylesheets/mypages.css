@@ -157,6 +157,13 @@
   line-height: 1;
 }
 
+.mypage__stat-unit {
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  color: var(--color-primary);
+  margin-left: 2px;
+}
+
 .mypage__stat-label {
   font-size: var(--font-size-sm);
   color: var(--color-text-muted);
