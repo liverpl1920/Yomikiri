@@ -119,13 +119,13 @@ RSpec.describe '書籍管理', type: :system do
     before { login_as(user, scope: :user) }
 
     it '詳細画面の「この本をもう一度読む」リンクから値が引き継がれた新規登録画面に遷移し、新しく登録できること' do
-      original_book = create(:book, user: user, title: 'コピー元の本', author: '著者A', genre: 'IT', category: :technical, pages: 300)
+      original_book = create(:book, user: user, title: 'コピー元の本', author: '著者A', genre: 'IT', category: :technical, pages: 300, status: :completed)
 
       visit book_path(original_book)
       click_link 'この本をもう一度読む'
 
       expect(page).to have_current_path(new_book_path(copy_from_id: original_book.id))
-      expect(find_field('タイトル').value).to eq('コピー元の本')
+      expect(find_field('タイトル').value).to eq('【2度目】コピー元の本')
       expect(find_field('著者').value).to eq('著者A')
       expect(find_field('ジャンル').value).to eq('IT')
       expect(find_field('種類').value).to eq('technical')
@@ -134,7 +134,7 @@ RSpec.describe '書籍管理', type: :system do
       fill_in '読了期限', with: (Date.current + 7).strftime('%Y-%m-%d')
       click_button '登録する'
 
-      expect(page).to have_text('コピー元の本')
+      expect(page).to have_text('【2度目】コピー元の本')
       expect(page).to have_text('著者A')
       expect(page).to have_text('技術書')
       expect(page).to have_text('未読')

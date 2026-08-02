@@ -57,6 +57,7 @@ class Book < ApplicationRecord
   before_validation :set_normalized_title
   before_save :auto_set_reading_status
   before_save :apply_past_reading_settings
+  before_save :set_initial_read_count_on_completion
   after_create :create_reading_log_for_past_reading, if: :past_reading_checked?
 
   def extend_deadline!(new_deadline)
@@ -176,7 +177,8 @@ class Book < ApplicationRecord
   end
 
   def self.normalize_title(val)
-    val.to_s.unicode_normalize(:nfkc).gsub(/[[:space:]]+/, " ").strip.downcase
+    clean = val.to_s.gsub(/\A【\d+度目】/, "")
+    clean.unicode_normalize(:nfkc).gsub(/[[:space:]]+/, " ").strip.downcase
   end
 
   def normalize_title(val)
@@ -195,12 +197,7 @@ class Book < ApplicationRecord
   end
 
   def display_title
-    round = reading_round
-    if round > 1
-      "#{title}(#{round}回目)"
-    else
-      title
-    end
+    title
   end
 
   def previous_book
@@ -322,6 +319,12 @@ class Book < ApplicationRecord
     return if current_page.to_i.zero?
 
     self.status = :reading
+  end
+
+  def set_initial_read_count_on_completion
+    if completed? && read_count.zero?
+      self.read_count = 1
+    end
   end
 
   def create_reading_log_for_past_reading

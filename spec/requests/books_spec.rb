@@ -288,11 +288,32 @@ RSpec.describe 'Books', type: :request do
                    memo_updated_at: Time.current)
           end
 
+          it 'read_countが+1カウントアップされ、タイトルにプレフィックスが自動付与されること' do
+            get new_book_path(copy_from_id: original_book.id)
+            expect(response).to have_http_status(:ok)
+
+            book_in_view = controller.instance_variable_get(:@book)
+            expect(book_in_view.read_count).to eq(2)
+            expect(book_in_view.title).to eq('【2度目】コピー元の本')
+            expect(response.body).to include('【2度目】コピー元の本')
+          end
+
+          it 'すでにプレフィックスがある場合、古いプレフィックスを除去して新しいプレフィックスが付与されること' do
+            original_book.update_columns(title: '【2度目】コピー元の本', read_count: 2)
+            get new_book_path(copy_from_id: original_book.id)
+            expect(response).to have_http_status(:ok)
+
+            book_in_view = controller.instance_variable_get(:@book)
+            expect(book_in_view.read_count).to eq(3)
+            expect(book_in_view.title).to eq('【3度目】コピー元の本')
+            expect(response.body).to include('【3度目】コピー元の本')
+          end
+
           it '200を返し、コピー元の属性が初期値としてフォームに含まれていること' do
             get new_book_path(copy_from_id: original_book.id)
             expect(response).to have_http_status(:ok)
 
-            expect(response.body).to include('コピー元の本')
+            expect(response.body).to include('【2度目】コピー元の本')
             expect(response.body).to include('著者A')
             expect(response.body).to include('IT')
             expect(response.body).to include('300')
