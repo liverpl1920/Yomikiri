@@ -1,2 +1,9 @@
 <%# ジャンル削除成功時: ジャンル行をリストから除去 %>
 <%= turbo_stream.remove "genre_#{@genre_id}" %>
+
+<% if current_user.genres.empty? %>
+  <%= turbo_stream.remove "genre-list" %>
+  <%= turbo_stream.after "genre-add-form-container" do %>
+    <p class="mypage__genre-empty" id="genre-list-empty">ジャンルはまだ登録されていません。</p>
+  <% end %>
+<% end %>

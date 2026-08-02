@@ -241,6 +241,11 @@
   color: #15803d;
 }
 
+.book-card__status--retired {
+  background-color: #e5e7eb;
+  color: #374151;
+}
+
 .book-card__rating {
   display: flex;
   align-items: center;
@@ -498,6 +503,11 @@
 .book-show__status--completed {
   background-color: #dcfce7;
   color: #15803d;
+}
+
+.book-show__status--retired {
+  background-color: #e5e7eb;
+  color: #374151;
 }
 
 /* ---- 進捗バー ---- */
@@ -1021,6 +1031,17 @@
 .book-card--completed:hover {
   opacity: 0.9;
   filter: grayscale(0%);
+}
+
+/* ---- リタイアカード ---- */
+.book-card--retired {
+  opacity: 0.65;
+  filter: grayscale(50%);
+}
+
+.book-card--retired:hover {
+  opacity: 0.85;
+  filter: grayscale(20%);
 }
 
 /* ---- 読了お祝いモーダル (W-13) ---- */

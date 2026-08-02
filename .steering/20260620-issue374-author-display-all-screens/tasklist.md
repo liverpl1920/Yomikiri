@@ -26,11 +26,24 @@
 
 ## フェーズ5: コミット・プッシュ・PR作成
 
-- [ ] `git add .`
-- [ ] `git commit -m "feat: 全画面で著者省略表示を統一適用 (#374)"`
-- [ ] `git push origin feature/#374-author-display-all-screens`
-- [ ] `gh pr create` でPR作成
+- [x] `git add .`
+- [x] `git commit -m "feat: 全画面で著者複数人の省略表示を統一適用 (#374)"`
+- [x] `git push origin feature/#374-author-display-all-screens`
+- [x] `gh pr create` でPR作成（PR #377）
 
 ## 振り返り
 
-（完了後に記載）
+### 実装完了日
+2026-06-20
+
+### 計画と実績の差分
+
+**計画と異なった点**: なし（計画通り実装完了）
+
+**新たに必要になったタスク**: なし
+
+### 学んだこと
+
+- Issue #361 にてヘルパーが実装済みだったため、各ビューの置換のみで実装完了できた
+- `BooksHelper` は Rails の Helper 機能により全コントローラーで自動 include されるため、追加の include 不要
+- RSpec 801 examples, 0 failures（カバレッジ 95.3%）で全テスト通過を確認

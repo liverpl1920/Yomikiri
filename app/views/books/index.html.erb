@@ -173,7 +173,7 @@
         <ul class="book-list" aria-label="積読一覧">
           <% @books.each do |book| %>
           <li class="book-list__item">
-              <%= link_to book_path(book), class: "book-card#{' book-card--completed' if book.completed?}" do %>
+              <%= link_to book_path(book), class: "book-card#{' book-card--completed' if book.completed?}#{' book-card--retired' if book.retired?}" do %>
                 <%# 書影 %>
                 <div class="book-card__cover-wrapper">
                   <div class="book-card__cover <%= book.deadline_urgency_class %>">
@@ -269,7 +269,7 @@
                   </div>
 
                   <%# 今日のノルマ %>
-                  <% unless book.completed? %>
+                  <% unless book.completed? || book.retired? %>
                     <div class="book-card__quota">
                       <span class="book-card__quota-label">今日のノルマ</span>
                       <% if book.overdue? %>

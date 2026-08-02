@@ -10,7 +10,7 @@ class Book < ApplicationRecord
 
   attr_accessor :is_past_reading, :completed_at_input
 
-  enum :status, { unread: 0, reading: 1, completed: 2 }
+  enum :status, { unread: 0, reading: 1, completed: 2, retired: 3 }
   enum :category, {
     other: 0,
     literature: 1,
@@ -36,6 +36,7 @@ class Book < ApplicationRecord
   validates :memo, length: { maximum: MEMO_MAX_LENGTH }, allow_blank: true
   validates :rating, numericality: { in: 1..5, only_integer: true }, allow_nil: true
   validates :review, length: { maximum: 1000 }, allow_blank: true
+  validates :retire_reason, length: { maximum: 1000 }, allow_blank: true
   validates :cover_image_url, length: { maximum: 2048 }, allow_blank: true
   validates :isbn, length: { maximum: 13 }, format: { with: /\A(?:\d{13}|\d{9}[\dX])\z/, message: :invalid }, allow_blank: true
   validates :genre, length: { maximum: 100 }, allow_blank: true
@@ -79,22 +80,28 @@ class Book < ApplicationRecord
     translator.to_s.split(/[,，]/).map(&:strip).reject(&:blank?)
   end
 
-  # 積読一覧用ソートスコープ：未了本を期限順 → 読了本を読了日の新しい順
+  # 積読一覧用ソートスコープ：未了本を期限順 → 読了・リタイア本を更新日または読了日の新しい順
   scope :for_index_list, lambda {
     completed_val = statuses[:completed]
+    retired_val = statuses[:retired]
     status_col = arel_table[:status]
     deadline_col = arel_table[:deadline]
     completed_at_col = arel_table[:completed_at]
+    updated_at_col = arel_table[:updated_at]
 
-    # 1次ソート：未了本(0) → 読了本(1)
-    group_order = Arel::Nodes::Case.new.when(status_col.eq(completed_val)).then(1).else(0)
+    # 1次ソート：未了本(0) → 読了・リタイア本(1)
+    group_order = Arel::Nodes::Case.new.when(status_col.in([ completed_val, retired_val ])).then(1).else(0)
 
-    # 2次ソート：未了本は deadline 昇順、読了本は completed_at 降順のキーを CASE で切り替え
-    # 読了本には deadline を NULL 相当に、未了本には completed_at を NULL 相当にする
-    deadline_key = Arel::Nodes::Case.new.when(status_col.eq(completed_val)).then(nil).else(deadline_col)
-    completed_at_desc_key = Arel::Nodes::Case.new.when(status_col.eq(completed_val)).then(completed_at_col).else(nil)
+    # 2次ソート：未了本は deadline 昇順、完了・リタイア本は deadline を NULL 相当にする
+    deadline_key = Arel::Nodes::Case.new.when(status_col.in([ completed_val, retired_val ])).then(nil).else(deadline_col)
 
-    order(group_order, deadline_key.asc.nulls_last, completed_at_desc_key.desc.nulls_last)
+    # 読了・リタイア本のソートキー：読了本は completed_at、リタイア本は updated_at を使用
+    completed_or_retired_desc_key = Arel::Nodes::Case.new
+                                         .when(status_col.eq(completed_val)).then(completed_at_col)
+                                         .when(status_col.eq(retired_val)).then(updated_at_col)
+                                         .else(nil)
+
+    order(group_order, deadline_key.asc.nulls_last, completed_or_retired_desc_key.desc.nulls_last)
   }
 
   scope :title_like, ->(query) { where("title ILIKE ?", "%#{sanitize_sql_like(query)}%") }
@@ -121,7 +128,7 @@ class Book < ApplicationRecord
   # 今日のノルマ（残ページ ÷ 残日数、切り上げ）
   # 期限超過時（D <= 0）は D=1 として計算する
   def daily_quota
-    return 0 if completed? || deadline.nil?
+    return 0 if completed? || retired? || deadline.nil?
 
     remaining = pages - current_page
     return 0 if remaining <= 0
@@ -154,7 +161,7 @@ class Book < ApplicationRecord
 
   # 賞味期限ビジュアライザー用CSSクラス
   def deadline_urgency_class
-    return "" if completed? || deadline.nil?
+    return "" if completed? || retired? || deadline.nil?
 
     days = days_remaining
     if days <= 1

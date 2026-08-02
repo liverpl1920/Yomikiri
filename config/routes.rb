@@ -31,6 +31,7 @@ Rails.application.routes.draw do
       patch :change_deadline
       patch :complete
       patch :update_review
+      patch :retire
     end
   end
 

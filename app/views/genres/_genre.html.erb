@@ -1,6 +1,6 @@
 <%# ジャンル1件の表示行 %>
 <%= turbo_frame_tag dom_id(genre) do %>
-  <li class="genre-list__item" id="<%= dom_id(genre) %>">
+  <li class="genre-list__item">
     <span class="genre-list__name"><%= genre.name %></span>
     <div class="genre-list__actions">
       <%= link_to "編集",
