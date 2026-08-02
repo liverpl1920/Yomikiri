@@ -146,6 +146,7 @@ RSpec.describe 'マイページ', type: :system do
     end
 
     it 'ジャンルが登録されていない場合はメッセージが表示される' do
+      user.genres.destroy_all
       visit mypage_path
 
       expect(page).to have_text('ジャンルはまだ登録されていません。')
@@ -176,6 +177,7 @@ RSpec.describe 'マイページ', type: :system do
     end
 
     it 'ジャンルを削除できる' do
+      user.genres.destroy_all
       genre = create(:genre, user: user, name: '削除対象ジャンル')
       visit mypage_path
 
