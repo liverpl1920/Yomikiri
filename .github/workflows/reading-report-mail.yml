@@ -15,6 +15,13 @@ jobs:
     env:
       RAILS_ENV: production
       RAILS_MASTER_KEY: ${{ secrets.RAILS_MASTER_KEY }}
+      DATABASE_URL: ${{ secrets.DATABASE_URL }}
+      SENDGRID_API_KEY: ${{ secrets.SENDGRID_API_KEY }}
+      B2_ACCESS_KEY_ID: "dummy"
+      B2_SECRET_ACCESS_KEY: "dummy"
+      B2_REGION: "dummy"
+      B2_BUCKET: "dummy"
+      B2_ENDPOINT: "https://dummy.example.com"
 
     steps:
       - uses: actions/checkout@v4
