@@ -624,7 +624,15 @@
 /* ---- アクションボタン ---- */
 .book-show__actions {
   display: flex;
+  flex-direction: column;
   gap: var(--spacing-md);
+}
+
+.book-show__actions-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-sm);
+  align-items: center;
 }
 
 /* ---- コメント・メモ ---- */
@@ -786,6 +794,15 @@
 @media (max-width: 640px) {
   .book-show__details {
     grid-template-columns: 1fr;
+  }
+
+  .book-show__actions-group {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .book-show__actions-group .btn {
+    width: 100%;
   }
 }
 
