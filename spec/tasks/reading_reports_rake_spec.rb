@@ -61,4 +61,40 @@ RSpec.describe 'reading_reports:dispatch' do
 
     expect(ReadingReportDispatchJob).not_to have_received(:perform_now)
   end
+
+  it 'DATE 環境変数が存在しない場合、デフォルトで現在日付を基準日として実行する' do
+    allow(ReadingReportDispatchJob).to receive(:perform_now)
+    current_date = Date.current
+
+    Rake::Task['reading_reports:dispatch'].invoke
+
+    if current_date.saturday? || current_date.sunday?
+      expect(ReadingReportDispatchJob).to have_received(:perform_now).with('weekly', current_date)
+    end
+    if current_date.day == 1
+      expect(ReadingReportDispatchJob).to have_received(:perform_now).with('monthly', current_date)
+    end
+  end
+
+  it 'DATE 環境変数が空文字列の場合、デフォルトで現在日付を基準日として実行する' do
+    ENV['DATE'] = ''
+    allow(ReadingReportDispatchJob).to receive(:perform_now)
+    current_date = Date.current
+
+    Rake::Task['reading_reports:dispatch'].invoke
+
+    if current_date.saturday? || current_date.sunday?
+      expect(ReadingReportDispatchJob).to have_received(:perform_now).with('weekly', current_date)
+    end
+    if current_date.day == 1
+      expect(ReadingReportDispatchJob).to have_received(:perform_now).with('monthly', current_date)
+    end
+  end
+
+  it '不正なフォーマットの DATE 環境変数が与えられた場合、ArgumentError を発生させる' do
+    ENV['DATE'] = 'invalid-date'
+    expect {
+      Rake::Task['reading_reports:dispatch'].invoke
+    }.to raise_error(ArgumentError, /Invalid DATE format: invalid-date/)
+  end
 end

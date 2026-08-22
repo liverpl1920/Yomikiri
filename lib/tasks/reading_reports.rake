@@ -34,8 +34,13 @@ namespace :reading_reports do
   end
 
   def parse_reference_date
-    Date.parse(ENV.fetch("DATE", Date.current.to_s))
-  rescue ArgumentError
+    date_str = ENV["DATE"].presence
+    if date_str
+      Date.parse(date_str)
+    else
+      Date.current
+    end
+  rescue ArgumentError, Date::Error
     raise ArgumentError, "Invalid DATE format: #{ENV['DATE']}"
   end
 end
